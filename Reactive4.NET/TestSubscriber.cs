@@ -18,8 +18,6 @@ namespace Reactive4.NET
 
         long completions;
 
-        bool hasSubscribed;
-
         long requested;
 
         long valueCount;
@@ -120,10 +118,10 @@ namespace Reactive4.NET
                         Cancel();
                         throw fail("Timeout!");
                     }
-                } catch (ObjectDisposedException ex)
+                } catch (ObjectDisposedException)
                 {
                     Cancel();
-                    throw ex;
+                    throw;
                 }
             }
             return this;

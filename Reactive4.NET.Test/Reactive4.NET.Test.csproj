@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Executors.cs" />
     <Compile Include="FlowableEmptyTck.cs" />
     <Compile Include="FlowableArrayTck.cs" />
     <Compile Include="FlowableFlatMap1Tck.cs" />

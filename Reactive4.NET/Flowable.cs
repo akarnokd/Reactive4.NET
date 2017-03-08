@@ -406,6 +406,26 @@ namespace Reactive4.NET
             return new FlowableFlatMap<T, R>(source, mapper, maxConcurrency, bufferSize);
         }
 
+        public static IFlowable<T> SubscribeOn<T>(this IFlowable<T> source, bool requestOn = true)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> ObserveOn<T>(this IFlowable<T> source, IExecutorService executor)
+        {
+            return ObserveOn(source, executor, BufferSize());
+        }
+
+        public static IFlowable<T> ObserveOn<T>(this IFlowable<T> source, IExecutorService executor, int bufferSize)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> Delay<T>(this IFlowable<T> source, TimeSpan delay, IExecutorService executor)
+        {
+            throw new NotImplementedException();
+        }
+
         // ********************************************************************************
         // Consumer methods
         // ********************************************************************************

@@ -44,7 +44,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BackpressureStrategy.cs" />
+    <Compile Include="Executors.cs" />
     <Compile Include="Flowable.cs" />
+    <Compile Include="ICompositeDisposable.cs" />
+    <Compile Include="IExecutorService.cs" />
     <Compile Include="IFlowableAPI.cs" />
     <Compile Include="IFlowableEmitter.cs" />
     <Compile Include="IGeneratorEmitter.cs" />
@@ -57,9 +60,15 @@
     <Compile Include="operators\FlowableJust.cs" />
     <Compile Include="operators\FlowableArray.cs" />
     <Compile Include="operators\FlowableRange.cs" />
+    <Compile Include="schedulers\ImmediateExecutorService.cs" />
+    <Compile Include="schedulers\TaskExecutorService.cs" />
+    <Compile Include="TestExecutor.cs" />
+    <Compile Include="utils\DisposableHelper.cs" />
     <Compile Include="utils\ExceptionHelper.cs" />
     <Compile Include="utils\FusionHelper.cs" />
     <Compile Include="subscribers\StrictSubscriber.cs" />
+    <Compile Include="utils\SchedulerHelper.cs" />
+    <Compile Include="utils\SetCompositeDisposable.cs" />
     <Compile Include="utils\SpscArrayQueue.cs" />
     <Compile Include="utils\SubscriptionHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -6,15 +6,15 @@ namespace Reactive4.NET.operators
 {
     internal static class SubscriptionHelper
     {
-        internal static readonly CancelledSubscription CANCELLED = new CancelledSubscription();
+        internal static readonly CancelledSubscription Cancelled = new CancelledSubscription();
 
         internal static bool Cancel(ref ISubscription field)
         {
             var current = Volatile.Read(ref field);
-            if (current != CANCELLED)
+            if (current != Cancelled)
             {
-                current = Interlocked.Exchange(ref field, CANCELLED);
-                if (current != CANCELLED)
+                current = Interlocked.Exchange(ref field, Cancelled);
+                if (current != Cancelled)
                 {
                     current?.Cancel();
                     return true;
@@ -25,7 +25,7 @@ namespace Reactive4.NET.operators
 
         internal static bool IsCancelled(ref ISubscription field)
         {
-            return Volatile.Read(ref field) == CANCELLED;
+            return Volatile.Read(ref field) == Cancelled;
         }
 
         internal static long AddRequest(ref long requested, long n)
@@ -60,7 +60,7 @@ namespace Reactive4.NET.operators
             {
                 return true;
             }
-            if (current != CANCELLED)
+            if (current != Cancelled)
             {
                 throw new InvalidOperationException("ISubscription already set!");
             }
