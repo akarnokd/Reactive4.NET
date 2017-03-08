@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Reactive.Streams;
+using Reactive4.NET.subscribers;
 
 namespace Reactive4.NET
 {
@@ -406,9 +407,9 @@ namespace Reactive4.NET
             return new FlowableFlatMap<T, R>(source, mapper, maxConcurrency, bufferSize);
         }
 
-        public static IFlowable<T> SubscribeOn<T>(this IFlowable<T> source, bool requestOn = true)
+        public static IFlowable<T> SubscribeOn<T>(this IFlowable<T> source, IExecutorService executor, bool requestOn = true)
         {
-            throw new NotImplementedException();
+            return new FlowableSubscribeOn<T>(source, executor, requestOn);
         }
 
         public static IFlowable<T> ObserveOn<T>(this IFlowable<T> source, IExecutorService executor)
@@ -421,7 +422,62 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
+        public static IFlowable<T> RebatchRequests<T>(this IFlowable<T> source, int batchSize)
+        {
+            return ObserveOn(source, Executors.Immediate, batchSize);
+        }
+
+        public static IFlowable<T> Delay<T>(this IFlowable<T> source, TimeSpan delay)
+        {
+            return Delay(source, delay, Executors.Computation);
+        }
+
         public static IFlowable<T> Delay<T>(this IFlowable<T> source, TimeSpan delay, IExecutorService executor)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<R> ConcatMap<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper)
+        {
+            return ConcatMap(source, mapper, 2);
+        }
+
+        public static IFlowable<R> ConcatMap<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper, int prefetch)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<R> ConcatMapEager<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper)
+        {
+            return ConcatMapEager(source, mapper, BufferSize());
+        }
+
+        public static IFlowable<R> ConcatMapEager<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper, int prefetch)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> Hide<T>(this IFlowable<T> source)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> Distinct<T>(this IFlowable<T> source)
+        {
+            return Distinct(source, EqualityComparer<T>.Default);
+        }
+
+        public static IFlowable<T> Distinct<T>(this IFlowable<T> source, IEqualityComparer<T> comparer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> DistinctUntilChanged<T>(this IFlowable<T> source)
+        {
+            return DistinctUntilChanged(source, EqualityComparer<T>.Default);
+        }
+
+        public static IFlowable<T> DistinctUntilChanged<T>(this IFlowable<T> source, IEqualityComparer<T> comparer)
         {
             throw new NotImplementedException();
         }
@@ -432,22 +488,30 @@ namespace Reactive4.NET
 
         public static IDisposable Subscribe<T>(this IFlowable<T> source)
         {
-            throw new NotImplementedException();
+            return Subscribe(source, v => { }, e => { }, () => { });
         }
 
         public static IDisposable Subscribe<T>(this IFlowable<T> source, Action<T> onNext)
         {
-            throw new NotImplementedException();
+            return Subscribe(source, onNext, e => { }, () => { });
         }
 
-        public static IDisposable Subscribe<T>(this IFlowable<T> source, Action<T> onNext, Action<T> onError)
+        public static IDisposable Subscribe<T>(this IFlowable<T> source, Action<T> onNext, Action<Exception> onError)
         {
-            throw new NotImplementedException();
+            return Subscribe(source, onNext, onError, () => { });
         }
 
-        public static IDisposable Subscribe<T>(this IFlowable<T> source, Action<T> onNext, Action<T> onError, Action onComplete)
+        public static IDisposable Subscribe<T>(this IFlowable<T> source, Action<T> onNext, Action<Exception> onError, Action onComplete)
         {
-            throw new NotImplementedException();
+            var s = new ActionSubscriber<T>(onNext, onError, onComplete);
+            source.Subscribe(s);
+            return s;
+        }
+
+        public static S SubscribeWith<T, S>(this IFlowable<T> source, S subscriber) where S : ISubscriber<T>
+        {
+            source.Subscribe(subscriber);
+            return subscriber;
         }
 
         public static Task<T> FirstTask<T>(this IFlowable<T> source)
@@ -469,14 +533,18 @@ namespace Reactive4.NET
         // Blocking operators
         // ********************************************************************************
 
-        public static T BlockingFirst<T>(this IFlowable<T> source)
+        public static bool BlockingFirst<T>(this IFlowable<T> source, out T result)
         {
-            throw new NotImplementedException();
+            var s = new BlockingFirstSubscriber<T>();
+            source.Subscribe(s);
+            return s.BlockingGet(out result);
         }
 
-        public static T BlockingLast<T>(this IFlowable<T> source)
+        public static bool BlockingLast<T>(this IFlowable<T> source, out T result)
         {
-            throw new NotImplementedException();
+            var s = new BlockingLastSubscriber<T>();
+            source.Subscribe(s);
+            return s.BlockingGet(out result);
         }
 
         public static IEnumerable<T> BlockingEnumerable<T>(this IFlowable<T> source)

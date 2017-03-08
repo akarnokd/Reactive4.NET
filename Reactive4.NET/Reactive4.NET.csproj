@@ -60,8 +60,13 @@
     <Compile Include="operators\FlowableJust.cs" />
     <Compile Include="operators\FlowableArray.cs" />
     <Compile Include="operators\FlowableRange.cs" />
+    <Compile Include="operators\FlowableSubscribeOn.cs" />
     <Compile Include="schedulers\ImmediateExecutorService.cs" />
     <Compile Include="schedulers\TaskExecutorService.cs" />
+    <Compile Include="subscribers\AbstractBlockingSubscriber.cs" />
+    <Compile Include="subscribers\ActionSubscriber.cs" />
+    <Compile Include="subscribers\BlockingLastSubscriber.cs" />
+    <Compile Include="subscribers\BlockingFirstSubscriber.cs" />
     <Compile Include="TestExecutor.cs" />
     <Compile Include="utils\DisposableHelper.cs" />
     <Compile Include="utils\ExceptionHelper.cs" />

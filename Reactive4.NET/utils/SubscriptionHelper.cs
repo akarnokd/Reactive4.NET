@@ -28,6 +28,11 @@ namespace Reactive4.NET.operators
             return Volatile.Read(ref field) == Cancelled;
         }
 
+        internal static void LazySetCancel(ref ISubscription field)
+        {
+            Volatile.Write(ref field, Cancelled);
+        }
+
         internal static long AddRequest(ref long requested, long n)
         {
             for (;;)

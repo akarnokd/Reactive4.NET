@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Reactive4.NET.Test
 {
     [TestFixture]
-    class Executors
+    class ExecutorsTest
     {
         [Test]
         public void periodic()

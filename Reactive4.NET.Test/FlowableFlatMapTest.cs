@@ -5,7 +5,7 @@ using System.Linq;
 namespace Reactive4.NET.Test
 {
     [TestFixture]
-    public class FlowableFlatMap
+    public class FlowableFlatMapTest
     {
         [Test]
         public void Simple()
