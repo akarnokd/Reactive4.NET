@@ -419,7 +419,7 @@ namespace Reactive4.NET
 
         public static IFlowable<T> ObserveOn<T>(this IFlowable<T> source, IExecutorService executor, int bufferSize)
         {
-            throw new NotImplementedException();
+            return new FlowableObserveOn<T>(source, executor, bufferSize);
         }
 
         public static IFlowable<T> RebatchRequests<T>(this IFlowable<T> source, int batchSize)

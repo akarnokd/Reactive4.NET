@@ -59,6 +59,7 @@
     <Compile Include="operators\FlowableFromPublisher.cs" />
     <Compile Include="operators\FlowableJust.cs" />
     <Compile Include="operators\FlowableArray.cs" />
+    <Compile Include="operators\FlowableObserveOn.cs" />
     <Compile Include="operators\FlowableRange.cs" />
     <Compile Include="operators\FlowableSubscribeOn.cs" />
     <Compile Include="schedulers\ImmediateExecutorService.cs" />

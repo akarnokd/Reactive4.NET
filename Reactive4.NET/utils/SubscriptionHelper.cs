@@ -54,6 +54,29 @@ namespace Reactive4.NET.operators
             }
         }
 
+        internal static bool Validate(long n)
+        {
+            if (n <= 0)
+            {
+                throw new ArgumentOutOfRangeException("n > 0 required but it was " + n);
+            }
+            return true;
+        }
+
+        internal static bool Validate(ref ISubscription subscription, ISubscription next)
+        {
+            if (next == null)
+            {
+                throw new ArgumentNullException(nameof(next));
+            }
+            if (subscription != null)
+            {
+                throw new InvalidOperationException("ISubscription already set!");
+            }
+            subscription = next;
+            return true;
+        }
+
         internal static bool SetOnce(ref ISubscription subscription, ISubscription next)
         {
             if (next == null)
