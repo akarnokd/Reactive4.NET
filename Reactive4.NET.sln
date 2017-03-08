@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reactive4.NET", "Reactive4.NET\Reactive4.NET.csproj", "{0979DB2E-0955-44B9-8B2B-8128A65D00A3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reactive4.NET.Test", "Reactive4.NET.Test\Reactive4.NET.Test.csproj", "{95B0864D-8BA5-478C-B03B-437612884A43}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{0979DB2E-0955-44B9-8B2B-8128A65D00A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0979DB2E-0955-44B9-8B2B-8128A65D00A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0979DB2E-0955-44B9-8B2B-8128A65D00A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95B0864D-8BA5-478C-B03B-437612884A43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95B0864D-8BA5-478C-B03B-437612884A43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95B0864D-8BA5-478C-B03B-437612884A43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95B0864D-8BA5-478C-B03B-437612884A43}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

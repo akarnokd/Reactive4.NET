@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Reactive4.NET
 {
-    public class Class1
+    public enum BackpressureStrategy
     {
+        MISSING,
+        ERROR,
+        BUFFER,
+        LATEST
     }
 }
