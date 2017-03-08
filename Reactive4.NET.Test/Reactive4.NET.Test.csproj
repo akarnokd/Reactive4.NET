@@ -53,9 +53,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FlowableEmptyTck.cs" />
+    <Compile Include="FlowableArrayTck.cs" />
+    <Compile Include="FlowableFlatMap1Tck.cs" />
+    <Compile Include="FlowableFlatMap3Tck.cs" />
+    <Compile Include="FlowableFlatMap2Tck.cs" />
+    <Compile Include="FlowableRangeTck.cs" />
     <Compile Include="FlowableJustTck.cs" />
     <Compile Include="FlowableVerification.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="FlowableFlatMap.cs" />
     <Compile Include="UnitTest1.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Threading;
 using Reactive.Streams;
+using Reactive4.NET.utils;
 
 namespace Reactive4.NET.operators
 {
-    sealed class StrictSubscriber<T> : IFlowableSubscriber<T>, ISubscription
+    internal sealed class StrictSubscriber<T> : IFlowableSubscriber<T>, ISubscription
     {
-        static readonly Exception DefaultError = new Exception("ISubscriber already terminated");
-
         readonly ISubscriber<T> actual;
 
         int wip;
@@ -34,7 +33,7 @@ namespace Reactive4.NET.operators
         {
             if (Interlocked.Increment(ref wip) == 1)
             {
-                var ex = Interlocked.Exchange(ref error, DefaultError);
+                var ex = Interlocked.Exchange(ref error, ExceptionHelper.Terminated);
                 if (ex == null)
                 {
                     actual.OnComplete();
@@ -62,7 +61,7 @@ namespace Reactive4.NET.operators
                 actual.OnNext(t);
                 if (Interlocked.CompareExchange(ref wip, 0, 1) != 1)
                 {
-                    var ex = Interlocked.Exchange(ref error, DefaultError);
+                    var ex = Interlocked.Exchange(ref error, ExceptionHelper.Terminated);
                     if (ex == null)
                     {
                         actual.OnComplete();
@@ -92,7 +91,7 @@ namespace Reactive4.NET.operators
             if (n <= 0L)
             {
                 upstream.Cancel();
-                OnError(new InvalidOperationException("§3.9 violated: non-positive request received"));
+                OnError(new ArgumentException("§3.9 violated: non-positive request received"));
             } else
             {
                 SubscriptionHelper.DeferredRequest(ref upstream, ref requested, n);

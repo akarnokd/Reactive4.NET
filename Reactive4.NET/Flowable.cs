@@ -92,7 +92,7 @@ namespace Reactive4.NET
 
         public static IFlowable<T> Empty<T>()
         {
-            throw new NotImplementedException();
+            return FlowableEmpty<T>.Instance;
         }
 
         public static IFlowable<T> Never<T>()
@@ -142,12 +142,17 @@ namespace Reactive4.NET
 
         public static IFlowable<T> FromArray<T>(params T[] items)
         {
-            throw new NotImplementedException();
+            return new FlowableArray<T>(items);
         }
 
         public static IFlowable<T> FromEnumerable<T>(IEnumerable<T> items)
         {
             throw new NotImplementedException();
+        }
+
+        public static IFlowable<int> Range(int start, int count)
+        {
+            return new FlowableRange(start, start + count);
         }
 
         // ********************************************************************************
@@ -301,6 +306,11 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
+        public static IFlowable<R> MapAsync<T, U, R>(this IFlowable<T> source, Func<T, IPublisher<U>> mapper, Func<T, U, R> resultMapper)
+        {
+            throw new NotImplementedException();
+        }
+
         public static IFlowable<T> Filter<T>(this IFlowable<T> source, Func<T, bool> predicate)
         {
             throw new NotImplementedException();
@@ -374,6 +384,26 @@ namespace Reactive4.NET
         public static IFlowable<long> MinLong(this IFlowable<long> source)
         {
             throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> IgnoreElements<T>(this IFlowable<T> source)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<R> FlatMap<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper)
+        {
+            return FlatMap(source, mapper, BufferSize(), BufferSize());
+        }
+
+        public static IFlowable<R> FlatMap<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper, int maxConcurrency)
+        {
+            return FlatMap(source, mapper, maxConcurrency, BufferSize());
+        }
+
+        public static IFlowable<R> FlatMap<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper, int maxConcurrency, int bufferSize)
+        {
+            return new FlowableFlatMap<T, R>(source, mapper, maxConcurrency, bufferSize);
         }
 
         // ********************************************************************************

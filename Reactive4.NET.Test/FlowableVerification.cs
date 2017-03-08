@@ -12,7 +12,7 @@ namespace Reactive4.NET.Test
     [TestFixture]
     abstract class FlowableVerification<T> : PublisherVerification<T>
     {
-        protected FlowableVerification() : base(new TestEnvironment())
+        protected FlowableVerification() : base(new TestEnvironment(25))
         {
         }
 

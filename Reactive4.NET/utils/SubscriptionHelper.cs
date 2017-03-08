@@ -49,6 +49,24 @@ namespace Reactive4.NET.operators
             }
         }
 
+        internal static bool SetOnce(ref ISubscription subscription, ISubscription next)
+        {
+            if (next == null)
+            {
+                throw new ArgumentNullException(nameof(next));
+            }
+            ISubscription current = Interlocked.CompareExchange(ref subscription, next, null);
+            if (current == null)
+            {
+                return true;
+            }
+            if (current != CANCELLED)
+            {
+                throw new InvalidOperationException("ISubscription already set!");
+            }
+            return false;
+        }
+
         internal static bool DeferredSetOnce(ref ISubscription subscription, ref long requested, ISubscription next)
         {
             if (next == null)
