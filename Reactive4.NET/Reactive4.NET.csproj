@@ -57,6 +57,7 @@
     <Compile Include="operators\FlowableError.cs" />
     <Compile Include="operators\FlowableFlatMap.cs" />
     <Compile Include="operators\FlowableFromPublisher.cs" />
+    <Compile Include="operators\FlowableHide.cs" />
     <Compile Include="operators\FlowableJust.cs" />
     <Compile Include="operators\FlowableArray.cs" />
     <Compile Include="operators\FlowableObserveOn.cs" />

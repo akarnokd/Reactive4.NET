@@ -66,11 +66,15 @@ namespace Reactive4.NET.operators
 
             public void Cancel()
             {
-                upstream.Cancel();
-                worker.Dispose();
-                if (Interlocked.Increment(ref wip) == 1)
+                if (!Volatile.Read(ref cancelled))
                 {
-                    queue.Clear();
+                    Volatile.Write(ref cancelled, true);
+                    upstream.Cancel();
+                    worker.Dispose();
+                    if (Interlocked.Increment(ref wip) == 1)
+                    {
+                        queue.Clear();
+                    }
                 }
             }
 
@@ -223,7 +227,7 @@ namespace Reactive4.NET.operators
                 {
                     if (Volatile.Read(ref cancelled))
                     {
-                        queue.Clear();
+                        q.Clear();
                         return;
                     }
 
@@ -312,10 +316,9 @@ namespace Reactive4.NET.operators
                             return;
                         }
 
-                        bool d = Volatile.Read(ref done);
                         bool empty = q.IsEmpty();
 
-                        if (d && empty)
+                        if (empty)
                         {
                             Exception ex = error;
                             if (ex != null)

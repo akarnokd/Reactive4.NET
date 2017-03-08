@@ -58,8 +58,13 @@
     <Compile Include="FlowableFlatMap1Tck.cs" />
     <Compile Include="FlowableFlatMap3Tck.cs" />
     <Compile Include="FlowableFlatMap2Tck.cs" />
+    <Compile Include="FlowableObserveOn4Tck.cs" />
+    <Compile Include="FlowableObserveOn3Tck.cs" />
     <Compile Include="FlowableObserveOn2Tck.cs" />
     <Compile Include="FlowableObserveOn1Tck.cs" />
+    <Compile Include="FlowableRange1Tck.cs" />
+    <Compile Include="FlowableSubscribeOn3Tck.cs" />
+    <Compile Include="FlowableObserveOnTest.cs" />
     <Compile Include="FlowableSubscribeOnTest.cs" />
     <Compile Include="FlowableSubscribeOn2Tck.cs" />
     <Compile Include="FlowableSubscribeOn1Tck.cs" />

@@ -459,7 +459,7 @@ namespace Reactive4.NET
 
         public static IFlowable<T> Hide<T>(this IFlowable<T> source)
         {
-            throw new NotImplementedException();
+            return new FlowableHide<T>(source);
         }
 
         public static IFlowable<T> Distinct<T>(this IFlowable<T> source)
