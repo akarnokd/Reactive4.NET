@@ -91,5 +91,33 @@ namespace Reactive4.NET.Test
             ts1.AssertFailure(typeof(Exception), 1);
             ts2.AssertFailure(typeof(Exception), 1);
         }
+
+        [Test]
+        public void Backpressure()
+        {
+            var pp = new PublishProcessor<int>();
+            pp.Start();
+
+            var ts1 = pp.Test(20);
+
+            pp.OnNext(1);
+            pp.OnNext(2);
+
+            ts1.AssertValues(1, 2);
+
+            var ts2 = pp.Test(0);
+
+            ts2.AssertValues();
+
+            pp.OnNext(3);
+
+            ts1.AssertValues(1, 2);
+            ts2.AssertValues();
+
+            ts2.Request(10);
+
+            ts1.AssertValues(1, 2, 3);
+            ts2.AssertValues(3);
+        }
     }
 }

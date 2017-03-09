@@ -10,6 +10,7 @@ using System.Threading;
 namespace Reactive4.NET.Test
 {
     [TestFixture]
+    [Ignore("The TCK doesn't support the behavior")]
     class PublishProcessor2Tck : FlowableProcessorVerification<int>
     {
         public override int CreateElement(int element)
