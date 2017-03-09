@@ -60,6 +60,8 @@
     <Compile Include="operators\FlowableFlatMap.cs" />
     <Compile Include="operators\FlowableFromFunction.cs" />
     <Compile Include="operators\FlowableFromPublisher.cs" />
+    <Compile Include="operators\FlowableFromTask.cs" />
+    <Compile Include="operators\FlowableFromTaskVoid.cs" />
     <Compile Include="operators\FlowableHide.cs" />
     <Compile Include="operators\FlowableIgnoreElements.cs" />
     <Compile Include="operators\FlowableJust.cs" />
@@ -72,6 +74,7 @@
     <Compile Include="operators\FlowableReduce.cs" />
     <Compile Include="operators\FlowableReducePlain.cs" />
     <Compile Include="operators\FlowableSubscribeOn.cs" />
+    <Compile Include="operators\FlowableToObservable.cs" />
     <Compile Include="schedulers\ImmediateExecutorService.cs" />
     <Compile Include="schedulers\TaskExecutorService.cs" />
     <Compile Include="subscribers\AbstractBlockingSubscriber.cs" />

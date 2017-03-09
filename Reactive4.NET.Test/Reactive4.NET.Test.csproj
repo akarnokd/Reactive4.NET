@@ -54,6 +54,8 @@
   <ItemGroup>
     <Compile Include="ExecutorsTest.cs" />
     <Compile Include="FlowableArray2Tck.cs" />
+    <Compile Include="FlowableFromTask2Tck.cs" />
+    <Compile Include="FlowableFromTask1Tck.cs" />
     <Compile Include="FlowableFromFunction1Tck.cs" />
     <Compile Include="FlowableIgnoreElements1Tck.cs" />
     <Compile Include="FlowableReduce3Tck.cs" />

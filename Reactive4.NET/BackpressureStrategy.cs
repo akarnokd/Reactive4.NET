@@ -8,7 +8,8 @@ namespace Reactive4.NET
     {
         MISSING,
         ERROR,
-        BUFFER,
-        LATEST
+        DROP,
+        LATEST,
+        BUFFER
     }
 }

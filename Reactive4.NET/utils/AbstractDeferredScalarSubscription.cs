@@ -108,6 +108,16 @@ namespace Reactive4.NET.utils
             return Volatile.Read(ref state) == STATE_CANCELLED;
         }
 
+
+        public void Error(Exception error)
+        {
+            if (Volatile.Read(ref state) != STATE_CANCELLED)
+            {
+                Volatile.Write(ref state, STATE_CONSUMED);
+                actual.OnError(error);
+            }
+        }
+
         public void Complete()
         {
             if (Volatile.Read(ref state) != STATE_CANCELLED)

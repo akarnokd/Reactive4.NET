@@ -45,8 +45,7 @@ namespace Reactive4.NET
 
         public static IFlowable<T> ToFlowable<T>(this Task<T> task)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableFromTask<T>(task);
         }
 
         public static IFlowable<T> FromTask<T>(Task<T> task)
@@ -56,8 +55,7 @@ namespace Reactive4.NET
 
         public static IFlowable<object> ToFlowable(this Task task)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableFromTaskVoid(task);
         }
 
         public static IFlowable<object> FromTask(this Task task)
@@ -67,8 +65,7 @@ namespace Reactive4.NET
 
         public static IObservable<T> ToObservable<T>(this IFlowable<T> source)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableToObservable<T>(source);
         }
 
         // ********************************************************************************
