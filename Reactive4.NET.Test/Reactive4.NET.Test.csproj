@@ -54,6 +54,11 @@
   <ItemGroup>
     <Compile Include="ExecutorsTest.cs" />
     <Compile Include="FlowableArray2Tck.cs" />
+    <Compile Include="FlowableFromFunction1Tck.cs" />
+    <Compile Include="FlowableIgnoreElements1Tck.cs" />
+    <Compile Include="FlowableReduce3Tck.cs" />
+    <Compile Include="FlowableReduce2Tck.cs" />
+    <Compile Include="FlowableToList1Tck.cs" />
     <Compile Include="FlowableEmptyTck.cs" />
     <Compile Include="FlowableArray1Tck.cs" />
     <Compile Include="FlowableFilter2Tck.cs" />
@@ -67,6 +72,9 @@
     <Compile Include="FlowableObserveOn2Tck.cs" />
     <Compile Include="FlowableObserveOn1Tck.cs" />
     <Compile Include="FlowableMap1Tck.cs" />
+    <Compile Include="FlowableDefer1Tck.cs" />
+    <Compile Include="FlowableCollect1Tck.cs" />
+    <Compile Include="FlowableReduce1Tck.cs" />
     <Compile Include="FlowableRange3Tck.cs" />
     <Compile Include="FlowableRange2Tck.cs" />
     <Compile Include="FlowableSubscribeOn3Tck.cs" />

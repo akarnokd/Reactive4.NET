@@ -139,6 +139,7 @@ namespace Reactive4.NET.operators
                 }
             }
         }
+
     }
 
     internal sealed class CancelledSubscription : ISubscription
