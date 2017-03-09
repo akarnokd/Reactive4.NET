@@ -138,7 +138,7 @@ namespace Reactive4.NET
 
         public void OnSubscribe(ISubscription subscription)
         {
-            if (SubscriptionHelper.SetOnce(ref upstream, subscription))
+            if (SubscriptionHelper.SetOnce(ref upstream, subscription, false))
             {
                 if (subscription is IQueueSubscription<T> qs)
                 {

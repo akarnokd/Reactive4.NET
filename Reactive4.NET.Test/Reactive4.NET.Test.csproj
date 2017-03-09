@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PublishProcessor5Tck.cs" />
     <Compile Include="PublishProcessor4Tck.cs" />
     <Compile Include="PublishProcessor3Tck.cs" />
     <Compile Include="PublishProcessorTest.cs" />

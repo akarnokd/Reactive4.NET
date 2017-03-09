@@ -77,7 +77,7 @@ namespace Reactive4.NET.operators
             return true;
         }
 
-        internal static bool SetOnce(ref ISubscription subscription, ISubscription next)
+        internal static bool SetOnce(ref ISubscription subscription, ISubscription next, bool crash = true)
         {
             if (next == null)
             {
@@ -88,9 +88,13 @@ namespace Reactive4.NET.operators
             {
                 return true;
             }
+            next?.Cancel();
             if (current != Cancelled)
             {
-                throw new InvalidOperationException("ISubscription already set!");
+                if (crash)
+                {
+                    throw new InvalidOperationException("ISubscription already set!");
+                }
             }
             return false;
         }

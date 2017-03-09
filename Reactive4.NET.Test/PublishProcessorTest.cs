@@ -66,5 +66,30 @@ namespace Reactive4.NET.Test
                 .Test()
                 .AssertResult(Enumerable.Range(1, 1000).ToArray());
         }
+
+        [Test]
+        public void Error()
+        {
+            Flowable.Error<int>(new Exception())
+                .SubscribeWith(new PublishProcessor<int>())
+                .Test()
+                .AssertFailure(typeof(Exception));
+        }
+
+        [Test]
+        public void Error2()
+        {
+            var pp = new PublishProcessor<int>();
+            pp.Start();
+
+            var ts1 = pp.Test();
+            var ts2 = pp.Test();
+
+            pp.OnNext(1);
+            pp.OnError(new Exception());
+
+            ts1.AssertFailure(typeof(Exception), 1);
+            ts2.AssertFailure(typeof(Exception), 1);
+        }
     }
 }
