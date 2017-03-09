@@ -17,7 +17,7 @@ namespace Reactive4.NET.utils
 
         internal SpscArrayQueue(int capacity)
         {
-            this.array = new Entry[capacity];
+            this.array = new Entry[QueueHelper.Pow2(capacity)];
         }
 
         public void Clear()

@@ -98,9 +98,11 @@
     <Compile Include="utils\ExceptionHelper.cs" />
     <Compile Include="utils\FusionHelper.cs" />
     <Compile Include="subscribers\StrictSubscriber.cs" />
+    <Compile Include="utils\QueueHelper.cs" />
     <Compile Include="utils\SchedulerHelper.cs" />
     <Compile Include="utils\SetCompositeDisposable.cs" />
     <Compile Include="utils\SpscArrayQueue.cs" />
+    <Compile Include="utils\SpscLinkedArrayQueue.cs" />
     <Compile Include="utils\SubscriptionHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReactiveStreamsAPI.cs" />

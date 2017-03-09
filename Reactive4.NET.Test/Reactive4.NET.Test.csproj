@@ -52,6 +52,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="UnicastProcessor3Tck.cs" />
+    <Compile Include="UnicastProcessorTest.cs" />
+    <Compile Include="UnicastProcessor2Tck.cs" />
+    <Compile Include="UnicastProcessor1Tck.cs" />
     <Compile Include="PublishProcessor5Tck.cs" />
     <Compile Include="PublishProcessor4Tck.cs" />
     <Compile Include="PublishProcessor3Tck.cs" />
@@ -106,6 +110,7 @@
     <Compile Include="FlowableVerification.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FlowableFlatMapTest.cs" />
+    <Compile Include="SpscLinkedArrayQueueTest.cs" />
     <Compile Include="UnitTest1.cs" />
   </ItemGroup>
   <ItemGroup>
