@@ -55,6 +55,17 @@ namespace Reactive4.NET
         IFlowable<T> WithSource(IFlowable<T> newSource);
     }
 
+    public interface IFlowableProcessor<T> : IFlowable<T>, IProcessor<T, T>, IFlowableSubscriber<T>
+    {
+        bool HasComplete { get; }
+
+        bool HasException { get; }
+
+        Exception Exception { get; }
+
+        bool HasSubscribers { get; }
+    }
+
     public static class FusionSupport
     {
         public static readonly int NONE = 0;

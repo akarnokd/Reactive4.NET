@@ -52,6 +52,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PublishProcessor4Tck.cs" />
+    <Compile Include="PublishProcessor3Tck.cs" />
+    <Compile Include="PublishProcessorTest.cs" />
+    <Compile Include="PublishProcessor2Tck.cs" />
+    <Compile Include="PublishProcessor1Tck.cs" />
+    <Compile Include="DirectProcessorTest.cs" />
     <Compile Include="ExecutorsTest.cs" />
     <Compile Include="FlowableEnumerable2Tck.cs" />
     <Compile Include="FlowableEnumerable1Tck.cs" />
@@ -60,6 +66,7 @@
     <Compile Include="FlowableFromTask1Tck.cs" />
     <Compile Include="FlowableFromFunction1Tck.cs" />
     <Compile Include="FlowableIgnoreElements1Tck.cs" />
+    <Compile Include="DirectProcessor1Tck.cs" />
     <Compile Include="FlowableSkip4Tck.cs" />
     <Compile Include="FlowableSkip3Tck.cs" />
     <Compile Include="FlowableSkip2Tck.cs" />
@@ -94,6 +101,7 @@
     <Compile Include="FlowableSubscribeOn1Tck.cs" />
     <Compile Include="FlowableRange1Tck.cs" />
     <Compile Include="FlowableJustTck.cs" />
+    <Compile Include="FlowableProcessorVerification.cs" />
     <Compile Include="FlowableVerification.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FlowableFlatMapTest.cs" />

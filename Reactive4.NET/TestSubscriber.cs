@@ -201,7 +201,7 @@ namespace Reactive4.NET
                 b.Append("]");
             }
 
-            return item == null ? item.ToString() : "null";
+            return item == null ? "null" : item.ToString();
         }
 
         public TestSubscriber<T> AssertFailure(Type exception, params T[] expected)

@@ -45,6 +45,11 @@
   <ItemGroup>
     <Compile Include="BackpressureStrategy.cs" />
     <Compile Include="BufferStrategy.cs" />
+    <Compile Include="ReplayProcessor.cs" />
+    <Compile Include="UnicastProcessor.cs" />
+    <Compile Include="MulticastPublisher.cs" />
+    <Compile Include="PublishProcessor.cs" />
+    <Compile Include="DirectProcessor.cs" />
     <Compile Include="Executors.cs" />
     <Compile Include="Flowable.cs" />
     <Compile Include="ICompositeDisposable.cs" />
