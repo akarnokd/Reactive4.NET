@@ -299,7 +299,7 @@ namespace Reactive4.NET
 
         public static IFlowable<R> Map<T, R>(this IFlowable<T> source, Func<T, R> mapper)
         {
-            throw new NotImplementedException();
+            return new FlowableMap<T, R>(source, mapper);
         }
 
         public static IFlowable<R> MapAsync<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper)
@@ -314,7 +314,7 @@ namespace Reactive4.NET
 
         public static IFlowable<T> Filter<T>(this IFlowable<T> source, Func<T, bool> predicate)
         {
-            throw new NotImplementedException();
+            return new FlowableFilter<T>(source, predicate);
         }
 
         public static IFlowable<T> FilterAsync<T>(this IFlowable<T> source, Func<T, IPublisher<bool>> predicate)
@@ -481,6 +481,18 @@ namespace Reactive4.NET
         {
             throw new NotImplementedException();
         }
+
+        public static IFlowable<T> TakeUntil<T, U>(this IFlowable<T> source, IPublisher<U> other)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> SkipUntil<T, U>(this IFlowable<T> source, IPublisher<U> other)
+        {
+            throw new NotImplementedException();
+        }
+
+
 
         // ********************************************************************************
         // Consumer methods

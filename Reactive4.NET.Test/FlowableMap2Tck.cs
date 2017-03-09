@@ -9,11 +9,11 @@ using NUnit.Framework;
 namespace Reactive4.NET.Test
 {
     [TestFixture]
-    class FlowableRange1Tck : FlowableVerification<int>
+    class FlowableMap2Tck : FlowableVerification<int>
     {
         public override IPublisher<int> CreatePublisher(long elements)
         {
-            return Flowable.Range(1, (int)elements);
+            return Flowable.Range(1, (int)elements).Map(v => v + 1).Filter(v => true);
         }
     }
 }

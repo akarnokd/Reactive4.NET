@@ -53,22 +53,28 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExecutorsTest.cs" />
+    <Compile Include="FlowableArray2Tck.cs" />
     <Compile Include="FlowableEmptyTck.cs" />
-    <Compile Include="FlowableArrayTck.cs" />
+    <Compile Include="FlowableArray1Tck.cs" />
+    <Compile Include="FlowableFilter2Tck.cs" />
     <Compile Include="FlowableFlatMap1Tck.cs" />
     <Compile Include="FlowableFlatMap3Tck.cs" />
     <Compile Include="FlowableFlatMap2Tck.cs" />
+    <Compile Include="FlowableFilter1Tck.cs" />
+    <Compile Include="FlowableMap2Tck.cs" />
     <Compile Include="FlowableObserveOn4Tck.cs" />
     <Compile Include="FlowableObserveOn3Tck.cs" />
     <Compile Include="FlowableObserveOn2Tck.cs" />
     <Compile Include="FlowableObserveOn1Tck.cs" />
-    <Compile Include="FlowableRange1Tck.cs" />
+    <Compile Include="FlowableMap1Tck.cs" />
+    <Compile Include="FlowableRange3Tck.cs" />
+    <Compile Include="FlowableRange2Tck.cs" />
     <Compile Include="FlowableSubscribeOn3Tck.cs" />
     <Compile Include="FlowableObserveOnTest.cs" />
     <Compile Include="FlowableSubscribeOnTest.cs" />
     <Compile Include="FlowableSubscribeOn2Tck.cs" />
     <Compile Include="FlowableSubscribeOn1Tck.cs" />
-    <Compile Include="FlowableRangeTck.cs" />
+    <Compile Include="FlowableRange1Tck.cs" />
     <Compile Include="FlowableJustTck.cs" />
     <Compile Include="FlowableVerification.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
