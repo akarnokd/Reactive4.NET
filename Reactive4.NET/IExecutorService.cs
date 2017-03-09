@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Reactive4.NET
 {
-    public interface IExecutor
+    public interface IActionScheduler
     {
         IDisposable Schedule(Action task);
 
@@ -17,7 +17,7 @@ namespace Reactive4.NET
         long Now();
     }
 
-    public interface IExecutorService : IExecutor
+    public interface IExecutorService : IActionScheduler
     {
 
         void Start();
@@ -27,7 +27,7 @@ namespace Reactive4.NET
         IExecutorWorker Worker { get; }
     }
 
-    public interface IExecutorWorker : IExecutor, IDisposable
+    public interface IExecutorWorker : IActionScheduler, IDisposable
     {
 
     }

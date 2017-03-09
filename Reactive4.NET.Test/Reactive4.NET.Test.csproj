@@ -60,6 +60,12 @@
     <Compile Include="FlowableFromTask1Tck.cs" />
     <Compile Include="FlowableFromFunction1Tck.cs" />
     <Compile Include="FlowableIgnoreElements1Tck.cs" />
+    <Compile Include="FlowableSkip4Tck.cs" />
+    <Compile Include="FlowableSkip3Tck.cs" />
+    <Compile Include="FlowableSkip2Tck.cs" />
+    <Compile Include="FlowableSkip1Tck.cs" />
+    <Compile Include="FlowableTake2Tck.cs" />
+    <Compile Include="FlowableTake1Tck.cs" />
     <Compile Include="FlowableReduce3Tck.cs" />
     <Compile Include="FlowableReduce2Tck.cs" />
     <Compile Include="FlowableToList1Tck.cs" />

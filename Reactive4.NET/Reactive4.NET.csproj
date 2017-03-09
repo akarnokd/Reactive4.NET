@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BackpressureStrategy.cs" />
+    <Compile Include="BufferStrategy.cs" />
     <Compile Include="Executors.cs" />
     <Compile Include="Flowable.cs" />
     <Compile Include="ICompositeDisposable.cs" />
@@ -75,7 +76,9 @@
     <Compile Include="operators\FlowableCollect.cs" />
     <Compile Include="operators\FlowableReduce.cs" />
     <Compile Include="operators\FlowableReducePlain.cs" />
+    <Compile Include="operators\FlowableSkip.cs" />
     <Compile Include="operators\FlowableSubscribeOn.cs" />
+    <Compile Include="operators\FlowableTake.cs" />
     <Compile Include="operators\FlowableToObservable.cs" />
     <Compile Include="schedulers\ImmediateExecutorService.cs" />
     <Compile Include="schedulers\TaskExecutorService.cs" />

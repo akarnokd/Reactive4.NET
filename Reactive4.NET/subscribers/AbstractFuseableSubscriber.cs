@@ -60,7 +60,7 @@ namespace Reactive4.NET.subscribers
 
         public abstract bool Poll(out R item);
 
-        public void Request(long n)
+        public virtual void Request(long n)
         {
             upstream.Request(n);
         }
@@ -76,6 +76,18 @@ namespace Reactive4.NET.subscribers
                     fusionMode = m;
                     return m;
                 }
+            }
+            return FusionSupport.NONE;
+        }
+
+        protected int RequestTransientFusion(int mode)
+        {
+            var qs = this.qs;
+            if (qs != null)
+            {
+                int m = qs.RequestFusion(mode);
+                fusionMode = m;
+                return m;
             }
             return FusionSupport.NONE;
         }

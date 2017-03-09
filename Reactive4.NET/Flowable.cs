@@ -165,7 +165,39 @@ namespace Reactive4.NET
         {
             return new FlowableDefer<T>(supplier);
         }
-        
+
+        public static IFlowable<long> Timer()
+        {
+            return Timer(Executors.Computation);
+        }
+
+        public static IFlowable<long> Timer(IExecutorService executor)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<long> Interval(long period)
+        {
+            return Interval(period, period, Executors.Computation);
+        }
+
+        public static IFlowable<long> Interval(long initialDelay, long period)
+        {
+            return Interval(initialDelay, period, Executors.Computation);
+        }
+
+        public static IFlowable<long> Interval(long period, IExecutorService executor)
+        {
+            return Interval(period, period, executor);
+        }
+
+        public static IFlowable<long> Interval(long initialDelay, long period, IExecutorService executor)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
         // ********************************************************************************
         // Multi-source factory methods
         // ********************************************************************************
@@ -362,16 +394,14 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
-        public static IFlowable<R> Take<T, R>(this IFlowable<T> source, long n)
+        public static IFlowable<T> Take<T>(this IFlowable<T> source, long n, bool limitRequest = false)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableTake<T>(source, n, limitRequest);
         }
 
-        public static IFlowable<R> Skip<T, R>(this IFlowable<T> source, long n)
+        public static IFlowable<T> Skip<T>(this IFlowable<T> source, long n)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableSkip<T>(source, n);
         }
 
         public static IFlowable<R> TakeLast<T, R>(this IFlowable<T> source, long n)
@@ -685,6 +715,35 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
+        public static IFlowable<T> OnBackpressureError<T>(this IFlowable<T> source)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> OnBackpressureDrop<T>(this IFlowable<T> source, Action<T> onDrop = null)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> OnBackpressureLatest<T>(this IFlowable<T> source)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> OnBackpressureBuffer<T>(this IFlowable<T> source)
+        {
+            return OnBackpressureBuffer(source, BufferSize(), BufferStrategy.ALL, null);
+        }
+
+        public static IFlowable<T> OnBackpressureBuffer<T>(this IFlowable<T> source, int capacityHint, BufferStrategy strategy = BufferStrategy.ALL, Action<T> onDrop = null)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
         // ********************************************************************************
         // State peeking methods
         // ********************************************************************************
@@ -830,25 +889,22 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
-        public static IDisposable BlockingSubscribe<T>(this IFlowable<T> source)
+        public static void BlockingSubscribe<T>(this IFlowable<T> source)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            BlockingSubscribe(source, v => { }, e => { }, () => { });
         }
 
-        public static IDisposable BlockingSubscribe<T>(this IFlowable<T> source, Action<T> onNext)
+        public static void BlockingSubscribe<T>(this IFlowable<T> source, Action<T> onNext)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            BlockingSubscribe(source, onNext, e => { }, () => { });
         }
 
-        public static IDisposable BlockingSubscribe<T>(this IFlowable<T> source, Action<T> onNext, Action<T> onError)
+        public static void BlockingSubscribe<T>(this IFlowable<T> source, Action<T> onNext, Action<T> onError)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            BlockingSubscribe(source, onNext, onError, () => { });
         }
 
-        public static IDisposable BlockingSubscribe<T>(this IFlowable<T> source, Action<T> onNext, Action<T> onError, Action onComplete)
+        public static void BlockingSubscribe<T>(this IFlowable<T> source, Action<T> onNext, Action<T> onError, Action onComplete)
         {
             // TODO implement
             throw new NotImplementedException();
