@@ -32,7 +32,7 @@ namespace Reactive4.NET.operators
             source.Subscribe(new FlatMapMainSubscriber(subscriber, mapper, maxConcurrency, bufferSize));
         }
 
-        sealed class FlatMapMainSubscriber : IFlowableSubscriber<T>, ISubscription
+        internal sealed class FlatMapMainSubscriber : IFlowableSubscriber<T>, ISubscription
         {
             readonly IFlowableSubscriber<R> actual;
 
@@ -526,6 +526,33 @@ namespace Reactive4.NET.operators
                     return q;
                 }
             }
+        }
+    }
+
+    internal sealed class FlowableFlatMapPublisher<T, R> : AbstractFlowableSource<R>
+    {
+        readonly IPublisher<T> source;
+
+        readonly Func<T, IPublisher<R>> mapper;
+
+        readonly int maxConcurrency;
+
+        readonly int bufferSize;
+
+        public FlowableFlatMapPublisher(IPublisher<T> source,
+            Func<T, IPublisher<R>> mapper,
+            int maxConcurrency,
+            int bufferSize)
+        {
+            this.source = source;
+            this.mapper = mapper;
+            this.maxConcurrency = maxConcurrency;
+            this.bufferSize = bufferSize;
+        }
+
+        public override void Subscribe(IFlowableSubscriber<R> subscriber)
+        {
+            source.Subscribe(new FlowableFlatMap<T, R>.FlatMapMainSubscriber(subscriber, mapper, maxConcurrency, bufferSize));
         }
     }
 }

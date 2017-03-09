@@ -53,6 +53,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExecutorsTest.cs" />
+    <Compile Include="FlowableEnumerable2Tck.cs" />
+    <Compile Include="FlowableEnumerable1Tck.cs" />
     <Compile Include="FlowableArray2Tck.cs" />
     <Compile Include="FlowableFromTask2Tck.cs" />
     <Compile Include="FlowableFromTask1Tck.cs" />

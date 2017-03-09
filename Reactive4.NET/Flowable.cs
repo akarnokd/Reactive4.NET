@@ -88,10 +88,9 @@ namespace Reactive4.NET
             return new FlowableError<T>(exception);
         }
 
-        public static IFlowable<T> Error<T>(Func<Exception> exception)
+        public static IFlowable<T> Error<T>(Func<Exception> errorSupplier)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableErrorSupplier<T>(errorSupplier);
         }
 
         public static IFlowable<T> Empty<T>()
@@ -154,7 +153,7 @@ namespace Reactive4.NET
 
         public static IFlowable<T> FromEnumerable<T>(IEnumerable<T> items)
         {
-            throw new NotImplementedException();
+            return new FlowableEnumerable<T>(items);
         }
 
         public static IFlowable<int> Range(int start, int count)
@@ -194,7 +193,7 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
-        public static IFlowable<T> Concat<T>(IPublisher<IPublisher<T>> sources)
+        public static IFlowable<T> Concat<T>(this IPublisher<IPublisher<T>> sources)
         {
             // TODO implement
             throw new NotImplementedException();
@@ -212,7 +211,7 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
-        public static IFlowable<T> ConcatEager<T>(IPublisher<IPublisher<T>> sources)
+        public static IFlowable<T> ConcatEager<T>(this IPublisher<IPublisher<T>> sources)
         {
             // TODO implement
             throw new NotImplementedException();
@@ -230,22 +229,19 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
-        public static IFlowable<T> Merge<T>(IPublisher<IPublisher<T>> sources, int maxConcurrency)
+        public static IFlowable<T> Merge<T>(this IPublisher<IPublisher<T>> sources)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return Merge(sources, BufferSize(), BufferSize());
         }
 
-        public static IFlowable<T> Flatten<T>(this IPublisher<IPublisher<T>> sources)
+        public static IFlowable<T> Merge<T>(this IPublisher<IPublisher<T>> sources, int maxConcurrency)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return Merge(sources, maxConcurrency, BufferSize());
         }
 
-        public static IFlowable<T> Flatten<T>(this IPublisher<IPublisher<T>> sources, int maxConcurrency)
+        public static IFlowable<T> Merge<T>(this IPublisher<IPublisher<T>> sources, int maxConcurrency, int bufferSize)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableFlatMapPublisher<IPublisher<T>, T>(sources, v => v, maxConcurrency, bufferSize);
         }
 
         public static IFlowable<R> CombineLatest<T, R>(Func<T[], R> combiner, params IPublisher<T>[] sources)
@@ -607,6 +603,159 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
+        public static IFlowable<T> Repeat<T>(this IFlowable<T> source, long times = long.MaxValue)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> Repeat<T>(this IFlowable<T> source, Func<bool> stop, long times = long.MaxValue)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> RepeatWhen<T, U>(this IFlowable<T> source, Func<IFlowable<object>, IPublisher<U>> handler)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> Retry<T>(this IFlowable<T> source, long times = long.MaxValue)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> Retry<T>(this IFlowable<T> source, Func<Exception, bool> predicate, long times = long.MaxValue)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> RetryWhen<T, U>(this IFlowable<T> source, Func<IFlowable<Exception>, IPublisher<U>> handler)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> OnErrorReturn<T>(this IFlowable<T> source, T fallbackItem)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> OnErrorComplete<T>(this IFlowable<T> source)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> OnErrorResumeNext<T>(this IFlowable<T> source, IPublisher<T> fallback)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> OnErrorResumeNext<T>(this IFlowable<T> source, Func<Exception, IPublisher<T>> handler)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> Timeout<T>(this IFlowable<T> source, TimeSpan itemTimeout, IPublisher<T> fallback = null)
+        {
+            return Timeout<T>(source, itemTimeout, Executors.Computation, fallback);
+        }
+
+        public static IFlowable<T> Timeout<T>(this IFlowable<T> source, TimeSpan itemTimeout, IExecutorService executor, IPublisher<T> fallback = null)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> Timeout<T>(this IFlowable<T> source, TimeSpan firstTimeout, TimeSpan itemTimeout, IPublisher<T> fallback = null)
+        {
+            return Timeout<T>(source, firstTimeout, itemTimeout, Executors.Computation, fallback);
+        }
+
+        public static IFlowable<T> Timeout<T>(this IFlowable<T> source, TimeSpan firstTimeout, TimeSpan itemTimeout, IExecutorService executor, IPublisher<T> fallback = null)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        // ********************************************************************************
+        // State peeking methods
+        // ********************************************************************************
+
+        public static IFlowable<T> DoOnNext<T>(this IFlowable<T> source, Action<T> onNext)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> DoAfterNext<T>(this IFlowable<T> source, Action<T> onAfterNext)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> DoOnError<T>(this IFlowable<T> source, Action<Exception> onError)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+
+        public static IFlowable<T> DoOnComplete<T>(this IFlowable<T> source, Action onComplete)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> DoOnTerminated<T>(this IFlowable<T> source, Action onTerminated)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> DoAfterTerminated<T>(this IFlowable<T> source, Action onAfterTerminated)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> DoFinally<T>(this IFlowable<T> source, Action onFinally)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> DoOnSubscribe<T>(this IFlowable<T> source, Action<ISubscription> onSubscribe)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> DoOnRequest<T>(this IFlowable<T> source, Action<long> onRequest)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> DoOnCancel<T>(this IFlowable<T> source, Action onCancel)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> DoOnPoll<T>(this IFlowable<T> source, Action<bool, T> onPoll)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
         // ********************************************************************************
         // Consumer methods
         // ********************************************************************************
@@ -633,7 +782,7 @@ namespace Reactive4.NET
             return s;
         }
 
-        public static S SubscribeWith<T, S>(this IFlowable<T> source, S subscriber) where S : ISubscriber<T>
+        public static S SubscribeWith<T, S>(this IFlowable<T> source, S subscriber) where S : IFlowableSubscriber<T>
         {
             source.Subscribe(subscriber);
             return subscriber;

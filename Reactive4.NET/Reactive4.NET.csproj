@@ -53,8 +53,10 @@
     <Compile Include="IGeneratorEmitter.cs" />
     <Compile Include="IParallelFlowable.cs" />
     <Compile Include="operators\AbstractFlowable.cs" />
+    <Compile Include="operators\FlowableEnumerable.cs" />
     <Compile Include="operators\FlowableDefer.cs" />
     <Compile Include="operators\FlowableEmpty.cs" />
+    <Compile Include="operators\FlowableErrorSupplier.cs" />
     <Compile Include="operators\FlowableError.cs" />
     <Compile Include="operators\FlowableFilter.cs" />
     <Compile Include="operators\FlowableFlatMap.cs" />
