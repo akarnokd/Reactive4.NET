@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Reactive4.NET.schedulers
@@ -11,33 +12,71 @@ namespace Reactive4.NET.schedulers
     {
         internal static readonly IExecutorService Instance = new SingleExecutorService();
 
-        public IExecutorWorker Worker => throw new NotImplementedException();
+        public IExecutorWorker Worker => new SingleExecutorWorker(executor);
 
         public long Now => SchedulerHelper.NowUTC();
 
+        SingleThreadedExecutor executor;
+
+        internal SingleExecutorService()
+        {
+            executor = new SingleThreadedExecutor();
+        }
+
         public IDisposable Schedule(Action task)
         {
-            throw new NotImplementedException();
+            var x = Volatile.Read(ref executor);
+            if (x != null)
+            {
+                return x.Schedule(task);
+            }
+            return EmptyDisposable.Instance;
         }
 
         public IDisposable Schedule(Action task, TimeSpan delay)
         {
-            throw new NotImplementedException();
+            var x = Volatile.Read(ref executor);
+            if (x != null)
+            {
+                return x.Schedule(task, delay);
+            }
+            return EmptyDisposable.Instance;
         }
 
         public IDisposable Schedule(Action task, TimeSpan initialDelay, TimeSpan period)
         {
-            throw new NotImplementedException();
+            var x = Volatile.Read(ref executor);
+            if (x != null)
+            {
+                return executor.Schedule(task, initialDelay, period);
+            }
+            return EmptyDisposable.Instance;
         }
 
         public void Shutdown()
         {
-            throw new NotImplementedException();
+            Interlocked.Exchange(ref executor, null)?.Shutdown();
         }
 
         public void Start()
         {
-            throw new NotImplementedException();
+            SingleThreadedExecutor ys = null;
+            for (;;)
+            {
+                var xs = Volatile.Read(ref executor);
+                if (xs != null)
+                {
+                    break;
+                }
+                if (ys == null)
+                {
+                    ys = new SingleThreadedExecutor();
+                }
+                if (Interlocked.CompareExchange(ref executor, ys, xs) == xs)
+                {
+                    break;
+                }
+            }
         }
     }
 }

@@ -46,6 +46,13 @@ namespace Reactive4.NET.utils
         {
             var cts = new CancellationTokenSource();
 
+            ScheduleTask(task, initialDelay, period, cts);
+
+            return cts;
+        }
+
+        internal static void ScheduleTask(Action task, TimeSpan initialDelay, TimeSpan period, CancellationTokenSource cts)
+        {
             Action<Task> recursive = null;
             long now = NowUTC() + (long)initialDelay.TotalMilliseconds;
             long[] round = { 0 };
@@ -59,7 +66,33 @@ namespace Reactive4.NET.utils
             Task.Delay(initialDelay, cts.Token)
                 .ContinueWith(recursive, cts.Token);
 
-            return cts;
+        }
+
+        internal static readonly IExecutorWorker RejectingWorker = new RejectingExecutorWorker();
+
+        sealed class RejectingExecutorWorker : IExecutorWorker
+        {
+            public long Now => NowUTC();
+
+            public void Dispose()
+            {
+                // ignored
+            }
+
+            public IDisposable Schedule(Action task)
+            {
+                return EmptyDisposable.Instance;
+            }
+
+            public IDisposable Schedule(Action task, TimeSpan delay)
+            {
+                return EmptyDisposable.Instance;
+            }
+
+            public IDisposable Schedule(Action task, TimeSpan initialDelay, TimeSpan period)
+            {
+                return EmptyDisposable.Instance;
+            }
         }
     }
 }

@@ -66,14 +66,19 @@ namespace Reactive4.NET
 
         // ----------------------------------------------------------------------------
 
-        public static IExecutorService NewParallel()
+        public static IExecutorService NewSingle()
         {
-            return null; // TODO return proper
+            return new SingleExecutorService();
         }
 
-        public static IExecutorService NewParallel(int paralellism)
+        public static IExecutorService NewParallel()
         {
-            return null; // TODO return proper
+            return new ParallelExecutorService();
+        }
+
+        public static IExecutorService NewParallel(int parallelism)
+        {
+            return new ParallelExecutorService(parallelism);
         }
 
         public static TestExecutor NewTest()
