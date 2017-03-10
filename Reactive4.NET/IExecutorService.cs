@@ -14,7 +14,7 @@ namespace Reactive4.NET
 
         IDisposable Schedule(Action task, TimeSpan initialDelay, TimeSpan period);
 
-        long Now();
+        long Now { get; }
     }
 
     public interface IExecutorService : IActionScheduler

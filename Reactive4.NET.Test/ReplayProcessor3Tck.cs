@@ -10,23 +10,20 @@ using System.Threading;
 namespace Reactive4.NET.Test
 {
     [TestFixture]
-    class PublishProcessor1Tck : FlowableVerification<int>
+    class ReplayProcessor3Tck : FlowableVerification<int>
     {
-        public PublishProcessor1Tck() : base(50) { }
-
         public override IPublisher<int> CreatePublisher(long elements)
         {
-            var pp = new PublishProcessor<int>();
-            pp.Start();
+            var pp = new ReplayProcessor<int>((int)elements + 10, TimeSpan.FromMinutes(5));
 
             Task.Factory.StartNew(() => {
                 while (!pp.HasSubscribers)
                 {
-                    Thread.Sleep(10);
+                    Thread.Sleep(1);
                 }
                 for (int i = 0; i < elements; i++)
                 {
-                    while (!pp.Offer(i)) ;
+                    pp.OnNext(i);
                 }
                 pp.OnComplete();
             }, TaskCreationOptions.LongRunning);

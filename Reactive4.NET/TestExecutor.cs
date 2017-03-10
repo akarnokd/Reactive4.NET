@@ -23,14 +23,11 @@ namespace Reactive4.NET
             this.queue = new SortedSet<TestDelayedTask>();
         }
 
-        public long Now()
-        {
-            return currentTime;
-        }
+        public long Now => currentTime;
 
         public IDisposable Schedule(Action task)
         {
-            TestDelayedTask tt = new TestDelayedTask(task, Now(), NewId(), this, null);
+            TestDelayedTask tt = new TestDelayedTask(task, Now, NewId(), this, null);
             Add(tt);
             return tt;
         }
@@ -38,7 +35,7 @@ namespace Reactive4.NET
         public IDisposable Schedule(Action task, TimeSpan delay)
         {
             TestDelayedTask tt = new TestDelayedTask(task, 
-                Now() + (long)delay.TotalMilliseconds, NewId(), this, null);
+                Now + (long)delay.TotalMilliseconds, NewId(), this, null);
             Add(tt);
             return tt;
         }
@@ -53,7 +50,7 @@ namespace Reactive4.NET
                 tt.time += (long)period.TotalMilliseconds;
                 tt.id = NewId();
                 Add(tt);
-            }, Now() + (long)initialDelay.TotalMilliseconds, NewId(), this, null);
+            }, Now + (long)initialDelay.TotalMilliseconds, NewId(), this, null);
             Add(tt);
             return tt;
         }
@@ -164,10 +161,7 @@ namespace Reactive4.NET
                 }
             }
 
-            public long Now()
-            {
-                return parent.Now();
-            }
+            public long Now => parent.Now;
 
             public IDisposable Schedule(Action task)
             {
@@ -175,7 +169,7 @@ namespace Reactive4.NET
                 {
                     return EmptyDisposable.Instance;
                 }
-                TestDelayedTask tt = new TestDelayedTask(task, parent.Now(), parent.NewId(), parent, this);
+                TestDelayedTask tt = new TestDelayedTask(task, parent.Now, parent.NewId(), parent, this);
                 parent.Add(tt);
                 if (Volatile.Read(ref disposed) != 0)
                 {
@@ -192,7 +186,7 @@ namespace Reactive4.NET
                     return EmptyDisposable.Instance;
                 }
                 TestDelayedTask tt = new TestDelayedTask(task, 
-                    parent.Now() + (long)delay.TotalMilliseconds, parent.NewId(), parent, this);
+                    parent.Now + (long)delay.TotalMilliseconds, parent.NewId(), parent, this);
                 parent.Add(tt);
                 if (Volatile.Read(ref disposed) != 0)
                 {
@@ -212,7 +206,7 @@ namespace Reactive4.NET
                     tt.time += (long)period.TotalMilliseconds;
                     tt.id = parent.NewId();
                     parent.Add(tt);
-                }, Now() + (long)initialDelay.TotalMilliseconds, parent.NewId(), parent, this);
+                }, Now + (long)initialDelay.TotalMilliseconds, parent.NewId(), parent, this);
                 parent.Add(tt);
                 return tt;
             }

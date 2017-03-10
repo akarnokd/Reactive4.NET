@@ -40,7 +40,7 @@ namespace Reactive4.NET.Test
 
             for (int i = 0; i < 10; i++)
             {
-                exec.Schedule(() => Console.WriteLine(exec.Now()), TimeSpan.FromSeconds(i));
+                exec.Schedule(() => Console.WriteLine(exec.Now), TimeSpan.FromSeconds(i));
             }
 
             exec.AdvanceTimeBy(TimeSpan.FromSeconds(10));
@@ -51,7 +51,7 @@ namespace Reactive4.NET.Test
         {
             TestExecutor exec = NET.Executors.NewTest();
 
-            exec.Schedule(() => Console.WriteLine(exec.Now()), TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(1));
+            exec.Schedule(() => Console.WriteLine(exec.Now), TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(1));
 
             exec.AdvanceTimeBy(TimeSpan.FromSeconds(10));
         }

@@ -54,6 +54,9 @@
   <ItemGroup>
     <Compile Include="AsyncProcessor2Tck.cs" />
     <Compile Include="AsyncProcessor1Tck.cs" />
+    <Compile Include="ReplayProcessor3Tck.cs" />
+    <Compile Include="ReplayProcessor2Tck.cs" />
+    <Compile Include="ReplayProcessor1Tck .cs" />
     <Compile Include="UnicastProcessor3Tck.cs" />
     <Compile Include="UnicastProcessorTest.cs" />
     <Compile Include="UnicastProcessor2Tck.cs" />
@@ -113,6 +116,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FlowableFlatMapTest.cs" />
     <Compile Include="SpscLinkedArrayQueueTest.cs" />
+    <Compile Include="ReplayProcessorTest.cs" />
+    <Compile Include="MpscLinkedArrayQueueTest.cs" />
     <Compile Include="UnitTest1.cs" />
   </ItemGroup>
   <ItemGroup>

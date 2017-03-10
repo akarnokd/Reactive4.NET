@@ -47,6 +47,12 @@
     <Compile Include="BufferStrategy.cs" />
     <Compile Include="AsyncProcessor.cs" />
     <Compile Include="ReplayProcessor.cs" />
+    <Compile Include="schedulers\TrampolineExecutorService.cs" />
+    <Compile Include="schedulers\ThreadExecutorService.cs" />
+    <Compile Include="schedulers\SingleExecutorService.cs" />
+    <Compile Include="schedulers\IOExecutorService.cs" />
+    <Compile Include="schedulers\ComputationExecutorService.cs" />
+    <Compile Include="subscribers\BlockingQueueConsumer.cs" />
     <Compile Include="UnicastProcessor.cs" />
     <Compile Include="MulticastPublisher.cs" />
     <Compile Include="PublishProcessor.cs" />
@@ -99,6 +105,7 @@
     <Compile Include="utils\ExceptionHelper.cs" />
     <Compile Include="utils\FusionHelper.cs" />
     <Compile Include="subscribers\StrictSubscriber.cs" />
+    <Compile Include="utils\MpscLinkedArrayQueue.cs" />
     <Compile Include="utils\QueueHelper.cs" />
     <Compile Include="utils\SchedulerHelper.cs" />
     <Compile Include="utils\SetCompositeDisposable.cs" />

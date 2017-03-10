@@ -10,7 +10,7 @@ using Reactive4.NET.utils;
 
 namespace Reactive4.NET
 {
-    public sealed class AsyncProcessor<T> : IFlowableProcessor<T>
+    public sealed class AsyncProcessor<T> : IFlowableProcessor<T>, IDisposable
     {
         public bool HasComplete
         {
@@ -55,6 +55,11 @@ namespace Reactive4.NET
         Exception error;
         T value;
         bool hasValue;
+
+        public void Dispose()
+        {
+            SubscriptionHelper.Cancel(ref upstream);
+        }
 
         public void OnComplete()
         {

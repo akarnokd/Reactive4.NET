@@ -14,14 +14,14 @@ namespace Reactive4.NET
         {
             get
             {
-                return null; // TODO return proper
+                return SingleExecutorService.Instance;
             }
         }
 
         public static IExecutorService Computation {
             get
             {
-                return null; // TODO return proper
+                return ComputationExecutorService.Instance;
             }
         }
 
@@ -29,7 +29,7 @@ namespace Reactive4.NET
         {
             get
             {
-                return null; // TODO return proper
+                return IOExecutorService.Instance;
             }
         }
 
@@ -37,7 +37,7 @@ namespace Reactive4.NET
         {
             get
             {
-                return null; // TODO return proper
+                return ThreadExecutorService.Instance;
             }
         }
 
@@ -45,7 +45,7 @@ namespace Reactive4.NET
         {
             get
             {
-                return null; // TODO return proper
+                return TrampolineExecutorService.Instance;
             }
         }
 

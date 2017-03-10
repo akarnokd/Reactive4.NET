@@ -7,45 +7,37 @@ using System.Threading.Tasks;
 
 namespace Reactive4.NET.schedulers
 {
-    internal sealed class ImmediateExecutorService : IExecutorService, IExecutorWorker
+    sealed class ComputationExecutorService : IExecutorService
     {
-        internal static readonly ImmediateExecutorService Instance = new ImmediateExecutorService();
+        internal static readonly IExecutorService Instance = new ComputationExecutorService();
 
-        public IExecutorWorker Worker => this;
-
-        private ImmediateExecutorService() { }
-
-        public void Dispose()
-        {
-            // ignored
-        }
+        public IExecutorWorker Worker => throw new NotImplementedException();
 
         public long Now => SchedulerHelper.NowUTC();
 
         public IDisposable Schedule(Action task)
         {
-            task();
-            return EmptyDisposable.Instance;
+            throw new NotImplementedException();
         }
 
         public IDisposable Schedule(Action task, TimeSpan delay)
         {
-            throw new NotImplementedException("Should not be called!");
+            throw new NotImplementedException();
         }
 
         public IDisposable Schedule(Action task, TimeSpan initialDelay, TimeSpan period)
         {
-            throw new NotImplementedException("Should not be called!");
+            throw new NotImplementedException();
         }
 
         public void Shutdown()
         {
-            // no-op
+            throw new NotImplementedException();
         }
 
         public void Start()
         {
-            // no-op
+            throw new NotImplementedException();
         }
     }
 }

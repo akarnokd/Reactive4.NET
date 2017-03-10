@@ -59,7 +59,6 @@ namespace Reactive4.NET
         int fusionMode;
         bool done;
         Exception error;
-        int once;
 
         int wip;
 

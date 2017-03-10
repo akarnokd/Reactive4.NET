@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace Reactive4.NET
 {
-    public sealed class ReplayProcessor<T> : IFlowableProcessor<T>
+    public sealed class ReplayProcessor<T> : IFlowableProcessor<T>, IDisposable
     {
         public bool HasComplete => manager.HasTerminated && manager.Error == null;
 
@@ -60,6 +60,11 @@ namespace Reactive4.NET
         internal ReplayProcessor(IBufferManager bufferManager)
         {
             this.manager = bufferManager;
+        }
+
+        public void Dispose()
+        {
+            SubscriptionHelper.Cancel(ref upstream);
         }
 
         public void OnComplete()
@@ -150,8 +155,6 @@ namespace Reactive4.NET
             bool Poll(ProcessorSubscription ps, out T item);
 
             bool IsEmpty(ProcessorSubscription ps);
-
-            void Clear(ProcessorSubscription ps);
         }
 
         internal sealed class ProcessorSubscription : IQueueSubscription<T>
@@ -160,27 +163,19 @@ namespace Reactive4.NET
 
             readonly IBufferManager parent;
 
-            internal bool IsCancelled => Requested == long.MinValue;
+            internal bool IsCancelled => Volatile.Read(ref requested) == long.MinValue;
 
-            internal long Requested
-            {
-                get
-                {
-                    return Volatile.Read(ref requested);
-                }
-            }
+            internal long requested;
 
-            internal long Emitted { get; set; }
+            internal long emitted;
 
-            internal object Node { get; set; }
+            internal object node;
 
-            internal int Offset { get; set; }
-
-            long requested;
+            internal int offset;
 
             internal int wip;
 
-            bool outputFused;
+            internal bool outputFused;
 
             internal ProcessorSubscription(IFlowableSubscriber<T> actual, IBufferManager parent)
             {
@@ -192,19 +187,19 @@ namespace Reactive4.NET
             {
                 if (Interlocked.Exchange(ref requested, long.MinValue) != long.MinValue)
                 {
-                    Node = parent.DeadNode;
+                    node = parent.DeadNode;
                     parent.Remove(this);
                 }
             }
 
             public void Clear()
             {
-                throw new NotImplementedException();
+                node = parent.DeadNode;
             }
 
             public bool IsEmpty()
             {
-                throw new NotImplementedException();
+                return parent.IsEmpty(this);
             }
 
             public bool Offer(T item)
@@ -214,7 +209,7 @@ namespace Reactive4.NET
 
             public bool Poll(out T item)
             {
-                throw new NotImplementedException();
+                return parent.Poll(this, out item);
             }
 
             public void Request(long n)
@@ -265,7 +260,7 @@ namespace Reactive4.NET
             {
                 if (Volatile.Read(ref requested) != long.MinValue)
                 {
-                    Node = parent.DeadNode;
+                    node = parent.DeadNode;
                     actual.OnError(cause);
                 }
             }
@@ -274,7 +269,7 @@ namespace Reactive4.NET
             {
                 if (Volatile.Read(ref requested) != long.MinValue)
                 {
-                    Node = parent.DeadNode;
+                    node = parent.DeadNode;
                     actual.OnComplete();
                 }
             }
@@ -287,6 +282,8 @@ namespace Reactive4.NET
             int once;
             internal bool done;
             internal Exception error;
+
+            internal int size;
 
             internal static readonly ProcessorSubscription[] Empty = new ProcessorSubscription[0];
             internal static readonly ProcessorSubscription[] Terminated = new ProcessorSubscription[0];
@@ -411,7 +408,21 @@ namespace Reactive4.NET
                 }
             }
 
-            public abstract void Replay(ProcessorSubscription ps);
+            public void Replay(ProcessorSubscription ps)
+            {
+                if (Interlocked.Increment(ref ps.wip) != 1)
+                {
+                    return;
+                }
+                if (ps.outputFused)
+                {
+                    ReplayFused(ps);
+                }
+                else
+                {
+                    ReplayAsync(ps);
+                }
+            }
 
             public abstract void AddElement(T element);
 
@@ -421,7 +432,9 @@ namespace Reactive4.NET
 
             public abstract bool IsEmpty(ProcessorSubscription ps);
 
-            public abstract void Clear(ProcessorSubscription ps);
+            public abstract void ReplayFused(ProcessorSubscription ps);
+
+            public abstract void ReplayAsync(ProcessorSubscription ps);
         }
 
         sealed class UnboundedBufferManager : AbstractBufferManager
@@ -433,8 +446,6 @@ namespace Reactive4.NET
             static readonly ArrayNode Dead = new ArrayNode(0);
 
             int tailOffset;
-
-            int size;
 
             internal UnboundedBufferManager(int capacityHint)
             {
@@ -469,11 +480,6 @@ namespace Reactive4.NET
                 Interlocked.Exchange(ref size, size + 1);
             }
 
-            public override void Clear(ProcessorSubscription ps)
-            {
-                throw new NotImplementedException();
-            }
-
             public override void Finish()
             {
                 // no cleanup required
@@ -481,17 +487,187 @@ namespace Reactive4.NET
 
             public override bool IsEmpty(ProcessorSubscription ps)
             {
-                throw new NotImplementedException();
+                return Volatile.Read(ref size) == ps.emitted;
             }
 
             public override bool Poll(ProcessorSubscription ps, out T item)
             {
-                throw new NotImplementedException();
+                long e = ps.emitted;
+                if (Volatile.Read(ref size) == e)
+                {
+                    item = default(T);
+                    return false;
+                }
+                int offset = ps.offset;
+                var n = ps.node as ArrayNode;
+                var a = n.array;
+                int m = a.Length;
+                if (offset == m)
+                {
+                    n = n.next;
+                    ps.node = n;
+                    a = n.array;
+                    offset = 0;
+                }
+
+                item = a[offset];
+                ps.offset = offset + 1;
+                ps.emitted = e + 1;
+                return true;
             }
 
-            public override void Replay(ProcessorSubscription ps)
+            public override void ReplayAsync(ProcessorSubscription ps)
             {
-                throw new NotImplementedException();
+                int missed = 1;
+                long e = ps.emitted;
+                ArrayNode n = ps.node as ArrayNode;
+                int offset = ps.offset;
+
+                if (n == null)
+                {
+                    n = head;
+                }
+                int m = n.array.Length;
+
+                for (;;)
+                {
+                    long r = Volatile.Read(ref ps.requested);
+
+                    while (e != r)
+                    {
+                        if (ps.IsCancelled)
+                        {
+                            ps.node = Dead;
+                            return;
+                        }
+                        bool d = Volatile.Read(ref done);
+                        bool empty = Volatile.Read(ref size) == e;
+
+                        if (d && empty)
+                        {
+                            Exception ex = error;
+                            if (ex != null)
+                            {
+                                ps.OnError(ex);
+                            }
+                            else
+                            {
+                                ps.OnComplete();
+                            }
+                            return;
+                        }
+
+                        if (empty)
+                        {
+                            break;
+                        }
+
+                        if (offset == m)
+                        {
+                            offset = 0;
+                            n = n.next;
+                        }
+
+                        T v = n.array[offset];
+
+                        ps.OnNext(v);
+
+                        e++;
+                        offset++;
+                    }
+
+                    if (e == r)
+                    {
+                        if (ps.IsCancelled)
+                        {
+                            return;
+                        }
+
+                        if (Volatile.Read(ref done) && Volatile.Read(ref size) == e)
+                        {
+                            Exception ex = error;
+                            if (ex != null)
+                            {
+                                ps.OnError(ex);
+                            }
+                            else
+                            {
+                                ps.OnComplete();
+                            }
+                            return;
+                        }
+                    }
+
+                    int w = Volatile.Read(ref ps.wip);
+                    if (w == missed)
+                    {
+                        ps.emitted = e;
+                        ps.offset = offset;
+                        ps.node = n;
+                        missed = Interlocked.Add(ref ps.wip, -missed);
+                        if (missed == 0)
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        missed = w;
+                    }
+                }
+            }
+
+            public override void ReplayFused(ProcessorSubscription ps)
+            {
+                int missed = 1;
+                ArrayNode n = ps.node as ArrayNode;
+
+                if (n == null)
+                {
+                    n = head;
+                    ps.node = n;
+                }
+
+                for (;;)
+                {
+                    if (ps.IsCancelled)
+                    {
+                        ps.node = Dead;
+                        return;
+                    }
+                    bool d = Volatile.Read(ref done);
+                    bool empty = Volatile.Read(ref size) == ps.emitted;
+
+                    ps.OnNext(default(T));
+
+                    if (d && empty)
+                    {
+                        Exception ex = error;
+                        if (ex != null)
+                        {
+                            ps.OnError(ex);
+                        }
+                        else
+                        {
+                            ps.OnComplete();
+                        }
+                        return;
+                    }
+
+                    int w = Volatile.Read(ref ps.wip);
+                    if (w == missed)
+                    {
+                        missed = Interlocked.Add(ref ps.wip, -missed);
+                        if (missed == 0)
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        missed = w;
+                    }
+                }
             }
         }
 
@@ -512,41 +688,207 @@ namespace Reactive4.NET
         {
             readonly int maxSize;
 
+            static readonly Node Dead = new Node(default(T));
+
+            Node head;
+
+            Node tail;
+
             internal SizeBoundBufferManager(int maxSize)
             {
                 this.maxSize = maxSize;
+                var n = new Node(default(T));
+                Volatile.Write(ref head, n);
+                Volatile.Write(ref tail, n);
             }
 
-            public override object DeadNode => throw new NotImplementedException();
+            public override object DeadNode => Dead;
 
             public override void AddElement(T element)
             {
-                throw new NotImplementedException();
-            }
+                Node n = new Node(element);
+                var t = tail;
+                Volatile.Write(ref t.next, n);
+                tail = n;
 
-            public override void Clear(ProcessorSubscription ps)
-            {
-                throw new NotImplementedException();
+                int s = size;
+                if (size == maxSize)
+                {
+                    Volatile.Write(ref head, head.next);
+                }
+                else
+                {
+                    size = s + 1;
+                }
             }
 
             public override void Finish()
             {
-                throw new NotImplementedException();
+                // nothing to do
             }
 
             public override bool IsEmpty(ProcessorSubscription ps)
             {
-                throw new NotImplementedException();
+                var n = ps.node as Node;
+                return n == null || Volatile.Read(ref n.next) == null;
             }
 
             public override bool Poll(ProcessorSubscription ps, out T item)
             {
-                throw new NotImplementedException();
+                if (ps.node is Node n)
+                {
+                    var next = Volatile.Read(ref n.next);
+                    if (next != null)
+                    {
+                        item = next.item;
+                        ps.node = next;
+                        return true;
+                    }
+                }
+                item = default(T);
+                return false;
             }
 
-            public override void Replay(ProcessorSubscription ps)
+            public override void ReplayAsync(ProcessorSubscription ps)
             {
-                throw new NotImplementedException();
+                int missed = 1;
+                long e = ps.emitted;
+                var n = ps.node as Node;
+                if (n == null)
+                {
+                    n = Volatile.Read(ref head);
+                }
+
+                for (;;)
+                {
+                    long r = Volatile.Read(ref ps.requested);
+
+                    while (e != r)
+                    {
+                        if (ps.IsCancelled)
+                        {
+                            ps.node = Dead;
+                            return;
+                        }
+
+                        bool d = Volatile.Read(ref done);
+                        var next = Volatile.Read(ref n.next);
+                        bool empty = next == null;
+
+                        if (d && empty)
+                        {
+                            Exception ex = error;
+                            if (ex != null)
+                            {
+                                ps.OnError(ex);
+                            }
+                            else
+                            {
+                                ps.OnComplete();
+                            }
+                            return;
+                        }
+
+                        if (empty)
+                        {
+                            break;
+                        }
+
+                        ps.OnNext(next.item);
+
+                        e++;
+                        n = next;
+                    }
+
+                    if (e == r)
+                    {
+                        if (ps.IsCancelled)
+                        {
+                            ps.node = Dead;
+                            return;
+                        }
+                        if (Volatile.Read(ref done) && Volatile.Read(ref n.next) == null)
+                        {
+                            Exception ex = error;
+                            if (ex != null)
+                            {
+                                ps.OnError(ex);
+                            }
+                            else
+                            {
+                                ps.OnComplete();
+                            }
+                            return;
+                        }
+                    }
+
+                    int w = Volatile.Read(ref ps.wip);
+                    if (w == missed)
+                    {
+                        ps.emitted = e;
+                        ps.node = n;
+                        missed = Interlocked.Add(ref ps.wip, -missed);
+                        if (missed == 0)
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        missed = w;
+                    }
+                }
+            }
+
+            public override void ReplayFused(ProcessorSubscription ps)
+            {
+                int missed = 1;
+                var n = ps.node as Node;
+                if (n == null)
+                {
+                    n = Volatile.Read(ref head);
+                    ps.node = n;
+                }
+
+                for (;;)
+                {
+                    if (ps.IsCancelled)
+                    {
+                        return;
+                    }
+                    bool d = Volatile.Read(ref done);
+                    bool empty = Volatile.Read(ref size) == ps.emitted;
+
+                    ps.OnNext(default(T));
+
+                    if (d && empty)
+                    {
+                        Exception ex = error;
+                        if (ex != null)
+                        {
+                            ps.OnError(ex);
+                        }
+                        else
+                        {
+                            ps.OnComplete();
+                        }
+                        return;
+                    }
+
+                    int w = Volatile.Read(ref ps.wip);
+                    if (w == missed)
+                    {
+                        missed = Interlocked.Add(ref ps.wip, -missed);
+                        if (missed == 0)
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        missed = w;
+                    }
+                }
             }
         }
 
@@ -569,43 +911,268 @@ namespace Reactive4.NET
 
             readonly IExecutorService executor;
 
+            static readonly TimedNode Dead = new TimedNode(default(T), long.MaxValue);
+
+            TimedNode head;
+
+            TimedNode tail;
+
             internal TimeBoundBufferManager(int maxSize, TimeSpan maxAge, IExecutorService executor)
             {
                 this.maxSize = maxSize;
                 this.maxAgeMillis = (long)maxAge.TotalMilliseconds;
                 this.executor = executor;
+                var n = new TimedNode(default(T), long.MinValue);
+                tail = n;
+                Volatile.Write(ref head, n);
             }
 
-            public override object DeadNode => throw new NotImplementedException();
+            public override object DeadNode => Dead;
 
             public override void AddElement(T element)
             {
-                throw new NotImplementedException();
+                var now = executor.Now;
+                var n = new TimedNode(element, now);
+                var t = tail;
+                Volatile.Write(ref t.next, n);
+                tail = n;
+
+                var h0 = head;
+                var h = h0;
+                int s = size;
+                if (s == maxSize)
+                {
+                    h = h.next;
+                }
+                now -= maxAgeMillis;
+                for (;;)
+                {
+                    n = Volatile.Read(ref h.next);
+                    if (n == null)
+                    {
+                        break;
+                    }
+                    if (n.timestamp > now)
+                    {
+                        break;
+                    }
+                    h = n;
+                    s--;
+                }
+                size = s;
+                if (h0 != h)
+                {
+                    Volatile.Write(ref head, h);
+                }
             }
 
-            public override void Clear(ProcessorSubscription ps)
+    public override void Finish()
             {
-                throw new NotImplementedException();
+                long now = executor.Now - maxAgeMillis;
+                var h = head;
+                for (;;)
+                {
+                    var n = Volatile.Read(ref h.next);
+                    if (n == null)
+                    {
+                        break;
+                    }
+                    if (n.timestamp > now)
+                    {
+                        break;
+                    }
+                    h = n;
+                }
+                Volatile.Write(ref head, h);
             }
 
-            public override void Finish()
+            TimedNode FindHead()
             {
-                throw new NotImplementedException();
+                var h0 = Volatile.Read(ref head);
+                var h = h0;
+                long now = executor.Now - maxAgeMillis;
+                for (;;)
+                {
+                    var n = Volatile.Read(ref h.next);
+                    if (n == null)
+                    {
+                        break;
+                    }
+                    if (n.timestamp > now)
+                    {
+                        break;
+                    }
+                    h = n;
+                }
+                if (h != h0)
+                {
+                    Interlocked.CompareExchange(ref head, h, h0);
+                }
+                return h;
             }
 
             public override bool IsEmpty(ProcessorSubscription ps)
             {
-                throw new NotImplementedException();
+                var n = ps.node as TimedNode;
+                return n == null || Volatile.Read(ref n.next) == null;
             }
 
             public override bool Poll(ProcessorSubscription ps, out T item)
             {
-                throw new NotImplementedException();
+                if (ps.node is TimedNode n)
+                {
+                    var next = Volatile.Read(ref n.next);
+                    if (next != null)
+                    {
+                        item = next.item;
+                        ps.node = next;
+                        return true;
+                    }
+                }
+                item = default(T);
+                return false;
             }
 
-            public override void Replay(ProcessorSubscription ps)
+            public override void ReplayAsync(ProcessorSubscription ps)
             {
-                throw new NotImplementedException();
+                int missed = 1;
+                long e = ps.emitted;
+                var n = ps.node as TimedNode;
+                if (n == null)
+                {
+                    n = FindHead();
+                }
+
+                for (;;)
+                {
+                    long r = Volatile.Read(ref ps.requested);
+
+                    while (e != r)
+                    {
+                        if (ps.IsCancelled)
+                        {
+                            ps.node = Dead;
+                            return;
+                        }
+
+                        bool d = Volatile.Read(ref done);
+                        var next = Volatile.Read(ref n.next);
+                        bool empty = next == null;
+
+                        if (d && empty)
+                        {
+                            Exception ex = error;
+                            if (ex != null)
+                            {
+                                ps.OnError(ex);
+                            }
+                            else
+                            {
+                                ps.OnComplete();
+                            }
+                            return;
+                        }
+
+                        if (empty)
+                        {
+                            break;
+                        }
+
+                        ps.OnNext(next.item);
+
+                        e++;
+                        n = next;
+                    }
+
+                    if (e == r)
+                    {
+                        if (ps.IsCancelled)
+                        {
+                            ps.node = Dead;
+                            return;
+                        }
+                        if (Volatile.Read(ref done) && Volatile.Read(ref n.next) == null)
+                        {
+                            Exception ex = error;
+                            if (ex != null)
+                            {
+                                ps.OnError(ex);
+                            }
+                            else
+                            {
+                                ps.OnComplete();
+                            }
+                            return;
+                        }
+                    }
+
+                    int w = Volatile.Read(ref ps.wip);
+                    if (w == missed)
+                    {
+                        ps.emitted = e;
+                        ps.node = n;
+                        missed = Interlocked.Add(ref ps.wip, -missed);
+                        if (missed == 0)
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        missed = w;
+                    }
+                }
+            }
+
+            public override void ReplayFused(ProcessorSubscription ps)
+            {
+                int missed = 1;
+                var n = ps.node as TimedNode;
+                if (n == null)
+                {
+                    n = FindHead();
+                    ps.node = n;
+                }
+
+                for (;;)
+                {
+                    if (ps.IsCancelled)
+                    {
+                        return;
+                    }
+                    bool d = Volatile.Read(ref done);
+                    bool empty = Volatile.Read(ref size) == ps.emitted;
+
+                    ps.OnNext(default(T));
+
+                    if (d && empty)
+                    {
+                        Exception ex = error;
+                        if (ex != null)
+                        {
+                            ps.OnError(ex);
+                        }
+                        else
+                        {
+                            ps.OnComplete();
+                        }
+                        return;
+                    }
+
+                    int w = Volatile.Read(ref ps.wip);
+                    if (w == missed)
+                    {
+                        missed = Interlocked.Add(ref ps.wip, -missed);
+                        if (missed == 0)
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        missed = w;
+                    }
+                }
             }
         }
 

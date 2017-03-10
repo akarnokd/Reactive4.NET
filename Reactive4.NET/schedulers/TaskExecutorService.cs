@@ -17,43 +17,21 @@ namespace Reactive4.NET.schedulers
 
         private TaskExecutorService() { }
 
-        public long Now()
-        {
-            return SchedulerHelper.NowUTC();
-        }
+        public long Now => SchedulerHelper.NowUTC();
 
         public IDisposable Schedule(Action task)
         {
-            var cts = new CancellationTokenSource();
-            Task.Run(task, cts.Token);
-            return cts;
+            return SchedulerHelper.ScheduleTask(task);
         }
 
         public IDisposable Schedule(Action task, TimeSpan delay)
         {
-            var cts = new CancellationTokenSource();
-            Task.Delay(delay, cts.Token).ContinueWith(a => task(), cts.Token);
-            return cts;
+            return SchedulerHelper.ScheduleTask(task, delay);
         }
 
         public IDisposable Schedule(Action task, TimeSpan initialDelay, TimeSpan period)
         {
-            var cts = new CancellationTokenSource();
-
-            Action<Task> recursive = null;
-            long now = Now() + (long)initialDelay.TotalMilliseconds;
-            long[] round = { 0 };
-            recursive = t =>
-            {
-                task();
-                long next = (long)(now + (++round[0]) * period.TotalMilliseconds - Now());
-                Task.Delay(TimeSpan.FromMilliseconds(Math.Max(0L, next)), cts.Token).ContinueWith(recursive, cts.Token);
-            };
-
-            Task.Delay(initialDelay, cts.Token)
-                .ContinueWith(recursive, cts.Token);
-
-            return cts;
+            return SchedulerHelper.ScheduleTask(task, initialDelay, period);
         }
 
         public void Shutdown()
@@ -80,10 +58,7 @@ namespace Reactive4.NET.schedulers
                 tasks.Dispose();
             }
 
-            public long Now()
-            {
-                return SchedulerHelper.NowUTC();
-            }
+            public long Now => SchedulerHelper.NowUTC();
 
             public IDisposable Schedule(Action task)
             {
@@ -109,7 +84,7 @@ namespace Reactive4.NET.schedulers
 
             public IDisposable Schedule(Action task, TimeSpan initialDelay, TimeSpan period)
             {
-                var dt = new DisposablePeriodicTask(task, this, (long)(Now() + initialDelay.TotalMilliseconds), (long)period.TotalMilliseconds);
+                var dt = new DisposablePeriodicTask(task, this, (long)(Now + initialDelay.TotalMilliseconds), (long)period.TotalMilliseconds);
                 if (tasks.Add(dt))
                 {
                     Task.Delay(initialDelay, dt.cts.Token).ContinueWith(a => dt.Run(), dt.cts.Token);
@@ -187,7 +162,7 @@ namespace Reactive4.NET.schedulers
                     {
                         task();
 
-                        long next = Math.Max(0L, start + (++count) * period - parent.Now());
+                        long next = Math.Max(0L, start + (++count) * period - parent.Now);
                         Task.Delay(TimeSpan.FromMilliseconds(next), cts.Token).ContinueWith(a => Run(), cts.Token);
                     }
                     catch
