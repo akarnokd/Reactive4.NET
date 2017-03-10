@@ -586,6 +586,12 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
+        public static IFlowable<R> Lift<T, R>(this IFlowable<T> source, Func<IFlowableSubscriber<R>, IFlowableSubscriber<T>> onLift)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
         public static IFlowable<R> Compose<T, R>(this IFlowable<T> source, Func<IFlowable<T>, IPublisher<R>> composer)
         {
             return composer(source).ToFlowable();
@@ -861,9 +867,40 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
+        public static IFlowable<T> Scan<T, R>(this IFlowable<T> source, Func<T, T, T> scanner)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<R> Scan<T, R>(this IFlowable<T> source, Func<R> initialSupplier, Func<R, T, R> scanner)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> AmbWith<T>(this IFlowable<T> source, IPublisher<T> other)
+        {
+            return Amb(source, other);
+        }
+
+        public static IFlowable<T> ConcatWith<T>(this IFlowable<T> source, IPublisher<T> other)
+        {
+            return Concat(source, other);
+        }
+
+        public static IFlowable<T> MergeWith<T>(this IFlowable<T> source, IPublisher<T> other)
+        {
+            return Merge(source, other);
+        }
+
+        public static IFlowable<R> ZipWith<T, U, R>(this IFlowable<T> source, IPublisher<U> other, Func<T, U, R> zipper)
+        {
+            return Zip(source, other, zipper);
+        }
 
         // ********************************************************************************
-        // IConnectableFlowable creators
+        // IConnectableFlowable related
         // ********************************************************************************
 
         public static IConnectableFlowable<T> Publish<T>(this IFlowable<T> source)
@@ -900,10 +937,6 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
-        // ********************************************************************************
-        // IConnectableFlowable operators
-        // ********************************************************************************
-
         public static IFlowable<T> AutoConnect<T>(this IConnectableFlowable<T> source, int count = 1, Action<IDisposable> onConnect = null)
         {
             // TODO implement
@@ -914,6 +947,17 @@ namespace Reactive4.NET
         {
             // TODO implement
             throw new NotImplementedException();
+        }
+
+        public static IFlowableProcessor<T> RefCount<T>(this IFlowableProcessor<T> source, int count = 1)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowableProcessor<T> Serialize<T>(this IFlowableProcessor<T> source)
+        {
+            return new FlowableProcessorSerialize<T>(source);
         }
 
         // ********************************************************************************
@@ -959,8 +1003,7 @@ namespace Reactive4.NET
 
         public static IFlowable<T> DoFinally<T>(this IFlowable<T> source, Action onFinally)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableDoFinally<T>(source, onFinally);
         }
 
         public static IFlowable<T> DoOnSubscribe<T>(this IFlowable<T> source, Action<ISubscription> onSubscribe)

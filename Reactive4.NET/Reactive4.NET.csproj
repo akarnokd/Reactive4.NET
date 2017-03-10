@@ -48,6 +48,8 @@
     <Compile Include="AsyncProcessor.cs" />
     <Compile Include="operators\FlowableConcatEnumerable.cs" />
     <Compile Include="operators\FlowableConcatArray.cs" />
+    <Compile Include="operators\FlowableDoFinally.cs" />
+    <Compile Include="operators\FlowableProcessorSerialize.cs" />
     <Compile Include="ReplayProcessor.cs" />
     <Compile Include="schedulers\InterruptibleAction.cs" />
     <Compile Include="schedulers\IWorkerServices.cs" />

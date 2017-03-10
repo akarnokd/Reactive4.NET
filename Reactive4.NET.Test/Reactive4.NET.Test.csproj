@@ -59,6 +59,8 @@
     <Compile Include="FlowableConcatEnumerable1Tck.cs" />
     <Compile Include="FlowableConcatArray1Tck.cs" />
     <Compile Include="FlowableConcatEnumerableTest.cs" />
+    <Compile Include="FlowableDoFinally2Tck.cs" />
+    <Compile Include="FlowableDoFinally1Tck.cs" />
     <Compile Include="ReplayProcessor3Tck.cs" />
     <Compile Include="ReplayProcessor2Tck.cs" />
     <Compile Include="ReplayProcessor1Tck .cs" />
