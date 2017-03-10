@@ -11,33 +11,34 @@ namespace Reactive4.NET.schedulers
     {
         internal static readonly IExecutorService Instance = new ThreadExecutorService();
 
-        public IExecutorWorker Worker => throw new NotImplementedException();
-
         public long Now => SchedulerHelper.NowUTC();
 
         public IDisposable Schedule(Action task)
         {
-            throw new NotImplementedException();
+            return SchedulerHelper.ScheduleTask(task);
         }
 
         public IDisposable Schedule(Action task, TimeSpan delay)
         {
-            throw new NotImplementedException();
+            return SchedulerHelper.ScheduleTask(task, delay);
         }
 
         public IDisposable Schedule(Action task, TimeSpan initialDelay, TimeSpan period)
         {
-            throw new NotImplementedException();
+            return SchedulerHelper.ScheduleTask(task, initialDelay, period);
         }
 
         public void Shutdown()
         {
-            throw new NotImplementedException();
+            // this type of IExecutorService doesn't support the operation
         }
 
         public void Start()
         {
-            throw new NotImplementedException();
+            // this type of IExecutorService doesn't support the operation
         }
+
+        public IExecutorWorker Worker => new SingleExecutorWorker(new SingleThreadedExecutor(), e => e.Shutdown());
+
     }
 }

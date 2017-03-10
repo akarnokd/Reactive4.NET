@@ -12,13 +12,16 @@ namespace Reactive4.NET.schedulers
     {
         readonly SingleThreadedExecutor executor;
 
+        readonly Action<SingleThreadedExecutor> onShutdown;
+
         int disposed;
 
         HashSet<InterruptibleAction> tasks;
 
-        internal SingleExecutorWorker(SingleThreadedExecutor executor)
+        internal SingleExecutorWorker(SingleThreadedExecutor executor, Action<SingleThreadedExecutor> onShutdown = null)
         {
             this.executor = executor;
+            this.onShutdown = onShutdown;
             this.tasks = new HashSet<InterruptibleAction>();
         }
 
@@ -60,6 +63,8 @@ namespace Reactive4.NET.schedulers
         {
             if (Interlocked.CompareExchange(ref disposed, 1, 0) == 0)
             {
+                onShutdown?.Invoke(executor);
+
                 HashSet<InterruptibleAction> set;
                 lock (this)
                 {

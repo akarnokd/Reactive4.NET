@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Reactive4.NET.schedulers
 {
-    internal sealed class SingleThreadedExecutor
+    internal sealed class SingleThreadedExecutor : IDisposable
     {
         int state;
 
@@ -40,6 +40,11 @@ namespace Reactive4.NET.schedulers
             {
                 runner.Shutdown();
             }
+        }
+
+        public void Dispose()
+        {
+            Shutdown();
         }
 
         bool Prepare()

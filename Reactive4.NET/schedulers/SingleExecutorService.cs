@@ -12,8 +12,6 @@ namespace Reactive4.NET.schedulers
     {
         internal static readonly IExecutorService Instance = new SingleExecutorService();
 
-        public IExecutorWorker Worker => new SingleExecutorWorker(executor);
-
         public long Now => SchedulerHelper.NowUTC();
 
         SingleThreadedExecutor executor;
@@ -76,6 +74,18 @@ namespace Reactive4.NET.schedulers
                 {
                     break;
                 }
+            }
+        }
+
+        public IExecutorWorker Worker { 
+            get
+            {
+                var x = Volatile.Read(ref executor);
+                if (x != null)
+                {
+                    return new SingleExecutorWorker(executor);
+                }
+                return SchedulerHelper.RejectingWorker;
             }
         }
     }
