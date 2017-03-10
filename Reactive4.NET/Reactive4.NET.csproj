@@ -46,6 +46,7 @@
     <Compile Include="BackpressureStrategy.cs" />
     <Compile Include="BufferStrategy.cs" />
     <Compile Include="AsyncProcessor.cs" />
+    <Compile Include="operators\FlowableAutoConnect.cs" />
     <Compile Include="operators\FlowableConcatEnumerable.cs" />
     <Compile Include="operators\FlowableConcatArray.cs" />
     <Compile Include="operators\FlowableDoFinally.cs" />

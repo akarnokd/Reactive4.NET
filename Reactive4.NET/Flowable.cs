@@ -939,8 +939,12 @@ namespace Reactive4.NET
 
         public static IFlowable<T> AutoConnect<T>(this IConnectableFlowable<T> source, int count = 1, Action<IDisposable> onConnect = null)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            if (count == 0)
+            {
+                source.Connect(onConnect);
+                return source;
+            }
+            return new FlowableAutoConnect<T>(source, count, onConnect);
         }
 
         public static IFlowable<T> RefCount<T>(this IConnectableFlowable<T> source, int count = 1)
@@ -949,7 +953,7 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
-        public static IFlowableProcessor<T> RefCount<T>(this IFlowableProcessor<T> source, int count = 1)
+        public static IFlowableProcessor<T> RefCount<T, P>(this P source, int count = 1) where P : IFlowableProcessor<T>, IDisposable
         {
             // TODO implement
             throw new NotImplementedException();
@@ -957,6 +961,10 @@ namespace Reactive4.NET
 
         public static IFlowableProcessor<T> Serialize<T>(this IFlowableProcessor<T> source)
         {
+            if (source is FlowableProcessorSerialize<T> s)
+            {
+                return s;
+            }
             return new FlowableProcessorSerialize<T>(source);
         }
 
