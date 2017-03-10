@@ -54,6 +54,11 @@
   <ItemGroup>
     <Compile Include="AsyncProcessor2Tck.cs" />
     <Compile Include="AsyncProcessor1Tck.cs" />
+    <Compile Include="FlowableConcatArray2Tck.cs" />
+    <Compile Include="FlowableConcatEnumerable2Tck.cs" />
+    <Compile Include="FlowableConcatEnumerable1Tck.cs" />
+    <Compile Include="FlowableConcatArray1Tck.cs" />
+    <Compile Include="FlowableConcatEnumerableTest.cs" />
     <Compile Include="ReplayProcessor3Tck.cs" />
     <Compile Include="ReplayProcessor2Tck.cs" />
     <Compile Include="ReplayProcessor1Tck .cs" />
@@ -118,6 +123,7 @@
     <Compile Include="SpscLinkedArrayQueueTest.cs" />
     <Compile Include="ReplayProcessorTest.cs" />
     <Compile Include="MpscLinkedArrayQueueTest.cs" />
+    <Compile Include="FlowableConcatArrayTest.cs" />
     <Compile Include="UnitTest1.cs" />
   </ItemGroup>
   <ItemGroup>

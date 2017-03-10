@@ -215,14 +215,12 @@ namespace Reactive4.NET
 
         public static IFlowable<T> Concat<T>(params IPublisher<T>[] sources)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableConcatArray<T>(sources);
         }
 
         public static IFlowable<T> Concat<T>(IEnumerable<IPublisher<T>> sources)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableConcatEnumerable<T>(sources);
         }
 
         public static IFlowable<T> Concat<T>(this IPublisher<IPublisher<T>> sources)
@@ -739,6 +737,180 @@ namespace Reactive4.NET
         }
 
         public static IFlowable<T> OnBackpressureBuffer<T>(this IFlowable<T> source, int capacityHint, BufferStrategy strategy = BufferStrategy.ALL, Action<T> onDrop = null)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<IGroupedFlowable<K, T>> GroupBy<T, K>(this IFlowable<T> source, Func<T, K> keyMapper)
+        {
+            return GroupBy<T, K, T>(source, keyMapper, v => v);
+        }
+
+        public static IFlowable<IGroupedFlowable<K, V>> GroupBy<T, K, V>(this IFlowable<T> source, Func<T, K> keyMapper, Func<T, V> valueMapper)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<R> WithLatestFrom<T, U, R>(this IFlowable<T> source, IPublisher<U> other, Func<T, U, R> combiner)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<R> WithLatestFrom<T, R>(this IFlowable<T> source, Func<T[], R> combiner, params IPublisher<T>[] others)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<R> WithLatestFrom<T, R>(this IFlowable<T> source, Func<T[], R> combiner, IEnumerable<IPublisher<T>> others)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> Sample<T>(this IFlowable<T> source, TimeSpan period)
+        {
+            return Sample(source, period, Executors.Computation);
+        }
+
+        public static IFlowable<T> Sample<T>(this IFlowable<T> source, TimeSpan period, IExecutorService executor)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> Sample<T, U>(this IFlowable<T> source, IPublisher<U> sampler)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> Debounce<T>(this IFlowable<T> source, TimeSpan delay)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> ThrottleFirst<T>(this IFlowable<T> source, TimeSpan delay)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> ThrottleLast<T>(this IFlowable<T> source, TimeSpan delay)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> ThrottleWithTimeout<T>(this IFlowable<T> source, TimeSpan delay)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<IList<T>> Buffer<T>(this IFlowable<T> source, int size)
+        {
+            return Buffer(source, size, size, () => new List<T>());
+        }
+
+        public static IFlowable<C> Buffer<T, C>(this IFlowable<T> source, int size, Func<C> collectionSupplier) where C : ICollection<T>
+        {
+            return Buffer(source, size, size, collectionSupplier);
+        }
+
+        public static IFlowable<IList<T>> Buffer<T>(this IFlowable<T> source, int size, int skip)
+        {
+            return Buffer(source, size, skip, () => new List<T>());
+        }
+
+        public static IFlowable<C> Buffer<T, C>(this IFlowable<T> source, int size, int skip, Func<C> collectionSupplier) where C : ICollection<T>
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<IList<T>> Buffer<T, U>(this IFlowable<T> source, IPublisher<U> boundary)
+        {
+            return Buffer(source, boundary, () => new List<T>());
+        }
+
+        public static IFlowable<C> Buffer<T, U, C>(this IFlowable<T> source, IPublisher<U> boundary, Func<C> collectionSupplier) where C : ICollection<T>
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<IFlowable<T>> Window<T>(this IFlowable<T> source, int size)
+        {
+            return Window(source, size, size);
+        }
+
+        public static IFlowable<IFlowable<T>> Window<T>(this IFlowable<T> source, int size, int skip)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<IFlowable<T>> Window<T, U>(this IFlowable<T> source, IPublisher<U> boundary)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+
+        // ********************************************************************************
+        // IConnectableFlowable creators
+        // ********************************************************************************
+
+        public static IConnectableFlowable<T> Publish<T>(this IFlowable<T> source)
+        {
+            return Publish(source, BufferSize());
+        }
+
+        public static IConnectableFlowable<T> Publish<T>(this IFlowable<T> source, int bufferSize)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<R> Publish<T, R>(this IFlowable<T> source, Func<IFlowable<T>, IPublisher<R>> handler)
+        {
+            return Publish(source, handler, BufferSize());
+        }
+
+        public static IFlowable<R> Publish<T, R>(this IFlowable<T> source, Func<IFlowable<T>, IPublisher<R>> handler, int bufferSize)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IConnectableFlowable<T> Replay<T>(this IFlowable<T> source)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IConnectableFlowable<R> Replay<T, R>(this IFlowable<T> source, Func<IFlowable<T>, IPublisher<R>> handler)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        // ********************************************************************************
+        // IConnectableFlowable operators
+        // ********************************************************************************
+
+        public static IFlowable<T> AutoConnect<T>(this IConnectableFlowable<T> source, int count = 1, Action<IDisposable> onConnect = null)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> RefCount<T>(this IConnectableFlowable<T> source, int count = 1)
         {
             // TODO implement
             throw new NotImplementedException();

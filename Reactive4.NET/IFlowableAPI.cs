@@ -74,4 +74,14 @@ namespace Reactive4.NET
         public static readonly int ANY = SYNC | ASYNC;
         public static readonly int BARRIER = 4;
     }
+
+    public interface IGroupedFlowable<K, V> : IFlowable<V>
+    {
+        K Key { get; }
+    }
+
+    public interface IConnectableFlowable<T> : IFlowable<T>
+    {
+        IDisposable Connect(Action<IDisposable> onConnect = null);
+    }
 }
