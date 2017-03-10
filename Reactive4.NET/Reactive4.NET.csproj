@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="BackpressureStrategy.cs" />
     <Compile Include="BufferStrategy.cs" />
+    <Compile Include="AsyncProcessor.cs" />
     <Compile Include="ReplayProcessor.cs" />
     <Compile Include="UnicastProcessor.cs" />
     <Compile Include="MulticastPublisher.cs" />

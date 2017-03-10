@@ -10,28 +10,24 @@ using System.Threading;
 namespace Reactive4.NET.Test
 {
     [TestFixture]
-    class PublishProcessor1Tck : FlowableVerification<int>
+    class AsyncProcessor2Tck : FlowableVerification<int>
     {
-        PublishProcessor1Tck() : base(50) { }
-
         public override IPublisher<int> CreatePublisher(long elements)
         {
-            var pp = new PublishProcessor<int>();
-            pp.Start();
+            var pp = new AsyncProcessor<int>();
 
             Task.Factory.StartNew(() => {
                 while (!pp.HasSubscribers)
                 {
                     Thread.Sleep(10);
                 }
-                for (int i = 0; i < elements; i++)
-                {
-                    while (!pp.Offer(i)) ;
-                }
+                
                 pp.OnComplete();
             }, TaskCreationOptions.LongRunning);
 
             return pp;
         }
+
+        public override long MaxElementsFromPublisher => 0; 
     }
 }

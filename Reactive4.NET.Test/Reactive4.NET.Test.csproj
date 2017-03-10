@@ -52,6 +52,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsyncProcessor2Tck.cs" />
+    <Compile Include="AsyncProcessor1Tck.cs" />
     <Compile Include="UnicastProcessor3Tck.cs" />
     <Compile Include="UnicastProcessorTest.cs" />
     <Compile Include="UnicastProcessor2Tck.cs" />
