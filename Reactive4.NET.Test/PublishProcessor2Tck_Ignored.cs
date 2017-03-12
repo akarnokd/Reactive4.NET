@@ -11,7 +11,7 @@ namespace Reactive4.NET.Test
 {
     [TestFixture]
     [Ignore("The TCK doesn't support the behavior")]
-    class PublishProcessor2Tck : FlowableProcessorVerification<int>
+    class PublishProcessor2Tck_Ignored : FlowableProcessorVerification<int>
     {
         public override int CreateElement(int element)
         {

@@ -52,8 +52,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AsyncProcessor4Tck.cs" />
-    <Compile Include="AsyncProcessor3Tck.cs" />
+    <Compile Include="AsyncProcessor4Tck_Ignored.cs" />
+    <Compile Include="AsyncProcessor3Tck_Ignored.cs" />
     <Compile Include="AsyncProcessor2Tck.cs" />
     <Compile Include="AsyncProcessor1Tck.cs" />
     <Compile Include="FlowableConcatArray2Tck.cs" />
@@ -65,19 +65,19 @@
     <Compile Include="FlowableDoFinally1Tck.cs" />
     <Compile Include="PublishProcessor6Tck.cs" />
     <Compile Include="ReplayProcessor5Tck.cs" />
-    <Compile Include="ReplayProcessor4Tck.cs" />
+    <Compile Include="ReplayProcessor4Tck_Ignored.cs" />
     <Compile Include="ReplayProcessor3Tck.cs" />
     <Compile Include="ReplayProcessor2Tck.cs" />
     <Compile Include="ReplayProcessor1Tck .cs" />
     <Compile Include="UnicastProcessor3Tck.cs" />
     <Compile Include="UnicastProcessorTest.cs" />
-    <Compile Include="UnicastProcessor2Tck.cs" />
+    <Compile Include="UnicastProcessor2Tck_Ignored.cs" />
     <Compile Include="UnicastProcessor1Tck.cs" />
-    <Compile Include="PublishProcessor5Tck.cs" />
+    <Compile Include="PublishProcessor5Tck_Ignored.cs" />
     <Compile Include="PublishProcessor4Tck.cs" />
     <Compile Include="PublishProcessor3Tck.cs" />
     <Compile Include="PublishProcessorTest.cs" />
-    <Compile Include="PublishProcessor2Tck.cs" />
+    <Compile Include="PublishProcessor2Tck_Ignored.cs" />
     <Compile Include="PublishProcessor1Tck.cs" />
     <Compile Include="DirectProcessorTest.cs" />
     <Compile Include="ExecutorsTest.cs" />

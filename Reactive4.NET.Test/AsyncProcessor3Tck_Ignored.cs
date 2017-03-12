@@ -11,12 +11,10 @@ namespace Reactive4.NET.Test
 {
     [TestFixture]
     [Ignore("The TCK doesn't support this behavior")]
-    class AsyncProcessor4Tck : FlowableProcessorVerification<object>
+    class AsyncProcessor3Tck_Ignored : FlowableProcessorVerification<object>
     {
 
         public override long MaxElementsFromPublisher => 1;
-
-        public override long MaxSupportedSubscribers => 1; 
 
         public override object CreateElement(int element)
         {

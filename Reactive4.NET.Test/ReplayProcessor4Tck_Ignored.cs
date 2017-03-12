@@ -11,11 +11,8 @@ namespace Reactive4.NET.Test
 {
     [TestFixture]
     [Ignore("The TCK doesn't support this behavior")]
-    class AsyncProcessor3Tck : FlowableProcessorVerification<object>
+    class ReplayProcessor4Tck_Ignored : FlowableProcessorVerification<object>
     {
-
-        public override long MaxElementsFromPublisher => 1;
-
         public override object CreateElement(int element)
         {
             return element;
@@ -23,7 +20,7 @@ namespace Reactive4.NET.Test
 
         public override IProcessor<object, object> CreateIdentityProcessor(int bufferSize)
         {
-            return new AsyncProcessor<object>().RefCount();
+            return new ReplayProcessor<object>().RefCount();
         }
     }
 }

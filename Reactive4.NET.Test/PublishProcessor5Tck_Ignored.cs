@@ -11,18 +11,16 @@ namespace Reactive4.NET.Test
 {
     [TestFixture]
     [Ignore("The TCK doesn't support the behavior")]
-    class UnicastProcessor2Tck : FlowableProcessorVerification<int>
+    class PublishProcessor5Tck_Ignored : FlowableProcessorVerification<object>
     {
-        public override int CreateElement(int element)
+        public override object CreateElement(int element)
         {
             return element;
         }
 
-        public override IProcessor<int, int> CreateIdentityProcessor(int bufferSize)
+        public override IProcessor<object, object> CreateIdentityProcessor(int bufferSize)
         {
-            return new UnicastProcessor<int>(bufferSize);
+            return new PublishProcessor<object>(bufferSize);
         }
-
-        public override long MaxSupportedSubscribers => 1;
     }
 }
