@@ -12,6 +12,8 @@ namespace Reactive4.NET.Test
     [TestFixture]
     class DirectProcessor1Tck : FlowableVerification<int>
     {
+        public DirectProcessor1Tck() : base(50) { }
+
         public override IPublisher<int> CreatePublisher(long elements)
         {
             var dp = new DirectProcessor<int>();

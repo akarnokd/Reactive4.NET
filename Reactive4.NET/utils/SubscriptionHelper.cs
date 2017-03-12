@@ -91,9 +91,14 @@ namespace Reactive4.NET.operators
             next?.Cancel();
             if (current != Cancelled)
             {
+                var e = new InvalidOperationException("ISubscription already set!");
                 if (crash)
                 {
-                    throw new InvalidOperationException("ISubscription already set!");
+                    throw e;
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine(e.ToString());
                 }
             }
             return false;

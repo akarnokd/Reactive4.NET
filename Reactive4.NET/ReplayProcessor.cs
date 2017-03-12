@@ -92,7 +92,7 @@ namespace Reactive4.NET
 
         public void OnSubscribe(ISubscription subscription)
         {
-            if (SubscriptionHelper.SetOnce(ref upstream, subscription))
+            if (SubscriptionHelper.SetOnce(ref upstream, subscription, crash: false))
             {
                 if (manager.HasTerminated)
                 {

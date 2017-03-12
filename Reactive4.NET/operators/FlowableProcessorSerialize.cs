@@ -99,13 +99,13 @@ namespace Reactive4.NET.operators
                 }
                 if (emitting)
                 {
-                    var a = list;
-                    if (a == null)
+                    var lst = list;
+                    if (lst == null)
                     {
-                        a = new List<T>();
-                        list = a;
+                        lst = new List<T>();
+                        list = lst;
                     }
-                    a.Add(element);
+                    lst.Add(element);
                     return;
                 }
                 emitting = true;
@@ -190,5 +190,9 @@ namespace Reactive4.NET.operators
             upstream.Cancel();
         }
 
+        public void Dispose()
+        {
+            Cancel();
+        }
     }
 }

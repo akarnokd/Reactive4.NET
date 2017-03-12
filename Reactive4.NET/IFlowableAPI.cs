@@ -55,7 +55,7 @@ namespace Reactive4.NET
         IFlowable<T> WithSource(IFlowable<T> newSource);
     }
 
-    public interface IFlowableProcessor<T> : IFlowable<T>, IProcessor<T, T>, IFlowableSubscriber<T>
+    public interface IFlowableProcessor<T> : IFlowable<T>, IProcessor<T, T>, IFlowableSubscriber<T>, IDisposable
     {
         bool HasComplete { get; }
 

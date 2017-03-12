@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace Reactive4.NET
 {
-    public sealed class DirectProcessor<T> : IFlowableProcessor<T>
+    public sealed class DirectProcessor<T> : IFlowableProcessor<T>, IDisposable
     {
         public bool HasComplete {
             get
@@ -49,6 +49,13 @@ namespace Reactive4.NET
 
         Exception error;
         int once;
+
+        ISubscription upstream;
+
+        public void Dispose()
+        {
+            SubscriptionHelper.Cancel(ref upstream);
+        }
 
         public void OnComplete()
         {
@@ -112,17 +119,16 @@ namespace Reactive4.NET
 
         public void OnSubscribe(ISubscription subscription)
         {
-            if (subscription == null)
+            if (SubscriptionHelper.SetOnce(ref upstream, subscription, crash: false))
             {
-                throw new ArgumentNullException(nameof(subscription));
-            }
-            if (Volatile.Read(ref subscribers) == Terminated)
-            {
-                subscription.Cancel();
-            }
-            else
-            {
-                subscription.Request(long.MaxValue);
+                if (Volatile.Read(ref subscribers) == Terminated)
+                {
+                    subscription.Cancel();
+                }
+                else
+                {
+                    subscription.Request(long.MaxValue);
+                }
             }
         }
 

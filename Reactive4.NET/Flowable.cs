@@ -953,10 +953,13 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
-        public static IFlowableProcessor<T> RefCount<T, P>(this P source, int count = 1) where P : IFlowableProcessor<T>, IDisposable
+        public static IFlowableProcessor<T> RefCount<T>(this IFlowableProcessor<T> source)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            if (source is FlowableProcessorRefCount<T>)
+            {
+                return source;
+            }
+            return new FlowableProcessorRefCount<T>(source);
         }
 
         public static IFlowableProcessor<T> Serialize<T>(this IFlowableProcessor<T> source)

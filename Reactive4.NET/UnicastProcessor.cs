@@ -10,7 +10,7 @@ using Reactive4.NET.utils;
 
 namespace Reactive4.NET
 {
-    public sealed class UnicastProcessor<T> : IFlowableProcessor<T>
+    public sealed class UnicastProcessor<T> : IFlowableProcessor<T>, IDisposable
     {
         public bool HasComplete
         {
@@ -129,6 +129,11 @@ namespace Reactive4.NET
             }
             queue.Offer(element);
             Drain();
+        }
+
+        public void Dispose()
+        {
+            SubscriptionHelper.Cancel(ref upstream);
         }
 
         public void OnSubscribe(ISubscription subscription)
