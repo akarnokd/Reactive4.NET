@@ -7,8 +7,15 @@ using Reactive4.NET.subscribers;
 
 namespace Reactive4.NET
 {
+    /// <summary>
+    /// Extension methods for composing backpressure-enabled operators in a fluent manner.
+    /// </summary>
     public static class Flowable
     {
+        /// <summary>
+        /// The default buffer size, prefetch amount, capacity hint.
+        /// </summary>
+        /// <returns></returns>
         public static int BufferSize()
         {
             return 128;
@@ -34,8 +41,7 @@ namespace Reactive4.NET
 
         public static IFlowable<T> ToFlowable<T>(this IObservable<T> source, BackpressureStrategy strategy)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableFromObservable<T>(source, strategy);
         }
 
         public static IFlowable<T> FromObservable<T>(IObservable<T> source, BackpressureStrategy strategy)
@@ -79,8 +85,7 @@ namespace Reactive4.NET
 
         public static IFlowable<T> RepeatItem<T>(T item)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableRepeatItem<T>(item);
         }
 
         public static IFlowable<T> Error<T>(Exception exception)
@@ -110,11 +115,10 @@ namespace Reactive4.NET
 
         public static IFlowable<T> RepeatFunction<T>(Func<T> function)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableRepeatFunction<T>(function);
         }
 
-        public static IFlowable<T> Create<T>(Action<IFlowableEmitter<T>> emitter)
+        public static IFlowable<T> Create<T>(Action<IFlowableEmitter<T>> emitter, BackpressureStrategy strategy)
         {
             // TODO implement
             throw new NotImplementedException();

@@ -63,6 +63,10 @@
     <Compile Include="FlowableConcatEnumerableTest.cs" />
     <Compile Include="FlowableDoFinally2Tck.cs" />
     <Compile Include="FlowableDoFinally1Tck.cs" />
+    <Compile Include="FlowableRepeatFunction2Tck.cs" />
+    <Compile Include="FlowableRepeatFunction1Tck.cs" />
+    <Compile Include="FlowableRepeatItem2Tck.cs" />
+    <Compile Include="FlowableRepeatItem1Tck.cs" />
     <Compile Include="PublishProcessor6Tck.cs" />
     <Compile Include="ReplayProcessor5Tck.cs" />
     <Compile Include="ReplayProcessor4Tck_Ignored.cs" />

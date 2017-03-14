@@ -11,7 +11,7 @@ namespace Reactive4.NET.utils
     {
         internal static readonly IDisposable Disposed = new DisposedDisposable();
 
-        internal static bool Cancel(ref IDisposable field)
+        internal static bool Dispose(ref IDisposable field)
         {
             var current = Volatile.Read(ref field);
             if (current != Disposed)
@@ -26,7 +26,7 @@ namespace Reactive4.NET.utils
             return false;
         }
 
-        internal static bool IsCancelled(ref IDisposable field)
+        internal static bool IsDisposed(ref IDisposable field)
         {
             return Volatile.Read(ref field) == Disposed;
         }

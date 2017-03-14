@@ -50,8 +50,11 @@
     <Compile Include="operators\FlowableConcatEnumerable.cs" />
     <Compile Include="operators\FlowableConcatArray.cs" />
     <Compile Include="operators\FlowableDoFinally.cs" />
+    <Compile Include="operators\FlowableFromObservable.cs" />
     <Compile Include="operators\FlowableProcessorRefCount.cs" />
     <Compile Include="operators\FlowableProcessorSerialize.cs" />
+    <Compile Include="operators\FlowableRepeatFunction.cs" />
+    <Compile Include="operators\FlowableRepeatItem.cs" />
     <Compile Include="ReplayProcessor.cs" />
     <Compile Include="schedulers\InterruptibleAction.cs" />
     <Compile Include="schedulers\IWorkerServices.cs" />
