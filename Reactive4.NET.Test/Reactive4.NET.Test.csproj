@@ -61,8 +61,12 @@
     <Compile Include="FlowableConcatEnumerable1Tck.cs" />
     <Compile Include="FlowableConcatArray1Tck.cs" />
     <Compile Include="FlowableConcatEnumerableTest.cs" />
+    <Compile Include="FlowableDelayTest.cs" />
     <Compile Include="FlowableDoFinally2Tck.cs" />
     <Compile Include="FlowableDoFinally1Tck.cs" />
+    <Compile Include="FlowableInterval1Tck.cs" />
+    <Compile Include="FlowableDelay1Tck.cs" />
+    <Compile Include="FlowableTimerTck.cs" />
     <Compile Include="FlowableRepeatFunction2Tck.cs" />
     <Compile Include="FlowableRepeatFunction1Tck.cs" />
     <Compile Include="FlowableRepeatItem2Tck.cs" />

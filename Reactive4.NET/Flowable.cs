@@ -170,36 +170,34 @@ namespace Reactive4.NET
             return new FlowableDefer<T>(supplier);
         }
 
-        public static IFlowable<long> Timer()
+        public static IFlowable<long> Timer(TimeSpan delay)
         {
-            return Timer(Executors.Computation);
+            return Timer(delay, Executors.Computation);
         }
 
-        public static IFlowable<long> Timer(IExecutorService executor)
+        public static IFlowable<long> Timer(TimeSpan delay, IExecutorService executor)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableTimer(delay, executor);
         }
 
-        public static IFlowable<long> Interval(long period)
+        public static IFlowable<long> Interval(TimeSpan period)
         {
             return Interval(period, period, Executors.Computation);
         }
 
-        public static IFlowable<long> Interval(long initialDelay, long period)
+        public static IFlowable<long> Interval(TimeSpan initialDelay, TimeSpan period)
         {
             return Interval(initialDelay, period, Executors.Computation);
         }
 
-        public static IFlowable<long> Interval(long period, IExecutorService executor)
+        public static IFlowable<long> Interval(TimeSpan period, IExecutorService executor)
         {
             return Interval(period, period, executor);
         }
 
-        public static IFlowable<long> Interval(long initialDelay, long period, IExecutorService executor)
+        public static IFlowable<long> Interval(TimeSpan initialDelay, TimeSpan period, IExecutorService executor)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableInterval(initialDelay, period, executor);
         }
 
         // ********************************************************************************
@@ -406,14 +404,26 @@ namespace Reactive4.NET
             return new FlowableSkip<T>(source, n);
         }
 
-        public static IFlowable<R> TakeLast<T, R>(this IFlowable<T> source, long n)
+        public static IFlowable<T> TakeLast<T>(this IFlowable<T> source, long n)
         {
+            if (n <= 0)
+            {
+                return Empty<T>();
+            }
+            if (n == 1L)
+            {
+                return new FlowableTakeLastOne<T>(source);
+            }
             // TODO implement
             throw new NotImplementedException();
         }
 
-        public static IFlowable<R> SkipLast<T, R>(this IFlowable<T> source, long n)
+        public static IFlowable<T> SkipLast<T>(this IFlowable<T> source, long n)
         {
+            if (n <= 0)
+            {
+                return source;
+            }
             // TODO implement
             throw new NotImplementedException();
         }
@@ -525,8 +535,23 @@ namespace Reactive4.NET
 
         public static IFlowable<T> Delay<T>(this IFlowable<T> source, TimeSpan delay, IExecutorService executor)
         {
+            return new FlowableDelay<T>(source, delay, executor);
+        }
+
+        public static IFlowable<T> DelaySubscription<T, U>(this IFlowable<T> source, IPublisher<U> other)
+        {
             // TODO implement
             throw new NotImplementedException();
+        }
+
+        public static IFlowable<T> DelaySubscription<T, U>(this IFlowable<T> source, TimeSpan delay)
+        {
+            return DelaySubscription(source, Timer(delay, Executors.Computation));
+        }
+
+        public static IFlowable<T> DelaySubscription<T, U>(this IFlowable<T> source, TimeSpan delay, IExecutorService executor)
+        {
+            return DelaySubscription(source, Timer(delay, executor));
         }
 
         public static IFlowable<R> ConcatMap<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper)
