@@ -49,6 +49,7 @@
     <Compile Include="operators\FlowableAutoConnect.cs" />
     <Compile Include="operators\FlowableConcatEnumerable.cs" />
     <Compile Include="operators\FlowableConcatArray.cs" />
+    <Compile Include="operators\FlowableConcatMap.cs" />
     <Compile Include="operators\FlowableDelay.cs" />
     <Compile Include="operators\FlowableDelaySubscription.cs" />
     <Compile Include="operators\FlowableDistinctUntilChanged.cs" />

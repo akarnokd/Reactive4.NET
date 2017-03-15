@@ -64,6 +64,7 @@ namespace Reactive4.NET.operators
             internal SkipUntilSubscriber(IFlowableSubscriber<T> actual)
             {
                 this.actual = actual;
+                this.other = new OtherSubscriber(this);
             }
 
             public void Cancel()
@@ -143,6 +144,7 @@ namespace Reactive4.NET.operators
             internal SkipUntilConditionalSubscriber(IConditionalSubscriber<T> actual)
             {
                 this.actual = actual;
+                this.other = new OtherSubscriber(this);
             }
 
             public void Cancel()

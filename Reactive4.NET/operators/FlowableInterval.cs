@@ -96,7 +96,14 @@ namespace Reactive4.NET.operators
                 if (SubscriptionHelper.Validate(n))
                 {
                     SubscriptionHelper.AddRequest(ref requested, n);
-                    Drain();
+                    if (outputFused)
+                    {
+                        DrainFused();
+                    }
+                    else
+                    {
+                        Drain();
+                    }
                 }
             }
 
@@ -113,7 +120,55 @@ namespace Reactive4.NET.operators
             internal void Run()
             {
                 Interlocked.Increment(ref available);
-                Drain();
+                if (outputFused)
+                {
+                    DrainFused();
+                }
+                else
+                {
+                    Drain();
+                }
+            }
+
+            internal void DrainFused()
+            {
+                if (Interlocked.Increment(ref wip) != 1)
+                {
+                    return;
+                }
+
+                int missed = 1;
+                for (;;)
+                {
+                    if (Volatile.Read(ref task) == DisposableHelper.Disposed)
+                    {
+                        return;
+                    }
+
+                    long q = Volatile.Read(ref available);
+                    long e = emitted;
+
+                    if (e != q)
+                    {
+                        e++;
+                        actual.OnNext(default(long));
+                    }
+
+                    int w = Volatile.Read(ref wip);
+                    if (w == missed)
+                    {
+                        emitted = e;
+                        missed = Interlocked.Add(ref wip, -missed);
+                        if (missed == 0)
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        missed = w;
+                    }
+                }
             }
 
             internal void Drain()

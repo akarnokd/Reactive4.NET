@@ -43,6 +43,7 @@ namespace Reactive4.NET.operators
             internal TakeUntilSubscriber(IFlowableSubscriber<T> actual)
             {
                 this.actual = actual;
+                this.other = new OtherSubscriber(this);
             }
 
             public void Cancel()

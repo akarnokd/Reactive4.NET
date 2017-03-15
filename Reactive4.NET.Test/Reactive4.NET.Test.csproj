@@ -57,6 +57,8 @@
     <Compile Include="AsyncProcessor2Tck.cs" />
     <Compile Include="AsyncProcessor1Tck.cs" />
     <Compile Include="FlowableConcatArray2Tck.cs" />
+    <Compile Include="FlowableConcatMap4Tck.cs" />
+    <Compile Include="FlowableConcatMapTest.cs" />
     <Compile Include="FlowableConcatEnumerable2Tck.cs" />
     <Compile Include="FlowableConcatEnumerable1Tck.cs" />
     <Compile Include="FlowableConcatArray1Tck.cs" />
@@ -71,6 +73,9 @@
     <Compile Include="FlowableDistinctTest.cs" />
     <Compile Include="FlowableDoFinally2Tck.cs" />
     <Compile Include="FlowableDoFinally1Tck.cs" />
+    <Compile Include="FlowableConcatMap1Tck.cs" />
+    <Compile Include="FlowableConcatMap2Tck.cs" />
+    <Compile Include="FlowableConcatMap3Tck.cs" />
     <Compile Include="FlowableInterval1Tck.cs" />
     <Compile Include="FlowableDelay1Tck.cs" />
     <Compile Include="FlowableDelaySubscription1Tck.cs" />

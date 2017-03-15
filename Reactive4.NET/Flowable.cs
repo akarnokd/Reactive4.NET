@@ -560,16 +560,21 @@ namespace Reactive4.NET
 
         public static IFlowable<R> ConcatMap<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper, int prefetch)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableConcatMap<T, R>(source, mapper, prefetch);
         }
 
         public static IFlowable<R> ConcatMapEager<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper)
         {
-            return ConcatMapEager(source, mapper, BufferSize());
+            return ConcatMapEager(source, mapper, BufferSize(), BufferSize());
         }
 
-        public static IFlowable<R> ConcatMapEager<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper, int prefetch)
+        public static IFlowable<R> ConcatMapEager<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper, int maxConcurrency)
+        {
+            // TODO implement
+            throw new NotImplementedException();
+        }
+
+        public static IFlowable<R> ConcatMapEager<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper, int maxConcurrency, int prefetch)
         {
             // TODO implement
             throw new NotImplementedException();

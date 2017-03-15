@@ -138,12 +138,24 @@ namespace Reactive4.NET.schedulers
                 {
                     long now = SchedulerHelper.NowUTC();
                     TimedTask tt = null;
+                    int next = 0;
                     lock (q)
                     {
                         tt = q.FirstOrDefault();
-                        if (tt != null && tt.due <= now)
+                        if (tt != null)
                         {
-                            q.Remove(tt);
+                            if (tt.due <= now)
+                            {
+                                q.Remove(tt);
+                            }
+                            else
+                            {
+                                next = (int)Math.Max(int.MaxValue, tt.due - now);
+                            }
+                        }
+                        else
+                        {
+                            next = int.MaxValue;
                         }
                     }
 
@@ -172,7 +184,7 @@ namespace Reactive4.NET.schedulers
                     {
                         if (Monitor.TryEnter(this))
                         {
-                            Monitor.Wait(this, 1);
+                            Monitor.Wait(this, next);
                             Monitor.Exit(this);
                         }
                     }
