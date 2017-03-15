@@ -587,8 +587,7 @@ namespace Reactive4.NET
 
         public static IFlowable<T> Distinct<T>(this IFlowable<T> source, IEqualityComparer<T> comparer)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableDistinct<T>(source, comparer);
         }
 
         public static IFlowable<T> DistinctUntilChanged<T>(this IFlowable<T> source)
@@ -598,8 +597,7 @@ namespace Reactive4.NET
 
         public static IFlowable<T> DistinctUntilChanged<T>(this IFlowable<T> source, IEqualityComparer<T> comparer)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableDistinctUntilChanged<T>(source, comparer);
         }
 
         public static IFlowable<T> TakeUntil<T, U>(this IFlowable<T> source, IPublisher<U> other)

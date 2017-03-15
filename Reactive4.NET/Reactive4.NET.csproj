@@ -51,6 +51,8 @@
     <Compile Include="operators\FlowableConcatArray.cs" />
     <Compile Include="operators\FlowableDelay.cs" />
     <Compile Include="operators\FlowableDelaySubscription.cs" />
+    <Compile Include="operators\FlowableDistinctUntilChanged.cs" />
+    <Compile Include="operators\FlowableDistinct.cs" />
     <Compile Include="operators\FlowableDoFinally.cs" />
     <Compile Include="operators\FlowableFromObservable.cs" />
     <Compile Include="operators\FlowableInterval.cs" />

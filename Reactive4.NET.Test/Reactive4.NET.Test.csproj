@@ -63,11 +63,18 @@
     <Compile Include="FlowableConcatEnumerableTest.cs" />
     <Compile Include="FlowableDelaySubscription2Tck.cs" />
     <Compile Include="FlowableDelayTest.cs" />
+    <Compile Include="FlowableDistinct3Tck.cs" />
+    <Compile Include="FlowableDistinctUntilChanged3Tck.cs" />
+    <Compile Include="FlowableDistinctUntilChanged2Tck.cs" />
+    <Compile Include="FlowableDistinctUntilChanged1Tck.cs" />
+    <Compile Include="FlowableDistinct2Tck.cs" />
+    <Compile Include="FlowableDistinctTest.cs" />
     <Compile Include="FlowableDoFinally2Tck.cs" />
     <Compile Include="FlowableDoFinally1Tck.cs" />
     <Compile Include="FlowableInterval1Tck.cs" />
     <Compile Include="FlowableDelay1Tck.cs" />
     <Compile Include="FlowableDelaySubscription1Tck.cs" />
+    <Compile Include="FlowableDistinct1Tck.cs" />
     <Compile Include="FlowableTimerTck.cs" />
     <Compile Include="FlowableRepeatFunction2Tck.cs" />
     <Compile Include="FlowableRepeatFunction1Tck.cs" />
@@ -141,6 +148,7 @@
     <Compile Include="ReplayProcessorTest.cs" />
     <Compile Include="MpscLinkedArrayQueueTest.cs" />
     <Compile Include="FlowableConcatArrayTest.cs" />
+    <Compile Include="FlowableDistinctUntilChangedTest.cs" />
     <Compile Include="UnitTest1.cs" />
   </ItemGroup>
   <ItemGroup>
