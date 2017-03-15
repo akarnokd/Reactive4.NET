@@ -540,11 +540,10 @@ namespace Reactive4.NET
 
         public static IFlowable<T> DelaySubscription<T, U>(this IFlowable<T> source, IPublisher<U> other)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableDelaySubscription<T, U>(source, other);
         }
 
-        public static IFlowable<T> DelaySubscription<T, U>(this IFlowable<T> source, TimeSpan delay)
+        public static IFlowable<T> DelaySubscription<T>(this IFlowable<T> source, TimeSpan delay)
         {
             return DelaySubscription(source, Timer(delay, Executors.Computation));
         }

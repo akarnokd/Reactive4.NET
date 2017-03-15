@@ -16,7 +16,7 @@ namespace Reactive4.NET.schedulers
 
         readonly int parallelism;
 
-        SingleThreadedExecutor[] executors;
+        SingleThreadedExecutor[] executors = ShutdownPool;
 
         int n;
 
