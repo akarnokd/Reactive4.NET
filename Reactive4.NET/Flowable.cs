@@ -602,20 +602,17 @@ namespace Reactive4.NET
 
         public static IFlowable<T> TakeUntil<T, U>(this IFlowable<T> source, IPublisher<U> other)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableTakeUntil<T, U>(source, other);
         }
 
         public static IFlowable<T> SkipUntil<T, U>(this IFlowable<T> source, IPublisher<U> other)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableSkipUntil<T, U>(source, other);
         }
 
-        public static IFlowable<R> Lift<T, R>(this IFlowable<T> source, Func<IFlowableSubscriber<R>, IFlowableSubscriber<T>> onLift)
+        public static IFlowable<R> Lift<T, R>(this IFlowable<T> source, Func<IFlowableSubscriber<R>, IFlowableSubscriber<T>> lifter)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableLift<T, R>(source, lifter);
         }
 
         public static IFlowable<R> Compose<T, R>(this IFlowable<T> source, Func<IFlowable<T>, IPublisher<R>> composer)

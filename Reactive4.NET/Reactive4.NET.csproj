@@ -56,11 +56,14 @@
     <Compile Include="operators\FlowableDoFinally.cs" />
     <Compile Include="operators\FlowableFromObservable.cs" />
     <Compile Include="operators\FlowableInterval.cs" />
+    <Compile Include="operators\FlowableLift.cs" />
     <Compile Include="operators\FlowableProcessorRefCount.cs" />
     <Compile Include="operators\FlowableProcessorSerialize.cs" />
     <Compile Include="operators\FlowableRepeatFunction.cs" />
     <Compile Include="operators\FlowableRepeatItem.cs" />
+    <Compile Include="operators\FlowableSkipUntil.cs" />
     <Compile Include="operators\FlowableTakeLastOne.cs" />
+    <Compile Include="operators\FlowableTakeUntil.cs" />
     <Compile Include="operators\FlowableTimer.cs" />
     <Compile Include="ReplayProcessor.cs" />
     <Compile Include="schedulers\InterruptibleAction.cs" />
@@ -132,6 +135,7 @@
     <Compile Include="utils\QueueHelper.cs" />
     <Compile Include="utils\SchedulerHelper.cs" />
     <Compile Include="utils\SequentialDisposable.cs" />
+    <Compile Include="utils\SerializationHelper.cs" />
     <Compile Include="utils\SetCompositeDisposable.cs" />
     <Compile Include="utils\SpscArrayQueue.cs" />
     <Compile Include="utils\SpscLinkedArrayQueue.cs" />

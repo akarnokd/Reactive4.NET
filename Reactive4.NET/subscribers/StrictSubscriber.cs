@@ -31,47 +31,17 @@ namespace Reactive4.NET.operators
 
         public void OnComplete()
         {
-            if (Interlocked.Increment(ref wip) == 1)
-            {
-                var ex = Interlocked.Exchange(ref error, ExceptionHelper.Terminated);
-                if (ex == null)
-                {
-                    actual.OnComplete();
-                } else {
-                    actual.OnError(ex);
-                }
-            }
+            SerializationHelper.OnComplete<T>(actual, ref wip, ref error);
         }
 
         public void OnError(Exception e)
         {
-            if (Interlocked.CompareExchange(ref error, e, null) == null)
-            {
-                if (Interlocked.Increment(ref wip) == 1)
-                {
-                    actual.OnError(e);
-                }
-            }
+            SerializationHelper.OnError<T>(actual, ref wip, ref error, e);
         }
 
         public void OnNext(T t)
         {
-            if (Volatile.Read(ref wip) == 0 && Interlocked.CompareExchange(ref wip, 1, 0) == 0)
-            {
-                actual.OnNext(t);
-                if (Interlocked.CompareExchange(ref wip, 0, 1) != 1)
-                {
-                    var ex = Interlocked.Exchange(ref error, ExceptionHelper.Terminated);
-                    if (ex == null)
-                    {
-                        actual.OnComplete();
-                    }
-                    else
-                    {
-                        actual.OnError(ex);
-                    }
-                }
-            }            
+            SerializationHelper.OnNext<T>(actual, ref wip, ref error, t);          
         }
 
         public void OnSubscribe(ISubscription subscription)
