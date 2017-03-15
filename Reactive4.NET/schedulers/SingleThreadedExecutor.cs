@@ -21,9 +21,12 @@ namespace Reactive4.NET.schedulers
 
         public long Now => SchedulerHelper.NowUTC();
 
+        readonly TimedBlockingExecutor timed;
+
         internal SingleThreadedExecutor()
         {
             runner = new BlockingQueueConsumer(Flowable.BufferSize());
+            timed = TimedExecutorPool.TimedExecutor;
         }
 
         internal void Start()
@@ -97,10 +100,11 @@ namespace Reactive4.NET.schedulers
                 t.resource = cts;
                 cts.Token.Register(t.Dispose);
 
-                Task.Delay(delay, cts.Token).ContinueWith(a =>
+                var d = timed.Schedule(() =>
                 {
                     run.Offer(t.Run);
-                }, cts.Token);
+                }, delay);
+                cts.Token.Register(d.Dispose);
 
                 return cts;
             }
@@ -119,7 +123,7 @@ namespace Reactive4.NET.schedulers
                 t.resource = cts;
                 cts.Token.Register(t.Dispose);
 
-                SchedulerHelper.ScheduleTask(() =>
+                var d = timed.Schedule(() =>
                 {
                     if (worker == null || worker.AddAction(t))
                     {
@@ -128,7 +132,8 @@ namespace Reactive4.NET.schedulers
                             run.Offer(t.Run);
                         }
                     }
-                }, initialDelay, period, cts);
+                }, initialDelay, period);
+                cts.Token.Register(d.Dispose);
 
                 return cts;
             }

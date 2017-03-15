@@ -65,6 +65,8 @@
     <Compile Include="schedulers\ParallelExecutorService.cs" />
     <Compile Include="schedulers\SingleExecutorWorker.cs" />
     <Compile Include="schedulers\SingleThreadedExecutor.cs" />
+    <Compile Include="schedulers\TimedBlockingExecutor.cs" />
+    <Compile Include="schedulers\TimedExecutorPool.cs" />
     <Compile Include="schedulers\TrampolineExecutorService.cs" />
     <Compile Include="schedulers\ThreadExecutorService.cs" />
     <Compile Include="schedulers\SingleExecutorService.cs" />
@@ -126,6 +128,7 @@
     <Compile Include="utils\MpscLinkedArrayQueue.cs" />
     <Compile Include="utils\QueueHelper.cs" />
     <Compile Include="utils\SchedulerHelper.cs" />
+    <Compile Include="utils\SequentialDisposable.cs" />
     <Compile Include="utils\SetCompositeDisposable.cs" />
     <Compile Include="utils\SpscArrayQueue.cs" />
     <Compile Include="utils\SpscLinkedArrayQueue.cs" />
