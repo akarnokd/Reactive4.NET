@@ -17,6 +17,7 @@ namespace Reactive4.NET.subscribers
                 item = element;
                 upstream.Cancel();
                 SubscriptionHelper.LazySetCancel(ref upstream);
+                latch.Signal();
             }
         }
     }

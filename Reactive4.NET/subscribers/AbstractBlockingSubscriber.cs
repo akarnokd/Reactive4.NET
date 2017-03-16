@@ -11,7 +11,7 @@ namespace Reactive4.NET.subscribers
 {
     internal abstract class AbstractBlockingSubscriber<T> : IFlowableSubscriber<T>, IDisposable
     {
-        readonly CountdownEvent latch;
+        protected readonly CountdownEvent latch;
 
         protected ISubscription upstream;
 

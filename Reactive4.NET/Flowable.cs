@@ -1013,6 +1013,16 @@ namespace Reactive4.NET
             return Zip(source, other, zipper);
         }
 
+        public static IFlowable<R> FlatMapEnumerable<T, R>(this IFlowable<T> source, Func<T, IEnumerable<R>> mapper)
+        {
+            return FlatMapEnumerable(source, mapper, BufferSize());
+        }
+
+        public static IFlowable<R> FlatMapEnumerable<T, R>(this IFlowable<T> source, Func<T, IEnumerable<R>> mapper, int prefetch)
+        {
+            return new FlowableFlatMapEnumerable<T, R>(source, mapper, prefetch);
+        }
+
         // ********************************************************************************
         // IConnectableFlowable related
         // ********************************************************************************
