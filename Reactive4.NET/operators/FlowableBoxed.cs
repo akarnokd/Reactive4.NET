@@ -64,6 +64,11 @@ namespace Reactive4.NET.operators
                 return false;
             }
 
+            public override int RequestFusion(int mode)
+            {
+                return RequestTransientFusion(mode);
+            }
+
             protected override void OnStart(ISubscription subscription)
             {
                 actual.OnSubscribe(this);
@@ -107,6 +112,11 @@ namespace Reactive4.NET.operators
             public override bool TryOnNext(T element)
             {
                 return actual.TryOnNext(element);
+            }
+
+            public override int RequestFusion(int mode)
+            {
+                return RequestTransientFusion(mode);
             }
 
             protected override void OnStart(ISubscription subscription)

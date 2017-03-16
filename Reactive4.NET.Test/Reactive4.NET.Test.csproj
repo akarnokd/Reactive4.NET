@@ -88,6 +88,8 @@
     <Compile Include="FlowableGenerate1Tck.cs" />
     <Compile Include="FlowableAmb1Tck.cs" />
     <Compile Include="FlowableCombineLatest1Tck.cs" />
+    <Compile Include="FlowableZip2Tck.cs" />
+    <Compile Include="FlowableZip1Tck.cs" />
     <Compile Include="FlowableUsing2Tck.cs" />
     <Compile Include="FlowableUsing1Tck.cs" />
     <Compile Include="FlowableSkipUntil2Tck.cs" />
@@ -171,6 +173,7 @@
     <Compile Include="BlockingSubscribeTest.cs" />
     <Compile Include="FlowableGenerateTest.cs" />
     <Compile Include="FlowableCombineLatestTest.cs" />
+    <Compile Include="FlowableZipTest.cs" />
     <Compile Include="UnitTest1.cs" />
   </ItemGroup>
   <ItemGroup>

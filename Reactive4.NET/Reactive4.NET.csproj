@@ -46,6 +46,7 @@
     <Compile Include="BackpressureStrategy.cs" />
     <Compile Include="BufferStrategy.cs" />
     <Compile Include="AsyncProcessor.cs" />
+    <Compile Include="operators\FlowableZipEnumerable.cs" />
     <Compile Include="operators\FlowableAmbEnumerable.cs" />
     <Compile Include="operators\FlowableAmbArray.cs" />
     <Compile Include="operators\FlowableAutoConnect.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="operators\FlowableTakeUntil.cs" />
     <Compile Include="operators\FlowableTimer.cs" />
     <Compile Include="operators\FlowableUsing.cs" />
+    <Compile Include="operators\FlowableZipArray.cs" />
     <Compile Include="ReplayProcessor.cs" />
     <Compile Include="schedulers\InterruptibleAction.cs" />
     <Compile Include="schedulers\IWorkerServices.cs" />

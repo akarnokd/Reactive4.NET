@@ -376,14 +376,22 @@ namespace Reactive4.NET
 
         public static IFlowable<R> Zip<T, R>(Func<T[], R> zipper, params IPublisher<T>[] sources)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return Zip(zipper, BufferSize(), sources);
+        }
+
+        public static IFlowable<R> Zip<T, R>(Func<T[], R> zipper, int prefetch, params IPublisher<T>[] sources)
+        {
+            return new FlowableZipArray<T, R>(sources, zipper, prefetch);
         }
 
         public static IFlowable<R> Zip<T, R>(IEnumerable<IPublisher<T>> sources, Func<T[], R> zipper)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return Zip(sources, zipper, BufferSize());
+        }
+
+        public static IFlowable<R> Zip<T, R>(IEnumerable<IPublisher<T>> sources, Func<T[], R> zipper, int prefetch)
+        {
+            return new FlowableZipEnumerable<T, R>(sources, zipper, prefetch);
         }
 
         public static IFlowable<R> Zip<T1, T2, R>(IPublisher<T1> source1, IPublisher<T2> source2, Func<T1, T2, R> zipper)
