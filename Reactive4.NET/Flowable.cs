@@ -121,8 +121,7 @@ namespace Reactive4.NET
 
         public static IFlowable<T> Create<T>(Action<IFlowableEmitter<T>> emitter, BackpressureStrategy strategy)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableCreate<T>(emitter, strategy);
         }
 
         public static IFlowable<T> Generate<T>(Action<IGeneratorEmitter<T>> emitter)
@@ -773,6 +772,10 @@ namespace Reactive4.NET
 
         public static IFlowable<T> OnBackpressureBuffer<T>(this IFlowable<T> source, int capacityHint, BufferStrategy strategy = BufferStrategy.ALL, Action<T> onDrop = null)
         {
+            if (strategy == BufferStrategy.ALL)
+            {
+                return new FlowableOnBackpressureBufferAll<T>(source, capacityHint);
+            }
             // TODO implement
             throw new NotImplementedException();
         }

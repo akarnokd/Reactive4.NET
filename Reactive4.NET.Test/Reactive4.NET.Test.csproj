@@ -63,6 +63,7 @@
     <Compile Include="FlowableConcatEnumerable1Tck.cs" />
     <Compile Include="FlowableConcatArray1Tck.cs" />
     <Compile Include="FlowableConcatEnumerableTest.cs" />
+    <Compile Include="FlowableCreateErrorl1Tck.cs" />
     <Compile Include="FlowableDelaySubscription2Tck.cs" />
     <Compile Include="FlowableDelayTest.cs" />
     <Compile Include="FlowableDistinct3Tck.cs" />
@@ -80,6 +81,9 @@
     <Compile Include="FlowableDelay1Tck.cs" />
     <Compile Include="FlowableDelaySubscription1Tck.cs" />
     <Compile Include="FlowableDistinct1Tck.cs" />
+    <Compile Include="FlowableCreateBufferl1Tck.cs" />
+    <Compile Include="FlowableOnBackpressureBufferAll2Tck.cs" />
+    <Compile Include="FlowableOnBackpressureBufferAll1Tck.cs" />
     <Compile Include="FlowableSkipUntil2Tck.cs" />
     <Compile Include="FlowableSkipUntil1Tck.cs" />
     <Compile Include="FlowableTakeUntil1Tck.cs" />

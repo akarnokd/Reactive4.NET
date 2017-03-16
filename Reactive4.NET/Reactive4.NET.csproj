@@ -50,6 +50,7 @@
     <Compile Include="operators\FlowableConcatEnumerable.cs" />
     <Compile Include="operators\FlowableConcatArray.cs" />
     <Compile Include="operators\FlowableConcatMap.cs" />
+    <Compile Include="operators\FlowableCreate.cs" />
     <Compile Include="operators\FlowableDelay.cs" />
     <Compile Include="operators\FlowableDelaySubscription.cs" />
     <Compile Include="operators\FlowableDistinctUntilChanged.cs" />
@@ -58,6 +59,7 @@
     <Compile Include="operators\FlowableFromObservable.cs" />
     <Compile Include="operators\FlowableInterval.cs" />
     <Compile Include="operators\FlowableLift.cs" />
+    <Compile Include="operators\FlowableOnBackpressureBufferAll.cs" />
     <Compile Include="operators\FlowablePeek.cs" />
     <Compile Include="operators\FlowableProcessorRefCount.cs" />
     <Compile Include="operators\FlowableProcessorSerialize.cs" />
@@ -135,6 +137,7 @@
     <Compile Include="subscribers\BlockingFirstSubscriber.cs" />
     <Compile Include="TestExecutor.cs" />
     <Compile Include="utils\AbstractDeferredScalarSubscription.cs" />
+    <Compile Include="utils\ActionDisposable.cs" />
     <Compile Include="utils\BooleanSubscription.cs" />
     <Compile Include="utils\DisposableHelper.cs" />
     <Compile Include="utils\ExceptionHelper.cs" />
