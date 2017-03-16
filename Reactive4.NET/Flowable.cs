@@ -209,14 +209,21 @@ namespace Reactive4.NET
         // ********************************************************************************
 
         public static IFlowable<T> Amb<T>(params IPublisher<T>[] sources) {
-            // TODO implement
-            throw new NotImplementedException();
+            var n = sources.Length;
+            if (n == 0)
+            {
+                return Empty<T>();
+            }
+            if (n == 1)
+            {
+                return FromPublisher(sources[0]);
+            }
+            return new FlowableAmbArray<T>(sources);
         }
 
         public static IFlowable<T> Amb<T>(IEnumerable<IPublisher<T>> sources)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableAmbEnumerable<T>(sources);
         }
 
         public static IFlowable<T> Concat<T>(params IPublisher<T>[] sources)
@@ -312,8 +319,21 @@ namespace Reactive4.NET
 
         public static IFlowable<R> CombineLatest<T, R>(Func<T[], R> combiner, params IPublisher<T>[] sources)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return CombineLatest(combiner, BufferSize(), sources);
+        }
+
+        public static IFlowable<R> CombineLatest<T, R>(Func<T[], R> combiner, int prefetch, params IPublisher<T>[] sources)
+        {
+            var n = sources.Length;
+            if (n == 0)
+            {
+                return Empty<R>();
+            }
+            if (n == 1)
+            {
+                return FromPublisher(sources[0]).Map(v => combiner(new T[] { v }));
+            }
+            return new FlowableCombineLatest<T, R>(sources, combiner, prefetch);
         }
 
         public static IFlowable<R> CombineLatest<T, R>(IEnumerable<IPublisher<T>> sources, Func<T[], R> combiner)
@@ -323,28 +343,35 @@ namespace Reactive4.NET
 
         public static IFlowable<R> CombineLatest<T, R>(IEnumerable<IPublisher<T>> sources, Func<T[], R> combiner, int prefetch)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableCombineLatestEnumerable<T, R>(sources, combiner, prefetch);
+        }
+
+        public static IFlowable<object> Boxed<T>(this IPublisher<T> source)
+        {
+            return new FlowableBoxed<T>(source);
         }
 
         public static IFlowable<R> CombineLatest<T1, T2, R>(IPublisher<T1> source1, IPublisher<T2> source2, Func<T1, T2, R> combiner)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return CombineLatest<object, R>(
+                a => combiner((T1)a[0], (T2)a[1]), 
+                source1.Boxed(), source2.Boxed());
         }
 
         public static IFlowable<R> CombineLatest<T1, T2, T3, R>(IPublisher<T1> source1, IPublisher<T2> source2,
             IPublisher<T3> source3, Func<T1, T2, T3, R> combiner)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return CombineLatest<object, R>(
+                a => combiner((T1)a[0], (T2)a[1], (T3)a[2]),
+                source1.Boxed(), source2.Boxed(), source3.Boxed());
         }
 
         public static IFlowable<R> CombineLatest<T1, T2, T3, T4, R>(IPublisher<T1> source1, IPublisher<T2> source2,
             IPublisher<T3> source3, IPublisher<T4> source4, Func<T1, T2, T3, T4, R> combiner)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return CombineLatest<object, R>(
+                a => combiner((T1)a[0], (T2)a[1], (T3)a[2], (T4)a[3]),
+                source1.Boxed(), source2.Boxed(), source3.Boxed(), source4.Boxed());
         }
 
         public static IFlowable<R> Zip<T, R>(Func<T[], R> zipper, params IPublisher<T>[] sources)
@@ -361,25 +388,33 @@ namespace Reactive4.NET
 
         public static IFlowable<R> Zip<T1, T2, R>(IPublisher<T1> source1, IPublisher<T2> source2, Func<T1, T2, R> zipper)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return Zip<object, R>(
+                a => zipper((T1)a[0], (T2)a[1]),
+                source1.Boxed(), source2.Boxed());
         }
 
         public static IFlowable<R> Zip<T1, T2, T3, R>(IPublisher<T1> source1, IPublisher<T2> source2, 
             IPublisher<T3> source3, Func<T1, T2, T3, R> zipper)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return Zip<object, R>(
+                a => zipper((T1)a[0], (T2)a[1], (T3)a[2]),
+                source1.Boxed(), source2.Boxed(), source3.Boxed());
         }
 
         public static IFlowable<R> Zip<T1, T2, T3, T4, R>(IPublisher<T1> source1, IPublisher<T2> source2,
             IPublisher<T3> source3, IPublisher<T4> source4, Func<T1, T2, T3, T4, R> zipper)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return Zip<object, R>(
+                a => zipper((T1)a[0], (T2)a[1], (T3)a[2], (T4)a[3]),
+                source1.Boxed(), source2.Boxed(), source3.Boxed(), source4.Boxed());
         }
 
         public static IFlowable<T> SwitchOnNext<T>(IPublisher<IPublisher<T>> sources)
+        {
+            return SwitchOnNext(sources, BufferSize());
+        }
+
+        public static IFlowable<T> SwitchOnNext<T>(IPublisher<IPublisher<T>> sources, int prefetch)
         {
             // TODO implement
             throw new NotImplementedException();

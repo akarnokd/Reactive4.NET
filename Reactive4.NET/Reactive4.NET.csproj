@@ -46,7 +46,12 @@
     <Compile Include="BackpressureStrategy.cs" />
     <Compile Include="BufferStrategy.cs" />
     <Compile Include="AsyncProcessor.cs" />
+    <Compile Include="operators\FlowableAmbEnumerable.cs" />
+    <Compile Include="operators\FlowableAmbArray.cs" />
     <Compile Include="operators\FlowableAutoConnect.cs" />
+    <Compile Include="operators\FlowableBoxed.cs" />
+    <Compile Include="operators\FlowableCombineLatestEnumerable.cs" />
+    <Compile Include="operators\FlowableCombineLatest.cs" />
     <Compile Include="operators\FlowableConcatEnumerable.cs" />
     <Compile Include="operators\FlowableConcatArray.cs" />
     <Compile Include="operators\FlowableConcatMapPublisher.cs" />
