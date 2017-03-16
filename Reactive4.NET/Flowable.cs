@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Reactive.Streams;
 using Reactive4.NET.subscribers;
+using System.Threading;
 
 namespace Reactive4.NET
 {
@@ -1101,22 +1102,25 @@ namespace Reactive4.NET
             return subscriber;
         }
 
-        public static Task<T> FirstTask<T>(this IFlowable<T> source)
+        public static Task<T> FirstTask<T>(this IFlowable<T> source, CancellationTokenSource cts)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            var s = new TaskFirstSubscriber<T>(cts);
+            source.Subscribe(s);
+            return s.Task;
         }
 
-        public static Task<T> LastTask<T>(this IFlowable<T> source)
+        public static Task<T> LastTask<T>(this IFlowable<T> source, CancellationTokenSource cts)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            var s = new TaskLastSubscriber<T>(cts);
+            source.Subscribe(s);
+            return s.Task;
         }
 
-        public static Task IgnoreElementsTask<T>(this IFlowable<T> source)
+        public static Task IgnoreElementsTask<T>(this IFlowable<T> source, CancellationTokenSource cts)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            var s = new TaskIgnoreElementsSubscriber<T>(cts);
+            source.Subscribe(s);
+            return s.Task;
         }
 
         // ********************************************************************************
@@ -1139,8 +1143,19 @@ namespace Reactive4.NET
 
         public static IEnumerable<T> BlockingEnumerable<T>(this IFlowable<T> source)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return BlockingEnumerable(source, BufferSize());
+        }
+
+        public static IEnumerable<T> BlockingEnumerable<T>(this IFlowable<T> source, int prefetch)
+        {
+            var parent = new BlockingEnumeratorSubscriber<T>(prefetch);
+            source.Subscribe(parent);
+
+            while (parent.MoveNext())
+            {
+                yield return parent.Current;
+            }
+            yield break;
         }
 
         public static void BlockingSubscribe<T>(this IFlowable<T> source)

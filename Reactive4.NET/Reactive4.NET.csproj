@@ -80,6 +80,10 @@
     <Compile Include="schedulers\IOExecutorService.cs" />
     <Compile Include="schedulers\ComputationExecutorService.cs" />
     <Compile Include="schedulers\BlockingQueueConsumer.cs" />
+    <Compile Include="subscribers\BlockingEnumeratorSubscriber.cs" />
+    <Compile Include="subscribers\TaskLastSubscriber.cs" />
+    <Compile Include="subscribers\TaskFirstSubscriber.cs" />
+    <Compile Include="subscribers\TaskIgnoreElementsSubscriber.cs" />
     <Compile Include="UnicastProcessor.cs" />
     <Compile Include="MulticastPublisher.cs" />
     <Compile Include="PublishProcessor.cs" />

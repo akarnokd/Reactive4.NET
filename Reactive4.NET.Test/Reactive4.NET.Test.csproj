@@ -157,6 +157,7 @@
     <Compile Include="MpscLinkedArrayQueueTest.cs" />
     <Compile Include="FlowableConcatArrayTest.cs" />
     <Compile Include="FlowableDistinctUntilChangedTest.cs" />
+    <Compile Include="BlockingEnumerableTest.cs" />
     <Compile Include="UnitTest1.cs" />
   </ItemGroup>
   <ItemGroup>
