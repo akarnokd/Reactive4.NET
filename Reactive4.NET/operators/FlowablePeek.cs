@@ -42,6 +42,7 @@ namespace Reactive4.NET.operators
             this.onNext = onNext;
             this.onAfterNext = onAfterNext;
             this.onError = onError;
+            this.onComplete = onComplete;
             this.onTerminated = onTerminated;
             this.onAfterTerminated = onAfterTerminated;
             this.onSubscribe = onSubscribe;
@@ -102,6 +103,7 @@ namespace Reactive4.NET.operators
         {
             if (source is FlowablePeek<T> s)
             {
+                source = s.source;
                 onNext = Combine(s.onNext, onNext);
                 onAfterNext = Combine(s.onAfterNext, onAfterNext);
                 onError = Combine(s.onError, onError);
