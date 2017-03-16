@@ -319,6 +319,11 @@ namespace Reactive4.NET
 
         public static IFlowable<R> CombineLatest<T, R>(IEnumerable<IPublisher<T>> sources, Func<T[], R> combiner)
         {
+            return CombineLatest(sources, combiner, BufferSize());
+        }
+
+        public static IFlowable<R> CombineLatest<T, R>(IEnumerable<IPublisher<T>> sources, Func<T[], R> combiner, int prefetch)
+        {
             // TODO implement
             throw new NotImplementedException();
         }
