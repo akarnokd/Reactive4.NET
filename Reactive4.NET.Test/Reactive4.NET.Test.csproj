@@ -158,6 +158,7 @@
     <Compile Include="FlowableConcatArrayTest.cs" />
     <Compile Include="FlowableDistinctUntilChangedTest.cs" />
     <Compile Include="BlockingEnumerableTest.cs" />
+    <Compile Include="BlockingSubscribeTest.cs" />
     <Compile Include="UnitTest1.cs" />
   </ItemGroup>
   <ItemGroup>

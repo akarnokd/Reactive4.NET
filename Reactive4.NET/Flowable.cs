@@ -1158,15 +1158,34 @@ namespace Reactive4.NET
             BlockingSubscribe(source, onNext, e => { }, () => { });
         }
 
-        public static void BlockingSubscribe<T>(this IFlowable<T> source, Action<T> onNext, Action<T> onError)
+        public static void BlockingSubscribe<T>(this IFlowable<T> source, Action<T> onNext, Action<Exception> onError)
         {
             BlockingSubscribe(source, onNext, onError, () => { });
         }
 
-        public static void BlockingSubscribe<T>(this IFlowable<T> source, Action<T> onNext, Action<T> onError, Action onComplete)
+        public static void BlockingSubscribe<T>(this IFlowable<T> source, Action<T> onNext, Action<Exception> onError, Action onComplete, Action<IDisposable> onConnect = null)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            BlockingSubscribe(source, onNext, onError, onComplete, BufferSize(), onConnect);
+        }
+
+        public static void BlockingSubscribe<T>(this IFlowable<T> source, Action<T> onNext, Action<Exception> onError, Action onComplete, int prefetch, Action<IDisposable> onConnect = null)
+        {
+            var s = new BlockingLambdaSubscriber<T>(prefetch, onNext, onError, onComplete);
+            onConnect?.Invoke(s);
+            source.Subscribe(s);
+            s.Run();
+        }
+
+        public static void BlockingSubscribe<T>(this IFlowable<T> source, IFlowableSubscriber<T> subscriber)
+        {
+            BlockingSubscribe(source, subscriber, BufferSize());
+        }
+
+        public static void BlockingSubscribe<T>(this IFlowable<T> source, IFlowableSubscriber<T> subscriber, int prefetch)
+        {
+            var s = new BlockingSubscriber<T>(prefetch, subscriber);
+            source.Subscribe(s);
+            s.Run();
         }
 
         // ********************************************************************************

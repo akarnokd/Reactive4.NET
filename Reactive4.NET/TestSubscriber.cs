@@ -26,7 +26,7 @@ namespace Reactive4.NET
 
         ISubscription upstream;
 
-        public TestSubscriber(long initialRequest = 0)
+        public TestSubscriber(long initialRequest = long.MaxValue)
         {
             this.requested = initialRequest;
             this.values = new List<T>();

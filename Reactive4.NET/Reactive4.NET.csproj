@@ -81,6 +81,8 @@
     <Compile Include="schedulers\IOExecutorService.cs" />
     <Compile Include="schedulers\ComputationExecutorService.cs" />
     <Compile Include="schedulers\BlockingQueueConsumer.cs" />
+    <Compile Include="subscribers\BlockingSubscriber.cs" />
+    <Compile Include="subscribers\BlockingLambdaSubscriber.cs" />
     <Compile Include="subscribers\BlockingEnumeratorSubscriber.cs" />
     <Compile Include="subscribers\TaskLastSubscriber.cs" />
     <Compile Include="subscribers\TaskFirstSubscriber.cs" />
@@ -133,6 +135,7 @@
     <Compile Include="subscribers\BlockingFirstSubscriber.cs" />
     <Compile Include="TestExecutor.cs" />
     <Compile Include="utils\AbstractDeferredScalarSubscription.cs" />
+    <Compile Include="utils\BooleanSubscription.cs" />
     <Compile Include="utils\DisposableHelper.cs" />
     <Compile Include="utils\ExceptionHelper.cs" />
     <Compile Include="subscribers\StrictSubscriber.cs" />

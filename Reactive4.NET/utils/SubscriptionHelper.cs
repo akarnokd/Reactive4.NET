@@ -54,6 +54,27 @@ namespace Reactive4.NET.operators
             }
         }
 
+        internal static long Produced(ref long requested, long n)
+        {
+            for (;;)
+            {
+                long r = Volatile.Read(ref requested);
+                if (r == long.MaxValue)
+                {
+                    return long.MaxValue;
+                }
+                long u = r - n;
+                if (u < 0L)
+                {
+                    throw new ArgumentOutOfRangeException("More produced than requested: " + u);
+                }
+                if (Interlocked.CompareExchange(ref requested, u, r) == r)
+                {
+                    return u;
+                }
+            }
+        }
+
         internal static bool Validate(long n)
         {
             if (n <= 0)
