@@ -71,6 +71,7 @@
     <Compile Include="operators\FlowableTakeLastOne.cs" />
     <Compile Include="operators\FlowableTakeUntil.cs" />
     <Compile Include="operators\FlowableTimer.cs" />
+    <Compile Include="operators\FlowableUsing.cs" />
     <Compile Include="ReplayProcessor.cs" />
     <Compile Include="schedulers\InterruptibleAction.cs" />
     <Compile Include="schedulers\IWorkerServices.cs" />

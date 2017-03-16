@@ -199,10 +199,9 @@ namespace Reactive4.NET
             return new FlowableInterval(initialDelay, period, executor);
         }
 
-        public static IFlowable<T> Using<T, D>(Func<D> resourceFactory, Func<D, IPublisher<T>> resourceMapper, Action<D> resourceCleanup, bool eager = true)
+        public static IFlowable<T> Using<T, D>(Func<D> resourceFactory, Func<D, IPublisher<T>> resourceMapper, Action<D> resourceCleanup = null, bool eager = true)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableUsing<T, D>(resourceFactory, resourceMapper, resourceCleanup, eager);
         }
 
         // ********************************************************************************

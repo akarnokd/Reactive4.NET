@@ -17,7 +17,7 @@ namespace Reactive4.NET.operators
 
         readonly int prefetch;
 
-        public FlowableConcatMapPublisher(IPublisher<T> source, Func<T, IPublisher<R>> mapper, int prefetch) : base(source)
+        public FlowableConcatMapPublisher(IPublisher<T> source, Func<T, IPublisher<R>> mapper, int prefetch)
         {
             this.source = source;
             this.mapper = mapper;
