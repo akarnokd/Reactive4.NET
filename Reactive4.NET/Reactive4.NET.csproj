@@ -57,6 +57,7 @@
     <Compile Include="operators\FlowableDistinct.cs" />
     <Compile Include="operators\FlowableDoFinally.cs" />
     <Compile Include="operators\FlowableFromObservable.cs" />
+    <Compile Include="operators\FlowableGenerate.cs" />
     <Compile Include="operators\FlowableInterval.cs" />
     <Compile Include="operators\FlowableLift.cs" />
     <Compile Include="operators\FlowableOnBackpressureBufferAll.cs" />

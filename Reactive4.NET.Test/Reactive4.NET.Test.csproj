@@ -84,6 +84,7 @@
     <Compile Include="FlowableCreateBufferl1Tck.cs" />
     <Compile Include="FlowableOnBackpressureBufferAll2Tck.cs" />
     <Compile Include="FlowableOnBackpressureBufferAll1Tck.cs" />
+    <Compile Include="FlowableGenerate1Tck.cs" />
     <Compile Include="FlowableSkipUntil2Tck.cs" />
     <Compile Include="FlowableSkipUntil1Tck.cs" />
     <Compile Include="FlowableTakeUntil1Tck.cs" />
@@ -163,6 +164,7 @@
     <Compile Include="FlowableDistinctUntilChangedTest.cs" />
     <Compile Include="BlockingEnumerableTest.cs" />
     <Compile Include="BlockingSubscribeTest.cs" />
+    <Compile Include="FlowableGenerateTest.cs" />
     <Compile Include="UnitTest1.cs" />
   </ItemGroup>
   <ItemGroup>

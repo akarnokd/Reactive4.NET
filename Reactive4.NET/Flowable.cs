@@ -146,8 +146,7 @@ namespace Reactive4.NET
 
         public static IFlowable<T> Generate<T, S>(Func<S> stateFactory, Func<S, IGeneratorEmitter<T>, S> emitter, Action<S> stateCleanup, bool eager = false)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableGenerate<T, S>(stateFactory, emitter, stateCleanup, eager);
         }
 
         public static IFlowable<T> FromArray<T>(params T[] items)
