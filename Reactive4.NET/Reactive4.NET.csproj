@@ -58,6 +58,7 @@
     <Compile Include="operators\FlowableFromObservable.cs" />
     <Compile Include="operators\FlowableInterval.cs" />
     <Compile Include="operators\FlowableLift.cs" />
+    <Compile Include="operators\FlowablePeek.cs" />
     <Compile Include="operators\FlowableProcessorRefCount.cs" />
     <Compile Include="operators\FlowableProcessorSerialize.cs" />
     <Compile Include="operators\FlowableRepeatFunction.cs" />
@@ -134,7 +135,6 @@
     <Compile Include="utils\AbstractDeferredScalarSubscription.cs" />
     <Compile Include="utils\DisposableHelper.cs" />
     <Compile Include="utils\ExceptionHelper.cs" />
-    <Compile Include="utils\FusionHelper.cs" />
     <Compile Include="subscribers\StrictSubscriber.cs" />
     <Compile Include="utils\MpscLinkedArrayQueue.cs" />
     <Compile Include="utils\QueueHelper.cs" />

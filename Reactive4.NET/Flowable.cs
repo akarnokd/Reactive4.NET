@@ -1006,39 +1006,32 @@ namespace Reactive4.NET
 
         public static IFlowable<T> DoOnNext<T>(this IFlowable<T> source, Action<T> onNext)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return FlowablePeek<T>.Create(source, onNext: onNext);
         }
 
         public static IFlowable<T> DoAfterNext<T>(this IFlowable<T> source, Action<T> onAfterNext)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return FlowablePeek<T>.Create(source, onAfterNext: onAfterNext);
         }
 
         public static IFlowable<T> DoOnError<T>(this IFlowable<T> source, Action<Exception> onError)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return FlowablePeek<T>.Create(source, onError: onError);
         }
-
 
         public static IFlowable<T> DoOnComplete<T>(this IFlowable<T> source, Action onComplete)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return FlowablePeek<T>.Create(source, onComplete: onComplete);
         }
 
         public static IFlowable<T> DoOnTerminated<T>(this IFlowable<T> source, Action onTerminated)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return FlowablePeek<T>.Create(source, onTerminated: onTerminated);
         }
 
         public static IFlowable<T> DoAfterTerminated<T>(this IFlowable<T> source, Action onAfterTerminated)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return FlowablePeek<T>.Create(source, onAfterTerminated: onAfterTerminated);
         }
 
         public static IFlowable<T> DoFinally<T>(this IFlowable<T> source, Action onFinally)
@@ -1048,20 +1041,17 @@ namespace Reactive4.NET
 
         public static IFlowable<T> DoOnSubscribe<T>(this IFlowable<T> source, Action<ISubscription> onSubscribe)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return FlowablePeek<T>.Create(source, onSubscribe: onSubscribe);
         }
 
         public static IFlowable<T> DoOnRequest<T>(this IFlowable<T> source, Action<long> onRequest)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return FlowablePeek<T>.Create(source, onRequest: onRequest);
         }
 
         public static IFlowable<T> DoOnCancel<T>(this IFlowable<T> source, Action onCancel)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return FlowablePeek<T>.Create(source, onCancel: onCancel);
         }
 
         public static IFlowable<T> DoOnPoll<T>(this IFlowable<T> source, Action<bool, T> onPoll)
