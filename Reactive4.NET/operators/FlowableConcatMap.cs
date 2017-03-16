@@ -26,7 +26,7 @@ namespace Reactive4.NET.operators
             source.Subscribe(new ConcatMapSubscriber(subscriber, mapper, prefetch));
         }
 
-        sealed class ConcatMapSubscriber : SubscriptionArbiter, IFlowableSubscriber<T>, ISubscription
+        internal sealed class ConcatMapSubscriber : SubscriptionArbiter, IFlowableSubscriber<T>, ISubscription
         {
             readonly IFlowableSubscriber<R> actual;
 

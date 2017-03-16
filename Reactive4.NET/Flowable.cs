@@ -232,23 +232,45 @@ namespace Reactive4.NET
 
         public static IFlowable<T> Concat<T>(this IPublisher<IPublisher<T>> sources)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return Concat(sources, BufferSize());
+        }
+
+        public static IFlowable<T> Concat<T>(this IPublisher<IPublisher<T>> sources, int prefetch)
+        {
+            return new FlowableConcatMapPublisher<IPublisher<T>, T>(sources, v => v, prefetch);
         }
 
         public static IFlowable<T> ConcatEager<T>(params IPublisher<T>[] sources)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return FromArray(sources).ConcatMapEager(v => v);
         }
 
         public static IFlowable<T> ConcatEager<T>(IEnumerable<IPublisher<T>> sources)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return ConcatEager(sources, BufferSize(), BufferSize());
+        }
+
+        public static IFlowable<T> ConcatEager<T>(IEnumerable<IPublisher<T>> sources, int maxConcurrency)
+        {
+            return ConcatEager(sources, maxConcurrency, BufferSize());
+        }
+
+        public static IFlowable<T> ConcatEager<T>(IEnumerable<IPublisher<T>> sources, int maxConcurrency, int prefetch)
+        {
+            return FromEnumerable(sources).ConcatMapEager(v => v, maxConcurrency, prefetch);
         }
 
         public static IFlowable<T> ConcatEager<T>(this IPublisher<IPublisher<T>> sources)
+        {
+            return ConcatEager(sources, BufferSize(), BufferSize());
+        }
+
+        public static IFlowable<T> ConcatEager<T>(this IPublisher<IPublisher<T>> sources, int maxConcurrency)
+        {
+            return ConcatEager(sources, maxConcurrency, BufferSize());
+        }
+
+        public static IFlowable<T> ConcatEager<T>(this IPublisher<IPublisher<T>> sources, int maxConcurrency, int prefetch)
         {
             // TODO implement
             throw new NotImplementedException();
@@ -256,14 +278,22 @@ namespace Reactive4.NET
 
         public static IFlowable<T> Merge<T>(params IPublisher<T>[] sources)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return FromArray(sources).FlatMap(v => v);
+        }
+
+        public static IFlowable<T> Merge<T>(IEnumerable<IPublisher<T>> sources)
+        {
+            return FromEnumerable(sources).FlatMap(v => v);
         }
 
         public static IFlowable<T> Merge<T>(IEnumerable<IPublisher<T>> sources, int maxConcurrency)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return FromEnumerable(sources).FlatMap(v => v, maxConcurrency);
+        }
+
+        public static IFlowable<T> Merge<T>(IEnumerable<IPublisher<T>> sources, int maxConcurrency, int prefetch)
+        {
+            return FromEnumerable(sources).FlatMap(v => v, maxConcurrency, prefetch);
         }
 
         public static IFlowable<T> Merge<T>(this IPublisher<IPublisher<T>> sources)
