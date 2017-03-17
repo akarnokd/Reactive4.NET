@@ -33,6 +33,18 @@ namespace Reactive4.NET.operators
             Volatile.Write(ref field, Cancelled);
         }
 
+        internal static long MultiplyCap(long a, long b) {
+            long u = a * b;
+            if (((a | b) >> 31) != 0)
+            {
+                if (u / a != b)
+                {
+                    return long.MaxValue;
+                }
+            }
+            return u;
+        }
+
         internal static long AddRequest(ref long requested, long n)
         {
             for (;;)

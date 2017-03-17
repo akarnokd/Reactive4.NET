@@ -8,7 +8,7 @@ namespace Reactive4.NET.Test
     [TestFixture]
     public class Benchmarks
     {
-        [Test]
+        //[Test]
         public void SubscriptionArbiter()
         {
             {
@@ -35,6 +35,20 @@ namespace Reactive4.NET.Test
                     }
                     return null;
                 }, "Request");
+            }
+
+            {
+                var sa = new SubscriptionArbiter();
+                var bs = new BooleanSubscription();
+                sa.ArbiterSet(bs);
+                Benchmark.Run(() =>
+                {
+                    for (int i = 0; i < 1000; i++)
+                    {
+                        sa.Request(1);
+                    }
+                    return null;
+                }, "Request-Upstream");
             }
 
             {

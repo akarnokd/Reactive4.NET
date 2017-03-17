@@ -25,6 +25,8 @@ namespace Reactive4.NET.utils
 
         bool cancelled;
 
+        protected bool IsUnbounded => requested == long.MaxValue;
+
         internal bool ArbiterIsCancelled()
         {
             return Volatile.Read(ref cancelled);
@@ -45,14 +47,63 @@ namespace Reactive4.NET.utils
             {
                 throw new ArgumentOutOfRangeException(nameof(n));
             }
-            SubscriptionHelper.AddRequest(ref missedRequested, n);
-            ArbiterDrain();
+            if (Volatile.Read(ref wip) == 0 && Interlocked.CompareExchange(ref wip, 1, 0) == 0)
+            {
+                ISubscription target = null;
+                long r = requested;
+                if (r != long.MaxValue)
+                {
+                    long u = r + n;
+                    if (u < 0L)
+                    {
+                        requested = long.MaxValue;
+                    }
+                    else
+                    {
+                        requested = u;
+                    }
+                    target = current;
+                }
+                if (Interlocked.Decrement(ref wip) == 0)
+                {
+                    target?.Request(n);
+                    return;
+                }
+            }
+            else
+            {
+                SubscriptionHelper.AddRequest(ref missedRequested, n);
+                if (Interlocked.Increment(ref wip) != 1)
+                {
+                    return;
+                }
+            }
+            ArbiterDrainLoop();
         }
 
         public void ArbiterSet(ISubscription next)
         {
+            if (Volatile.Read(ref wip) == 0 && Interlocked.CompareExchange(ref wip, 1, 0) == 0)
+            {
+                current = next;
+                var r = requested;
+                if (Interlocked.Decrement(ref wip) != 0)
+                {
+                    ArbiterDrainLoop();
+                }
+                if (r != 0L)
+                {
+                    next?.Request(r);
+                }
+                return;
+            }
+            else
             Volatile.Write(ref missedSubscription, next);
-            ArbiterDrain();
+            if (Interlocked.Increment(ref wip) != 1)
+            {
+                return;
+            }
+            ArbiterDrainLoop();
         }
 
         public void ArbiterProduced(long n)
@@ -61,8 +112,32 @@ namespace Reactive4.NET.utils
             {
                 throw new ArgumentOutOfRangeException(nameof(n));
             }
-            Interlocked.Add(ref missedProduced, n);
-            ArbiterDrain();
+            if (Volatile.Read(ref wip) == 0 && Interlocked.CompareExchange(ref wip, 1, 0) == 0)
+            {
+                var r = requested;
+                if (r != long.MaxValue)
+                {
+                    long u = r - n;
+                    if (u < 0)
+                    {
+                        u = 0;
+                    }
+                    requested = u;
+                }
+                if (Interlocked.Decrement(ref wip) == 0)
+                {
+                    return;
+                }
+            }
+            else
+            {
+                Interlocked.Add(ref missedProduced, n);
+                if (Interlocked.Increment(ref wip) != 1)
+                {
+                    return;
+                }
+            }
+            ArbiterDrainLoop();
         }
 
         void ArbiterDrain()
