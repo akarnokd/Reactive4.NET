@@ -413,17 +413,9 @@ namespace Reactive4.NET
         public TestSubscriber<T> AssertResult(params T[] expected)
         {
             AssertSubscribed();
-            if (Volatile.Read(ref errorCount) != 0)
-            {
-                throw Fail("Error(s) present");
-            }
-
-            if (Volatile.Read(ref completions) != 1)
-            {
-                throw Fail("Not (properly) completed");
-            }
-
             AssertValues(expected);
+            AssertNoError();
+            AssertComplete();
             return this;
         }
 

@@ -555,7 +555,7 @@ namespace Reactive4.NET.operators
                 consumerIndex = ci;
             }
 
-            sealed class InnerSubscriber : ISubscriber<R>
+            sealed class InnerSubscriber : IFlowableSubscriber<R>
             {
                 readonly ConcatMapEagerSubscriber parent;
 

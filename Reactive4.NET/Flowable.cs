@@ -968,8 +968,7 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> SwitchOnNext<T>(IPublisher<IPublisher<T>> sources, int prefetch)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableSwitchMapPublisher<IPublisher<T>, T>(sources, v => v, prefetch);
         }
 
         // ********************************************************************************
@@ -1291,15 +1290,50 @@ namespace Reactive4.NET
             return converter(source);
         }
 
-        public static IFlowable<R> DeferComose<T, R>(this IFlowable<T> source, Func<IFlowable<T>, IPublisher<R>> composer)
+        /// <summary>
+        /// Defers the call to the composer function to subscription time,
+        /// allowing a per-Subscriber state to be created.
+        /// </summary>
+        /// <typeparam name="T">The input value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="composer">The function that receives the upstream source and
+        /// should return the IPublisher to be subscribed to by the downstream.</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<R> DeferCompose<T, R>(this IFlowable<T> source, Func<IFlowable<T>, IPublisher<R>> composer)
         {
             return Defer(() => composer(source));
         }
 
+        /// <summary>
+        /// Switches to emitting the values of the latest IPublisher mapped from
+        /// the upstream value, cancelling the previous IPublisher in the process.
+        /// </summary>
+        /// <typeparam name="T">The input value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="mapper">The function that receives an item from upstream
+        /// and turns it into an IPublisher whose elements should be relayed then on.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> SwitchMap<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper)
+        { 
+            return SwitchMap(source, mapper, BufferSize());
+        }
+
+        /// <summary>
+        /// Switches to emitting the values of the latest IPublisher mapped from
+        /// the upstream value, cancelling the previous IPublisher in the process.
+        /// </summary>
+        /// <typeparam name="T">The input value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="mapper">The function that receives an item from upstream
+        /// and turns it into an IPublisher whose elements should be relayed then on.</param>
+        /// <param name="prefetch">The number of items to prefetch from each inner IPublisher.</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<R> SwitchMap<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper, int prefetch)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableSwitchMap<T, R>(source, mapper, prefetch);
         }
 
         public static IFlowable<T> DefaultIfEmpty<T>(this IFlowable<T> source, T defaultItem)
