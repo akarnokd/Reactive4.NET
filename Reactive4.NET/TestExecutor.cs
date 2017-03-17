@@ -8,9 +8,17 @@ using System.Threading.Tasks;
 
 namespace Reactive4.NET
 {
+    /// <summary>
+    /// Synchronous IExecutorService that allows moving a virtual time ahead in
+    /// a programmatic fashion and execute delayed tasks without actually waiting
+    /// for the time to pass.
+    /// </summary>
     public sealed class TestExecutor : IExecutorService
     {
-        public IExecutorWorker Worker => throw new NotImplementedException();
+        /// <summary>
+        /// Returns a worker that schedules tasks into the common synchronous queue.
+        /// </summary>
+        public IExecutorWorker Worker => new TestExecutorWorker(this);
 
         long currentTime;
 
@@ -18,13 +26,24 @@ namespace Reactive4.NET
 
         readonly SortedSet<TestDelayedTask> queue;
 
+        /// <summary>
+        /// Constructs a TestExecutor.
+        /// </summary>
         public TestExecutor()
         {
             this.queue = new SortedSet<TestDelayedTask>();
         }
 
+        /// <summary>
+        /// Returns the current time in milliseconds since the unix epoch.
+        /// </summary>
         public long Now => currentTime;
 
+        /// <summary>
+        /// Schedule a task for non-delayed execution.
+        /// </summary>
+        /// <param name="task">The task to schedule.</param>
+        /// <returns>The IDisposable that allows cancelling the execution of the task.</returns>
         public IDisposable Schedule(Action task)
         {
             TestDelayedTask tt = new TestDelayedTask(task, Now, NewId(), this, null);
@@ -32,6 +51,12 @@ namespace Reactive4.NET
             return tt;
         }
 
+        /// <summary>
+        /// Schedule a task for a delayed execution.
+        /// </summary>
+        /// <param name="task">The task to schedule.</param>
+        /// <param name="delay">The delay amount.</param>
+        /// <returns>The IDisposable that allows cancelling the execution of the task.</returns>
         public IDisposable Schedule(Action task, TimeSpan delay)
         {
             TestDelayedTask tt = new TestDelayedTask(task, 
@@ -40,6 +65,13 @@ namespace Reactive4.NET
             return tt;
         }
 
+        /// <summary>
+        /// Schedule a task for periodic execution with a fixed rate.
+        /// </summary>
+        /// <param name="task">The task to schedule.</param>
+        /// <param name="initialDelay">The initial delay amount.</param>
+        /// <param name="period">The repeat period.</param>
+        /// <returns>The IDisposable that allows cancelling the execution of the task.</returns>
         public IDisposable Schedule(Action task, TimeSpan initialDelay, TimeSpan period)
         {
             TestDelayedTask tt = null;
@@ -79,6 +111,9 @@ namespace Reactive4.NET
             }
         }
 
+        /// <summary>
+        /// Clears the internal task queue.
+        /// </summary>
         public void Shutdown()
         {
             lock (this)
@@ -87,16 +122,28 @@ namespace Reactive4.NET
             }
         }
 
+        /// <summary>
+        /// TestExecutor doesn't support this operation and this method does nothing.
+        /// </summary>
         public void Start()
         {
             // deliberately no-op
         }
 
+        /// <summary>
+        /// Advances the current time by the given amount and executes
+        /// tasks (old and new) during this time.
+        /// </summary>
+        /// <param name="time">The time amount to move the current time ahead.</param>
         public void AdvanceTimeBy(TimeSpan time)
         {
             RunTasks(currentTime + (long)time.TotalMilliseconds);
         }
 
+        /// <summary>
+        /// Runs tasks that have an execution due-time less than or equal
+        /// to the current time.
+        /// </summary>
         public void RunTasks()
         {
             RunTasks(currentTime);
@@ -127,6 +174,9 @@ namespace Reactive4.NET
             currentTime = timeLimit;
         }
 
+        /// <summary>
+        /// Returns true if there are still pending tasks present.
+        /// </summary>
         public bool HasTasks {
             get
             {
@@ -137,7 +187,7 @@ namespace Reactive4.NET
             }
         }
 
-        public long NewId()
+        long NewId()
         {
             return Interlocked.Increment(ref id);
         }

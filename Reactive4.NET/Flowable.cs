@@ -1386,31 +1386,58 @@ namespace Reactive4.NET
             return FlowablePeek<T>.Create(source, onCancel: onCancel);
         }
 
-        public static IFlowable<T> DoOnPoll<T>(this IFlowable<T> source, Action<bool, T> onPoll)
-        {
-            // TODO implement
-            throw new NotImplementedException();
-        }
-
         // ********************************************************************************
         // Consumer methods
         // ********************************************************************************
 
+        /// <summary>
+        /// Consume the source IFlowable.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <returns>The IDisposable that allows cancelling the sequence.</returns>
         public static IDisposable Subscribe<T>(this IFlowable<T> source)
         {
             return Subscribe(source, v => { }, e => { }, () => { });
         }
 
+        /// <summary>
+        /// Consume the source IFlowable and call the given action
+        /// with each item received.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="onNext">The Action called with each item received.</param>
+        /// <returns>The IDisposable that allows cancelling the sequence.</returns>
         public static IDisposable Subscribe<T>(this IFlowable<T> source, Action<T> onNext)
         {
             return Subscribe(source, onNext, e => { }, () => { });
         }
 
+        /// <summary>
+        /// Consume the source IFlowable and call the given actions
+        /// with each item received or the error.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="onNext">The Action called with each item received.</param>
+        /// <param name="onError">The Action called with the error.</param>
+        /// <returns>The IDisposable that allows cancelling the sequence.</returns>
         public static IDisposable Subscribe<T>(this IFlowable<T> source, Action<T> onNext, Action<Exception> onError)
         {
             return Subscribe(source, onNext, onError, () => { });
         }
 
+        /// <summary>
+        /// Consume the source IFlowable and call the given actions
+        /// with each item received, the error or the completion event.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="onNext">The Action called with each item received.</param>
+        /// <param name="onError">The Action called with the error.</param>
+        /// <param name="onComplete">The Action called when the upstream completes.</param>
+        /// <returns>The IDisposable that allows cancelling the sequence.</returns>
         public static IDisposable Subscribe<T>(this IFlowable<T> source, Action<T> onNext, Action<Exception> onError, Action onComplete)
         {
             var s = new ActionSubscriber<T>(onNext, onError, onComplete);
@@ -1418,12 +1445,29 @@ namespace Reactive4.NET
             return s;
         }
 
+        /// <summary>
+        /// Subscribes the given IFlowableSubscriber (descendant) to the
+        /// source IFlowable and return the same IFlowableSubscriber instance.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <typeparam name="S">The IFlowableSubscriber (subclass) type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="subscriber">The IFlowableSubsriber (subclass) instance.</param>
+        /// <returns>The <paramref name="subscriber"/>.</returns>
         public static S SubscribeWith<T, S>(this IFlowable<T> source, S subscriber) where S : IFlowableSubscriber<T>
         {
             source.Subscribe(subscriber);
             return subscriber;
         }
 
+        /// <summary>
+        /// Returns a Task that returns the first element from the source
+        /// IFlowable.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="cts">The cancellation token source to allow cancelling the sequence.</param>
+        /// <returns>The new Task instance.</returns>
         public static Task<T> FirstTask<T>(this IFlowable<T> source, CancellationTokenSource cts)
         {
             var s = new TaskFirstSubscriber<T>(cts);
@@ -1431,6 +1475,14 @@ namespace Reactive4.NET
             return s.Task;
         }
 
+        /// <summary>
+        /// Returns a Task that returns the last element from the source
+        /// IFlowable.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="cts">The cancellation token source to allow cancelling the sequence.</param>
+        /// <returns>The new Task instance.</returns>
         public static Task<T> LastTask<T>(this IFlowable<T> source, CancellationTokenSource cts)
         {
             var s = new TaskLastSubscriber<T>(cts);
@@ -1438,6 +1490,14 @@ namespace Reactive4.NET
             return s.Task;
         }
 
+        /// <summary>
+        /// Returns a Task that succeeds or fails when the source
+        /// IFlowable terminates.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="cts">The cancellation token source to allow cancelling the sequence.</param>
+        /// <returns>The new Task instance.</returns>
         public static Task IgnoreElementsTask<T>(this IFlowable<T> source, CancellationTokenSource cts)
         {
             var s = new TaskIgnoreElementsSubscriber<T>(cts);
@@ -1449,6 +1509,13 @@ namespace Reactive4.NET
         // Blocking operators
         // ********************************************************************************
 
+        /// <summary>
+        /// Blocks until the source produces its first item or completes.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance</param>
+        /// <param name="result">the first item</param>
+        /// <returns>True if the soruce produced an item, false if the source was empty.</returns>
         public static bool BlockingFirst<T>(this IFlowable<T> source, out T result)
         {
             var s = new BlockingFirstSubscriber<T>();
@@ -1456,6 +1523,13 @@ namespace Reactive4.NET
             return s.BlockingGet(out result);
         }
 
+        /// <summary>
+        /// Blocks until the source produces its last item or completes.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance</param>
+        /// <param name="result">the first item</param>
+        /// <returns>True if the soruce produced an item, false if the source was empty.</returns>
         public static bool BlockingLast<T>(this IFlowable<T> source, out T result)
         {
             var s = new BlockingLastSubscriber<T>();
@@ -1463,11 +1537,28 @@ namespace Reactive4.NET
             return s.BlockingGet(out result);
         }
 
+        /// <summary>
+        /// Returns an IEnumerable that when enumerated, subscribes to
+        /// the source and blocks for each item and terminal event
+        /// before relaying it through the IEnumerator.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <returns>The new IEnumerable instance.</returns>
         public static IEnumerable<T> BlockingEnumerable<T>(this IFlowable<T> source)
         {
             return BlockingEnumerable(source, BufferSize());
         }
 
+        /// <summary>
+        /// Returns an IEnumerable that when enumerated, subscribes to
+        /// the source and blocks for each item and terminal event
+        /// before relaying it through the IEnumerator.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="prefetch">The number of items to prefetch.</param>
+        /// <returns>The new IEnumerable instance.</returns>
         public static IEnumerable<T> BlockingEnumerable<T>(this IFlowable<T> source, int prefetch)
         {
             var parent = new BlockingEnumeratorSubscriber<T>(prefetch);
@@ -1480,26 +1571,69 @@ namespace Reactive4.NET
             yield break;
         }
 
+        /// <summary>
+        /// Blocks until the source terminates.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
         public static void BlockingSubscribe<T>(this IFlowable<T> source)
         {
             BlockingSubscribe(source, v => { }, e => { }, () => { });
         }
 
+        /// <summary>
+        /// Consumes the IFlowable source in a blocking
+        /// fashion and calls the action on the current thread.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="onNext">The action to call with the items from the source.</param>
         public static void BlockingSubscribe<T>(this IFlowable<T> source, Action<T> onNext)
         {
             BlockingSubscribe(source, onNext, e => { }, () => { });
         }
 
+        /// <summary>
+        /// Consumes the IFlowable source in a blocking
+        /// fashion and calls the actions on the current thread.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="onNext">The action to call with the items from the source.</param>
+        /// <param name="onError">The action to call with the error from the source.</param>
         public static void BlockingSubscribe<T>(this IFlowable<T> source, Action<T> onNext, Action<Exception> onError)
         {
             BlockingSubscribe(source, onNext, onError, () => { });
         }
 
+        /// <summary>
+        /// Consumes the IFlowable source in a blocking
+        /// fashion and calls the actions on the current thread.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="onNext">The action to call with the items from the source.</param>
+        /// <param name="onError">The action to call with the error from the source.</param>
+        /// <param name="onComplete">The action to to call when the source terminates.</param>
+        /// <param name="onConnect">The optional action called with the IDisposable representing the
+        /// active connection that allows cancelling the flow.</param>
         public static void BlockingSubscribe<T>(this IFlowable<T> source, Action<T> onNext, Action<Exception> onError, Action onComplete, Action<IDisposable> onConnect = null)
         {
             BlockingSubscribe(source, onNext, onError, onComplete, BufferSize(), onConnect);
         }
 
+        /// <summary>
+        /// Consumes the IFlowable source in a blocking
+        /// fashion and calls the actions on the current thread.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="onNext">The action to call with the items from the source.</param>
+        /// <param name="onError">The action to call with the error from the source.</param>
+        /// <param name="onComplete">The action to to call when the source terminates.</param>
+        /// <param name="prefetch">The number of items to prefetch.</param>
+        /// <param name="onConnect">The optional action called with the IDisposable representing the
+        /// active connection that allows cancelling the flow.</param>
         public static void BlockingSubscribe<T>(this IFlowable<T> source, Action<T> onNext, Action<Exception> onError, Action onComplete, int prefetch, Action<IDisposable> onConnect = null)
         {
             var s = new BlockingLambdaSubscriber<T>(prefetch, onNext, onError, onComplete);
@@ -1508,11 +1642,26 @@ namespace Reactive4.NET
             s.Run();
         }
 
+        /// <summary>
+        /// Consumes the IFlowable source and relays events to the
+        /// given IFlowableSubscriber instance.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="subscriber">The IFlowableSubscriber that consumes the signals.</param>
         public static void BlockingSubscribe<T>(this IFlowable<T> source, IFlowableSubscriber<T> subscriber)
         {
             BlockingSubscribe(source, subscriber, BufferSize());
         }
 
+        /// <summary>
+        /// Consumes the IFlowable source and relays events to the
+        /// given IFlowableSubscriber instance.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="subscriber">The IFlowableSubscriber that consumes the signals.</param>
+        /// <param name="prefetch">The number of items to prefetch from the source.</param>
         public static void BlockingSubscribe<T>(this IFlowable<T> source, IFlowableSubscriber<T> subscriber, int prefetch)
         {
             var s = new BlockingSubscriber<T>(prefetch, subscriber);
@@ -1524,6 +1673,15 @@ namespace Reactive4.NET
         // Test methods
         // ********************************************************************************
 
+        /// <summary>
+        /// Creates a TestSubscriber with the given initial settings
+        /// and subscribes it to the source IFlowable.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="initialRequest">The initial request amount, non-negative, default long.MaxValue.</param>
+        /// <param name="cancel">If true, the TestSubscriber will be cancelled before subscribing to the source.</param>
+        /// <returns>The new TestSubscriber instance.</returns>
         public static TestSubscriber<T> Test<T>(this IFlowable<T> source, long initialRequest = long.MaxValue, bool cancel = false)
         {
             var ts = new TestSubscriber<T>(initialRequest);

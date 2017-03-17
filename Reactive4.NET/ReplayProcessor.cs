@@ -9,16 +9,39 @@ using System.Threading;
 
 namespace Reactive4.NET
 {
+    /// <summary>
+    /// Represents an IFlowableProcessor that replays all or a bounded number of items
+    /// to its subscribers.
+    /// </summary>
+    /// <typeparam name="T">The input and output value type.</typeparam>
     public sealed class ReplayProcessor<T> : IFlowableProcessor<T>, IDisposable
     {
+        /// <summary>
+        /// Indicates that this IFlowableProcessor has completed normally.
+        /// </summary>
         public bool HasComplete => manager.HasTerminated && manager.Error == null;
 
+        /// <summary>
+        /// Indicates that this IFlowableProcessor has terminated with an exception.
+        /// </summary>
         public bool HasException => manager.HasTerminated && manager.Error != null;
 
+        /// <summary>
+        /// Returns the terminal exception if HasException is true, null otherwise.
+        /// </summary>
         public Exception Exception => manager.HasTerminated ? manager.Error : null;
 
+        /// <summary>
+        /// Indicates there are any subscribers subscribed to this IFlowableProcessor.
+        /// </summary>
         public bool HasSubscribers => manager.HasSubscribers;
 
+        /// <summary>
+        /// Creates an unbounded ReplayProcessor with the given capacity hint for
+        /// the internal buffer.
+        /// </summary>
+        /// <param name="capacityHint">The expected number of items to be replayed, positive.</param>
+        /// <returns></returns>
         public static ReplayProcessor<T> CreateUnbounded(int capacityHint)
         {
             if (capacityHint <= 0)
@@ -32,11 +55,19 @@ namespace Reactive4.NET
 
         ISubscription upstream;
 
+        /// <summary>
+        /// Creates a default, unbounded ReplayProcessor.
+        /// </summary>
         public ReplayProcessor()
         {
             manager = new UnboundedBufferManager(10);
         }
 
+        /// <summary>
+        /// Creates a size-bound ReplayProcessor that holds and replays up
+        /// to the given number of historical items to new subscribers.
+        /// </summary>
+        /// <param name="maxSize">The maximum number of historical items, positive.</param>
         public ReplayProcessor(int maxSize)
         {
             if (maxSize <= 0)
@@ -46,32 +77,82 @@ namespace Reactive4.NET
             manager = new SizeBoundBufferManager(maxSize);
         }
 
+        /// <summary>
+        /// Creates a time-bound ReplayProcessor that holds and replays up
+        /// to the given age of historical items to new subscribers
+        /// where the age is determined with the help of 
+        /// the Executors.Computation.Now property (no asynchrony is introduced).
+        /// </summary>
+        /// <param name="maxAge">The maximum age of historical items.</param>
         public ReplayProcessor(TimeSpan maxAge) : this(int.MaxValue, maxAge, Executors.Computation) { }
 
+        /// <summary>
+        /// Creates a time-bound ReplayProcessor that holds and replays up
+        /// to the given age of historical items to new subscribers
+        /// where the age is determined with the help of the provided executor
+        /// (no asynchrony is introduced).
+        /// </summary>
+        /// <param name="maxAge">The maximum age of historical items.</param>
+        /// <param name="executor">The IExecutorService to use for the source of current time.</param>
         public ReplayProcessor(TimeSpan maxAge, IExecutorService executor) : this(int.MaxValue, maxAge, executor) { }
 
+        /// <summary>
+        /// Creates a time- and size-bound ReplayProcessor that holds and replays up
+        /// to the given number and age of historical items to new subscribers
+        /// where the age is determined with the help of 
+        /// the Executors.Computation.Now property (no asynchrony is introduced).
+        /// </summary>
+        /// <param name="maxSize">The maximum number of historical items, positive.</param>
+        /// <param name="maxAge">The maximum age of historical items.</param>
         public ReplayProcessor(int maxSize, TimeSpan maxAge) : this(maxSize, maxAge, Executors.Computation) { }
 
+        /// <summary>
+        /// Creates a time- and size-bound ReplayProcessor that holds and replays up
+        /// to the given number and age of historical items to new subscribers
+        /// where the age is determined with the help of the provided executor
+        /// (no asynchrony is introduced).
+        /// </summary>
+        /// <param name="maxSize">The maximum number of historical items, positive.</param>
+        /// <param name="maxAge">The maximum age of historical items.</param>
+        /// <param name="executor">The IExecutorService to use for the source of current time.</param>
         public ReplayProcessor(int maxSize, TimeSpan maxAge, IExecutorService executor)
         {
             this.manager = new TimeBoundBufferManager(maxSize, maxAge, executor);
         }
 
+        /// <summary>
+        /// Constructs a ReplayProcessor with a custom buffer manager.
+        /// </summary>
+        /// <param name="bufferManager">The IBufferManager instance.</param>
         internal ReplayProcessor(IBufferManager bufferManager)
         {
             this.manager = bufferManager;
         }
 
+        /// <summary>
+        /// Cancels the upstream ISubscription.
+        /// </summary>
         public void Dispose()
         {
             SubscriptionHelper.Cancel(ref upstream);
         }
 
+        /// <summary>
+        /// Successful terminal state.
+        /// No further events will be sent even if Reactive.Streams.ISubscription.Request(System.Int64)
+        /// is invoked again.
+        /// </summary>
         public void OnComplete()
         {
             manager.OnComplete();
         }
 
+        /// <summary>
+        /// Failed terminal state.
+        /// No further events will be sent even if Reactive.Streams.ISubscription.Request(System.Int64)
+        /// is invoked again.
+        /// </summary>
+        /// <param name="cause">The exception signaled.</param>
         public void OnError(Exception cause)
         {
             if (cause == null)
@@ -81,6 +162,11 @@ namespace Reactive4.NET
             manager.OnError(cause);
         }
 
+        /// <summary>
+        /// Data notification sent by the IPublisher in response to requests
+        /// to ISubscription.Request(long).
+        /// </summary>
+        /// <param name="element">The element signaled</param>
         public void OnNext(T element)
         {
             if (element == null)
@@ -90,6 +176,16 @@ namespace Reactive4.NET
             manager.OnNext(element);
         }
 
+        /// <summary>
+        /// Invoked after calling IPublisher.Subscribe(ISubscriber).
+        /// No data will start flowing until ISubscription.Request(long)
+        /// is invoked.
+        /// It is the responsibility of this ISubscriber instance to call
+        /// Reactive.Streams.ISubscription.Request(System.Int64) whenever more data is wanted.
+        /// The IPublisher will send notifications only in response to
+        /// Reactive.Streams.ISubscription.Request(System.Int64).
+        /// </summary>
+        /// <param name="subscription">ISubscription that allows requesting data via ISubscription.Request(long)</param>
         public void OnSubscribe(ISubscription subscription)
         {
             if (SubscriptionHelper.SetOnce(ref upstream, subscription, crash: false))
@@ -105,6 +201,16 @@ namespace Reactive4.NET
             }
         }
 
+        /// <summary>
+        /// Request IPublisher to start streaming data.
+        /// This is a "factory method" and can be called multiple times, each time starting
+        /// a new ISubscription.
+        /// Each ISubscription will work for only a single ISubscriber.
+        /// A ISubscriber should only subscribe once to a single IPublisher.
+        /// If IPublisher rejects the subscription attempt or otherwise
+        /// fails it will signal the error via ISubscriber.OnError(Exception).
+        /// </summary>
+        /// <param name="subscriber">The ISubscriber that will consume signals from this IPublisher</param>
         public void Subscribe(ISubscriber<T> subscriber)
         {
             if (subscriber == null)
@@ -121,6 +227,10 @@ namespace Reactive4.NET
             }
         }
 
+        /// <summary>
+        /// Subscribe with the relaxed IFlowableSubscriber instance.
+        /// </summary>
+        /// <param name="subscriber">The IFlowableSubscriber instance, not null.</param>
         public void Subscribe(IFlowableSubscriber<T> subscriber)
         {
             manager.Subscribe(subscriber);

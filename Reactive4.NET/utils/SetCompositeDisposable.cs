@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Reactive4.NET.utils
 {
+    /// <summary>
+    /// A container for IDisposables based on a backing HashSet.
+    /// </summary>
     public sealed class SetCompositeDisposable : ICompositeDisposable
     {
 
@@ -14,22 +17,45 @@ namespace Reactive4.NET.utils
 
         int disposed;
 
+        /// <summary>
+        /// Constructs an empty SetCompositeDisposable.
+        /// </summary>
         public SetCompositeDisposable()
         {
         }
 
-        public SetCompositeDisposable(IEnumerable<IDisposable> input)
+        /// <summary>
+        /// Constructs a SetCompositeDisposable with the given params array
+        /// of initial IDisposables.
+        /// </summary>
+        /// <param name="disposables">The params array of IDisposables to start with.</param>
+        public SetCompositeDisposable(params IDisposable[] disposables)
         {
-            this.set = new HashSet<IDisposable>(input);
+            this.set = new HashSet<IDisposable>(disposables);
         }
 
+        /// <summary>
+        /// Constructs a SetCompositeDisposable with the given enumerable
+        /// of initial IDisposables.
+        /// </summary>
+        /// <param name="disposables">The enumerable of IDisposables to start with.</param>
+        public SetCompositeDisposable(IEnumerable<IDisposable> disposables)
+        {
+            this.set = new HashSet<IDisposable>(disposables);
+        }
+
+        /// <summary>
+        /// Add the specified IDisposable to this container.
+        /// </summary>
+        /// <param name="d">The IDisposable to add, not null</param>
+        /// <returns>True if successful; false if the container has been disposed.</returns>
         public bool Add(IDisposable d)
         {
-            if (!IsDisposed())
+            if (!IsDisposed)
             {
                 lock (this)
                 {
-                    if (!IsDisposed())
+                    if (!IsDisposed)
                     {
                         var s = set;
                         if (s == null)
@@ -46,6 +72,10 @@ namespace Reactive4.NET.utils
             return false;
         }
 
+        /// <summary>
+        /// Removes all current IDisposables from this container and
+        /// disposes all of them.
+        /// </summary>
         public void Clear()
         {
             HashSet<IDisposable> s;
@@ -63,9 +93,15 @@ namespace Reactive4.NET.utils
             }
         }
 
+        /// <summary>
+        /// Removes the specified IDisposable from this container
+        /// but does not dispose it.
+        /// </summary>
+        /// <param name="d">The IDisposable to delete.</param>
+        /// <returns>True if successful, false if the IDisposable was not in the container.</returns>
         public bool Delete(IDisposable d)
         {
-            if (!IsDisposed())
+            if (!IsDisposed)
             {
                 lock (this)
                 {
@@ -76,9 +112,12 @@ namespace Reactive4.NET.utils
             return false;
         }
 
+        /// <summary>
+        /// Disposes this container and all IDisposable items it contains.
+        /// </summary>
         public void Dispose()
         {
-            if (!IsDisposed())
+            if (!IsDisposed)
             {
                 Interlocked.Exchange(ref disposed, 1);
                 HashSet<IDisposable> s;
@@ -98,11 +137,17 @@ namespace Reactive4.NET.utils
             }
         }
 
-        public bool IsDisposed()
-        {
-            return Volatile.Read(ref disposed) != 0;
-        }
+        /// <summary>
+        /// Returns true if this container has been disposed.
+        /// </summary>
+        public bool IsDisposed => Volatile.Read(ref disposed) != 0;
 
+        /// <summary>
+        /// Removes the specified IDisposable from this container
+        /// and disposes it.
+        /// </summary>
+        /// <param name="d">The IDisposable to remove.</param>
+        /// <returns>True if successful, false if the IDisposable was not in the container.</returns>
         public bool Remove(IDisposable d)
         {
             if (Delete(d))

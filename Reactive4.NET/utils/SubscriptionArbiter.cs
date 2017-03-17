@@ -106,6 +106,11 @@ namespace Reactive4.NET.utils
             ArbiterDrainLoop();
         }
 
+        /// <summary>
+        /// Deduce the given number of produced elements from the current requested
+        /// amount (if not long.MaxValue.
+        /// </summary>
+        /// <param name="n">The number to deduce, positive.</param>
         public void ArbiterProduced(long n)
         {
             if (n <= 0L)
