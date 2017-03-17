@@ -23,7 +23,7 @@ namespace Reactive4.NET.operators
             other.Subscribe(o);
         }
 
-        sealed class OtherSubscriber : ISubscriber<U>, ISubscription
+        sealed class OtherSubscriber : IFlowableSubscriber<U>, ISubscription
         {
             readonly IFlowableSubscriber<T> actual;
 
@@ -91,11 +91,11 @@ namespace Reactive4.NET.operators
                 SubscriptionHelper.DeferredSetOnce(ref mainUpstream, ref requested, subscription);
             }
 
-            sealed class MainSubscriber : ISubscriber<T>
+            sealed class MainSubscriber : IFlowableSubscriber<T>
             {
                 readonly OtherSubscriber parent;
 
-                readonly ISubscriber<T> actual;
+                readonly IFlowableSubscriber<T> actual;
 
                 internal MainSubscriber(OtherSubscriber parent)
                 {

@@ -56,6 +56,7 @@
     <Compile Include="AsyncProcessor3Tck_Ignored.cs" />
     <Compile Include="AsyncProcessor2Tck.cs" />
     <Compile Include="AsyncProcessor1Tck.cs" />
+    <Compile Include="Benchmark.cs" />
     <Compile Include="FlowableAmb2Tck.cs" />
     <Compile Include="FlowableConcatArray2Tck.cs" />
     <Compile Include="FlowableConcatMap4Tck.cs" />
@@ -177,7 +178,9 @@
     <Compile Include="FlowableCombineLatestTest.cs" />
     <Compile Include="FlowableZipTest.cs" />
     <Compile Include="FlowableReduceTest.cs" />
+    <Compile Include="FlowableFlatMapEnumerableTest.cs" />
     <Compile Include="UnitTest1.cs" />
+    <Compile Include="Benchmarks.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

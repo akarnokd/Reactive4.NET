@@ -111,7 +111,7 @@ namespace Reactive4.NET.operators
                 return false;
             }
 
-            internal sealed class AmbSubscriber : ISubscriber<T>
+            internal sealed class AmbSubscriber : IFlowableSubscriber<T>
             {
                 readonly IFlowableSubscriber<T> actual;
 
