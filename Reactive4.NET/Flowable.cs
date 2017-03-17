@@ -445,6 +445,12 @@ namespace Reactive4.NET
         // Multi-source factory methods
         // ********************************************************************************
 
+        /// <summary>
+        /// Relays events of the IPublisher that signals first.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="sources">The params array of IPublisher instances.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Amb<T>(params IPublisher<T>[] sources) {
             var n = sources.Length;
             if (n == 0)
@@ -458,106 +464,252 @@ namespace Reactive4.NET
             return new FlowableAmbArray<T>(sources);
         }
 
+        /// <summary>
+        /// Relays events of the IPublisher that signals first.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="sources">The enumerable of IPublisher instances.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Amb<T>(IEnumerable<IPublisher<T>> sources)
         {
             return new FlowableAmbEnumerable<T>(sources);
         }
 
+        /// <summary>
+        /// Concatenates elements of IPublishers one after the other.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="sources">The params array of IPublisher sources.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Concat<T>(params IPublisher<T>[] sources)
         {
             return new FlowableConcatArray<T>(sources);
         }
 
+        /// <summary>
+        /// Concatenates elements of IPublishers one after the other.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="sources">The enumerable of IPublisher sources.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Concat<T>(IEnumerable<IPublisher<T>> sources)
         {
             return new FlowableConcatEnumerable<T>(sources);
         }
 
+        /// <summary>
+        /// Concatenates elements of IPublishers one after the other.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="sources">The IPublisher of IPublisher sources.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Concat<T>(this IPublisher<IPublisher<T>> sources)
         {
             return Concat(sources, BufferSize());
         }
 
+        /// <summary>
+        /// Concatenates elements of IPublishers one after the other.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="sources">The IPublisher of IPublisher sources.</param>
+        /// <param name="prefetch">Number of inner IPublishers to prefetch from the outer IPublisher.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Concat<T>(this IPublisher<IPublisher<T>> sources, int prefetch)
         {
             return new FlowableConcatMapPublisher<IPublisher<T>, T>(sources, v => v, prefetch);
         }
 
+        /// <summary>
+        /// Concatenates the IPublishers one after the other while pre-running them.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="sources">The params array of IPublisher sources.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> ConcatEager<T>(params IPublisher<T>[] sources)
         {
             return FromArray(sources).ConcatMapEager(v => v);
         }
 
+        /// <summary>
+        /// Concatenates the IPublishers one after the other while pre-running them.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="sources">The enumerable of IPublisher sources.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> ConcatEager<T>(IEnumerable<IPublisher<T>> sources)
         {
             return ConcatEager(sources, BufferSize(), BufferSize());
         }
 
+        /// <summary>
+        /// Concatenates the IPublishers one after the other while pre-running them.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="sources">The enumerable of IPublisher sources.</param>
+        /// <param name="maxConcurrency">The maximum number of IPublishers to run at once.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> ConcatEager<T>(IEnumerable<IPublisher<T>> sources, int maxConcurrency)
         {
             return ConcatEager(sources, maxConcurrency, BufferSize());
         }
 
+        /// <summary>
+        /// Concatenates the IPublishers one after the other while pre-running them.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="sources">The enumerable of IPublisher sources.</param>
+        /// <param name="maxConcurrency">The maximum number of IPublishers to run at once.</param>
+        /// <param name="prefetch">Number of items to prefetch from the inner IPublishers.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> ConcatEager<T>(IEnumerable<IPublisher<T>> sources, int maxConcurrency, int prefetch)
         {
             return FromEnumerable(sources).ConcatMapEager(v => v, maxConcurrency, prefetch);
         }
 
+        /// <summary>
+        /// Concatenates elements of IPublishers one after the other.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="sources">The IPublisher of IPublisher sources.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> ConcatEager<T>(this IPublisher<IPublisher<T>> sources)
         {
             return ConcatEager(sources, BufferSize(), BufferSize());
         }
 
+        /// <summary>
+        /// Concatenates the IPublishers one after the other while pre-running them.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="sources">The enumerable of IPublisher sources.</param>
+        /// <param name="maxConcurrency">The maximum number of IPublishers to run at once.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> ConcatEager<T>(this IPublisher<IPublisher<T>> sources, int maxConcurrency)
         {
             return ConcatEager(sources, maxConcurrency, BufferSize());
         }
 
+        /// <summary>
+        /// Concatenates the IPublishers one after the other while pre-running them.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="sources">The enumerable of IPublisher sources.</param>
+        /// <param name="maxConcurrency">The maximum number of IPublishers to run at once.</param>
+        /// <param name="prefetch">Number of items to prefetch from the inner IPublishers.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> ConcatEager<T>(this IPublisher<IPublisher<T>> sources, int maxConcurrency, int prefetch)
         {
             return new FlowableConcatMapEagerPublisher<IPublisher<T>, T>(sources, v => v, maxConcurrency, prefetch);
         }
 
+        /// <summary>
+        /// Merges an array of IPublishers.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="sources">The params array of IPublisher instances.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Merge<T>(params IPublisher<T>[] sources)
         {
             return FromArray(sources).FlatMap(v => v);
         }
 
+        /// <summary>
+        /// Merges an array of IPublishers.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="sources">The enumerable of IPublisher instances.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Merge<T>(IEnumerable<IPublisher<T>> sources)
         {
             return FromEnumerable(sources).FlatMap(v => v);
         }
 
+        /// <summary>
+        /// Merges an array of IPublishers up to a maximum at a time.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="sources">The params array of IPublisher source.</param>
+        /// <param name="maxConcurrency">The maximum number of inner IPublishers to merge at once.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Merge<T>(IEnumerable<IPublisher<T>> sources, int maxConcurrency)
         {
             return FromEnumerable(sources).FlatMap(v => v, maxConcurrency);
         }
 
+        /// <summary>
+        /// Merges an array of IPublishers up to a maximum at a time.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="sources">The params array of IPublisher source.</param>
+        /// <param name="maxConcurrency">The maximum number of inner IPublishers to merge at once.</param>
+        /// <param name="prefetch">The number of items to prefetch from the inner IPublishers.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Merge<T>(IEnumerable<IPublisher<T>> sources, int maxConcurrency, int prefetch)
         {
             return FromEnumerable(sources).FlatMap(v => v, maxConcurrency, prefetch);
         }
 
+        /// <summary>
+        /// Merges an array of IPublishers.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="sources">The IPublisher of inner IPublisher instances.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Merge<T>(this IPublisher<IPublisher<T>> sources)
         {
             return Merge(sources, BufferSize(), BufferSize());
         }
 
+        /// <summary>
+        /// Merges an array of IPublishers up to a maximum at a time.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="sources">The IPublisher of inner IPublisher instances.</param>
+        /// <param name="maxConcurrency">The maximum number of inner IPublishers to merge at once.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Merge<T>(this IPublisher<IPublisher<T>> sources, int maxConcurrency)
         {
             return Merge(sources, maxConcurrency, BufferSize());
         }
 
+        /// <summary>
+        /// Merges an array of IPublishers up to a maximum at a time.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="sources">The IPublisher of inner IPublisher instances.</param>
+        /// <param name="maxConcurrency">The maximum number of inner IPublishers to merge at once.</param>
+        /// <param name="bufferSize">The number of items to prefetch from the inner IPublishers.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Merge<T>(this IPublisher<IPublisher<T>> sources, int maxConcurrency, int bufferSize)
         {
             return new FlowableFlatMapPublisher<IPublisher<T>, T>(sources, v => v, maxConcurrency, bufferSize);
         }
 
+        /// <summary>
+        /// Combines the latest elements from all the IPublishers via a combiner function.
+        /// </summary>
+        /// <typeparam name="T">The common input value type.</typeparam>
+        /// <typeparam name="R">The output value type.</typeparam>
+        /// <param name="combiner">The function that receives the array of the latest items and
+        /// returns the value to be emitted to downstream.</param>
+        /// <param name="sources">The params array of IPublisher sources.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> CombineLatest<T, R>(Func<T[], R> combiner, params IPublisher<T>[] sources)
         {
             return CombineLatest(combiner, BufferSize(), sources);
         }
 
+        /// <summary>
+        /// Combines the latest elements from all the IPublishers via a combiner function.
+        /// </summary>
+        /// <typeparam name="T">The common input value type.</typeparam>
+        /// <typeparam name="R">The output value type.</typeparam>
+        /// <param name="combiner">The function that receives the array of the latest items and
+        /// returns the value to be emitted to downstream.</param>
+        /// <param name="prefetch">The number of items to prefetch from each IPublisher.</param>
+        /// <param name="sources">The params array of IPublisher sources.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> CombineLatest<T, R>(Func<T[], R> combiner, int prefetch, params IPublisher<T>[] sources)
         {
             var n = sources.Length;
@@ -572,21 +724,57 @@ namespace Reactive4.NET
             return new FlowableCombineLatest<T, R>(sources, combiner, prefetch);
         }
 
+        /// <summary>
+        /// Combines the latest elements from all the IPublishers via a combiner function.
+        /// </summary>
+        /// <typeparam name="T">The common input value type.</typeparam>
+        /// <typeparam name="R">The output value type.</typeparam>
+        /// <param name="sources">The enumerable of IPublisher sources.</param>
+        /// <param name="combiner">The function that receives the array of the latest items and
+        /// returns the value to be emitted to downstream.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> CombineLatest<T, R>(IEnumerable<IPublisher<T>> sources, Func<T[], R> combiner)
         {
             return CombineLatest(sources, combiner, BufferSize());
         }
 
+        /// <summary>
+        /// Combines the latest elements from all the IPublishers via a combiner function.
+        /// </summary>
+        /// <typeparam name="T">The common input value type.</typeparam>
+        /// <typeparam name="R">The output value type.</typeparam>
+        /// <param name="sources">The enumerable of IPublisher sources.</param>
+        /// <param name="combiner">The function that receives the array of the latest items and
+        /// returns the value to be emitted to downstream.</param>
+        /// <param name="prefetch">The number of items to prefetch from each IPublisher.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> CombineLatest<T, R>(IEnumerable<IPublisher<T>> sources, Func<T[], R> combiner, int prefetch)
         {
             return new FlowableCombineLatestEnumerable<T, R>(sources, combiner, prefetch);
         }
 
+        /// <summary>
+        /// Converts a sequence of type T into a sequence of (boxed) objects.
+        /// </summary>
+        /// <typeparam name="T">The input value type</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<object> Boxed<T>(this IPublisher<T> source)
         {
             return new FlowableBoxed<T>(source);
         }
 
+        /// <summary>
+        /// Combines the latest elements from all the IPublishers via a combiner function.
+        /// </summary>
+        /// <typeparam name="T1">The first input value type.</typeparam>
+        /// <typeparam name="T2">The first input value type.</typeparam>
+        /// <typeparam name="R">The output value type.</typeparam>
+        /// <param name="source1">The first input IPublisher source.</param>
+        /// <param name="source2">The second input IPublisher source.</param>
+        /// <param name="combiner">The function that receives the array of the latest items and
+        /// returns the value to be emitted to downstream.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> CombineLatest<T1, T2, R>(IPublisher<T1> source1, IPublisher<T2> source2, Func<T1, T2, R> combiner)
         {
             return CombineLatest<object, R>(
@@ -594,6 +782,19 @@ namespace Reactive4.NET
                 source1.Boxed(), source2.Boxed());
         }
 
+        /// <summary>
+        /// Combines the latest elements from all the IPublishers via a combiner function.
+        /// </summary>
+        /// <typeparam name="T1">The first input value type.</typeparam>
+        /// <typeparam name="T2">The first input value type.</typeparam>
+        /// <typeparam name="T3">The third input value type.</typeparam>
+        /// <typeparam name="R">The output value type.</typeparam>
+        /// <param name="source1">The first input IPublisher source.</param>
+        /// <param name="source2">The second input IPublisher source.</param>
+        /// <param name="source3">The third input IPublisher source.</param>
+        /// <param name="combiner">The function that receives the array of the latest items and
+        /// returns the value to be emitted to downstream.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> CombineLatest<T1, T2, T3, R>(IPublisher<T1> source1, IPublisher<T2> source2,
             IPublisher<T3> source3, Func<T1, T2, T3, R> combiner)
         {
@@ -602,6 +803,21 @@ namespace Reactive4.NET
                 source1.Boxed(), source2.Boxed(), source3.Boxed());
         }
 
+        /// <summary>
+        /// Combines the latest elements from all the IPublishers via a combiner function.
+        /// </summary>
+        /// <typeparam name="T1">The first input value type.</typeparam>
+        /// <typeparam name="T2">The first input value type.</typeparam>
+        /// <typeparam name="T3">The third input value type.</typeparam>
+        /// <typeparam name="T4">The fourth input value type.</typeparam>
+        /// <typeparam name="R">The output value type.</typeparam>
+        /// <param name="source1">The first input IPublisher source.</param>
+        /// <param name="source2">The second input IPublisher source.</param>
+        /// <param name="source3">The third input IPublisher source.</param>
+        /// <param name="source4">The fourth input IPublisher source.</param>
+        /// <param name="combiner">The function that receives the array of the latest items and
+        /// returns the value to be emitted to downstream.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> CombineLatest<T1, T2, T3, T4, R>(IPublisher<T1> source1, IPublisher<T2> source2,
             IPublisher<T3> source3, IPublisher<T4> source4, Func<T1, T2, T3, T4, R> combiner)
         {
@@ -610,26 +826,75 @@ namespace Reactive4.NET
                 source1.Boxed(), source2.Boxed(), source3.Boxed(), source4.Boxed());
         }
 
+        /// <summary>
+        /// Combines the next elements from all the IPublishers via a zipper function.
+        /// </summary>
+        /// <typeparam name="T">The common input value type.</typeparam>
+        /// <typeparam name="R">The output value type.</typeparam>
+        /// <param name="zipper">The function that receives the array of the next items and
+        /// returns the value to be emitted to downstream.</param>
+        /// <param name="sources">The params array of IPublisher sources.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> Zip<T, R>(Func<T[], R> zipper, params IPublisher<T>[] sources)
         {
             return Zip(zipper, BufferSize(), sources);
         }
 
+        /// <summary>
+        /// Combines the next elements from all the IPublishers via a zipper function.
+        /// </summary>
+        /// <typeparam name="T">The common input value type.</typeparam>
+        /// <typeparam name="R">The output value type.</typeparam>
+        /// <param name="zipper">The function that receives the array of the next items and
+        /// returns the value to be emitted to downstream.</param>
+        /// <param name="prefetch">The number of items to prefetch from each IPublisher.</param>
+        /// <param name="sources">The params array of IPublisher sources.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> Zip<T, R>(Func<T[], R> zipper, int prefetch, params IPublisher<T>[] sources)
         {
             return new FlowableZipArray<T, R>(sources, zipper, prefetch);
         }
 
+        /// <summary>
+        /// Combines the next elements from all the IPublishers via a zipper function.
+        /// </summary>
+        /// <typeparam name="T">The common input value type.</typeparam>
+        /// <typeparam name="R">The output value type.</typeparam>
+        /// <param name="sources">The enumerable of IPublisher sources.</param>
+        /// <param name="zipper">The function that receives the array of the next items and
+        /// returns the value to be emitted to downstream.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> Zip<T, R>(IEnumerable<IPublisher<T>> sources, Func<T[], R> zipper)
         {
             return Zip(sources, zipper, BufferSize());
         }
 
+        /// <summary>
+        /// Combines the next elements from all the IPublishers via a zipper function.
+        /// </summary>
+        /// <typeparam name="T">The common input value type.</typeparam>
+        /// <typeparam name="R">The output value type.</typeparam>
+        /// <param name="sources">The enumerable of IPublisher sources.</param>
+        /// <param name="zipper">The function that receives the array of the next items and
+        /// returns the value to be emitted to downstream.</param>
+        /// <param name="prefetch">The number of items to prefetch from each IPublisher.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> Zip<T, R>(IEnumerable<IPublisher<T>> sources, Func<T[], R> zipper, int prefetch)
         {
             return new FlowableZipEnumerable<T, R>(sources, zipper, prefetch);
         }
 
+        /// <summary>
+        /// Combines the next elements from all the IPublishers via a zipper function.
+        /// </summary>
+        /// <typeparam name="T1">The first input value type.</typeparam>
+        /// <typeparam name="T2">The first input value type.</typeparam>
+        /// <typeparam name="R">The output value type.</typeparam>
+        /// <param name="source1">The first input IPublisher source.</param>
+        /// <param name="source2">The second input IPublisher source.</param>
+        /// <param name="zipper">The function that receives the array of the next items and
+        /// returns the value to be emitted to downstream.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> Zip<T1, T2, R>(IPublisher<T1> source1, IPublisher<T2> source2, Func<T1, T2, R> zipper)
         {
             return Zip<object, R>(
@@ -637,6 +902,19 @@ namespace Reactive4.NET
                 source1.Boxed(), source2.Boxed());
         }
 
+        /// <summary>
+        /// Combines the next elements from all the IPublishers via a zipper function.
+        /// </summary>
+        /// <typeparam name="T1">The first input value type.</typeparam>
+        /// <typeparam name="T2">The first input value type.</typeparam>
+        /// <typeparam name="T3">The third input value type.</typeparam>
+        /// <typeparam name="R">The output value type.</typeparam>
+        /// <param name="source1">The first input IPublisher source.</param>
+        /// <param name="source2">The second input IPublisher source.</param>
+        /// <param name="source3">The third input IPublisher source.</param>
+        /// <param name="zipper">The function that receives the array of the next items and
+        /// returns the value to be emitted to downstream.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> Zip<T1, T2, T3, R>(IPublisher<T1> source1, IPublisher<T2> source2, 
             IPublisher<T3> source3, Func<T1, T2, T3, R> zipper)
         {
@@ -645,6 +923,21 @@ namespace Reactive4.NET
                 source1.Boxed(), source2.Boxed(), source3.Boxed());
         }
 
+        /// <summary>
+        /// Combines the next elements from all the IPublishers via a zipper function.
+        /// </summary>
+        /// <typeparam name="T1">The first input value type.</typeparam>
+        /// <typeparam name="T2">The first input value type.</typeparam>
+        /// <typeparam name="T3">The third input value type.</typeparam>
+        /// <typeparam name="T4">The fourth input value type.</typeparam>
+        /// <typeparam name="R">The output value type.</typeparam>
+        /// <param name="source1">The first input IPublisher source.</param>
+        /// <param name="source2">The second input IPublisher source.</param>
+        /// <param name="source3">The third input IPublisher source.</param>
+        /// <param name="source4">The fourth input IPublisher source.</param>
+        /// <param name="zipper">The function that receives the array of the next items and
+        /// returns the value to be emitted to downstream.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> Zip<T1, T2, T3, T4, R>(IPublisher<T1> source1, IPublisher<T2> source2,
             IPublisher<T3> source3, IPublisher<T4> source4, Func<T1, T2, T3, T4, R> zipper)
         {
@@ -653,11 +946,26 @@ namespace Reactive4.NET
                 source1.Boxed(), source2.Boxed(), source3.Boxed(), source4.Boxed());
         }
 
+        /// <summary>
+        /// Switches to emitting the items of the inner IPublisher when the outer IPublisher
+        /// produces that IPublisher.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="sources">The IPublisher producing the inner IPublisher instances</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> SwitchOnNext<T>(IPublisher<IPublisher<T>> sources)
         {
             return SwitchOnNext(sources, BufferSize());
         }
 
+        /// <summary>
+        /// Switches to emitting the items of the inner IPublisher when the outer IPublisher
+        /// produces that IPublisher.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="sources">The IPublisher producing the inner IPublisher instances</param>
+        /// <param name="prefetch">The number of items to prefetch from each iner IPublisher source.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> SwitchOnNext<T>(IPublisher<IPublisher<T>> sources, int prefetch)
         {
             // TODO implement
