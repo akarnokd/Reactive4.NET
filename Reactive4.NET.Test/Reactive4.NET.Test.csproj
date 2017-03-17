@@ -60,6 +60,9 @@
     <Compile Include="FlowableAmb2Tck.cs" />
     <Compile Include="FlowableConcatArray2Tck.cs" />
     <Compile Include="FlowableConcatMap4Tck.cs" />
+    <Compile Include="FlowableConcatMapEager4Tck.cs" />
+    <Compile Include="FlowableConcatMapEager3Tck.cs" />
+    <Compile Include="FlowableConcatMapEager2Tck.cs" />
     <Compile Include="FlowableConcatMapTest.cs" />
     <Compile Include="FlowableConcatEnumerable2Tck.cs" />
     <Compile Include="FlowableConcatEnumerable1Tck.cs" />
@@ -91,6 +94,7 @@
     <Compile Include="FlowableAmb1Tck.cs" />
     <Compile Include="FlowableCombineLatest1Tck.cs" />
     <Compile Include="FlowableFlatMapEnumerable1Tck.cs" />
+    <Compile Include="FlowableConcatMapEager1Tck.cs" />
     <Compile Include="FlowableZip2Tck.cs" />
     <Compile Include="FlowableZip1Tck.cs" />
     <Compile Include="FlowableUsing2Tck.cs" />
@@ -179,6 +183,7 @@
     <Compile Include="FlowableZipTest.cs" />
     <Compile Include="FlowableReduceTest.cs" />
     <Compile Include="FlowableFlatMapEnumerableTest.cs" />
+    <Compile Include="FlowableConcatMapEagerTest.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Benchmarks.cs" />
   </ItemGroup>

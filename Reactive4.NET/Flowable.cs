@@ -515,8 +515,7 @@ namespace Reactive4.NET
 
         public static IFlowable<T> ConcatEager<T>(this IPublisher<IPublisher<T>> sources, int maxConcurrency, int prefetch)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableConcatMapEagerPublisher<IPublisher<T>, T>(sources, v => v, maxConcurrency, prefetch);
         }
 
         public static IFlowable<T> Merge<T>(params IPublisher<T>[] sources)
@@ -882,23 +881,58 @@ namespace Reactive4.NET
             return new FlowableConcatMap<T, R>(source, mapper, prefetch);
         }
 
+        /// <summary>
+        /// Maps the upstream values into IPublishers, pre-runs them and
+        /// concatenates their items in order.
+        /// </summary>
+        /// <typeparam name="T">The upstream value type.</typeparam>
+        /// <typeparam name="R">The inner IPublisher and result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance</param>
+        /// <param name="mapper">The mapper that turns an upstream value into an IPublisher.</param>
+        /// <returns>The new IFlowable instance</returns>
         public static IFlowable<R> ConcatMapEager<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper)
         {
             return ConcatMapEager(source, mapper, BufferSize(), BufferSize());
         }
 
+        /// <summary>
+        /// Maps the upstream values into IPublishers, pre-runs them and
+        /// concatenates their items in order.
+        /// </summary>
+        /// <typeparam name="T">The upstream value type.</typeparam>
+        /// <typeparam name="R">The inner IPublisher and result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance</param>
+        /// <param name="mapper">The mapper that turns an upstream value into an IPublisher.</param>
+        /// <param name="maxConcurrency">The maximum number of concurrently running inner IPublishers, positive</param>
+        /// <returns>The new IFlowable instance</returns>
         public static IFlowable<R> ConcatMapEager<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper, int maxConcurrency)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return ConcatMapEager(source, mapper, maxConcurrency, BufferSize());
         }
 
+        /// <summary>
+        /// Maps the upstream values into IPublishers, pre-runs them and
+        /// concatenates their items in order.
+        /// </summary>
+        /// <typeparam name="T">The upstream value type.</typeparam>
+        /// <typeparam name="R">The inner IPublisher and result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance</param>
+        /// <param name="mapper">The mapper that turns an upstream value into an IPublisher.</param>
+        /// <param name="maxConcurrency">The maximum number of concurrently running inner IPublishers, positive</param>
+        /// <param name="prefetch">The number of items to prefetch from each inner IPublisher</param>
+        /// <returns>The new IFlowable instance</returns>
         public static IFlowable<R> ConcatMapEager<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper, int maxConcurrency, int prefetch)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableConcatMapEager<T, R>(source, mapper, maxConcurrency, prefetch);
         }
 
+        /// <summary>
+        /// Hides the identity of the source IFlowable and prevents
+        /// identity-based optimizations over the flow.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance</param>
+        /// <returns>The new IFlowable instance</returns>
         public static IFlowable<T> Hide<T>(this IFlowable<T> source)
         {
             return new FlowableHide<T>(source);

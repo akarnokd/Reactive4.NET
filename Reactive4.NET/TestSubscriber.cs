@@ -145,7 +145,7 @@ namespace Reactive4.NET
         /// </summary>
         /// <param name="message">The message to print</param>
         /// <returns>The Exception that can be thrown.</returns>
-        protected InvalidOperationException fail(string message)
+        public InvalidOperationException Fail(string message)
         {
             StringBuilder b = new StringBuilder(64);
 
@@ -226,7 +226,7 @@ namespace Reactive4.NET
                     if (!latch.Wait(timespan))
                     {
                         Cancel();
-                        throw fail("Timeout!");
+                        throw Fail("Timeout!");
                     }
                 } catch (ObjectDisposedException)
                 {
@@ -287,7 +287,7 @@ namespace Reactive4.NET
         {
             if (!hasSubscribed)
             {
-                throw fail("Not subscribed!");
+                throw Fail("Not subscribed!");
             }
             return this;
         }
@@ -314,17 +314,17 @@ namespace Reactive4.NET
         {
             if (latch.CurrentCount != 0)
             {
-                throw fail("Not terminated");
+                throw Fail("Not terminated");
             }
             long ec = Volatile.Read(ref errorCount);
             if (ec > 1)
             {
-                throw fail("Terminated with multiple errors");
+                throw Fail("Terminated with multiple errors");
             }
             long c = Volatile.Read(ref completions);
             if (ec > 1)
             {
-                throw fail("Terminated with multiple completions");
+                throw Fail("Terminated with multiple completions");
             }
             return this;
         }
@@ -337,7 +337,7 @@ namespace Reactive4.NET
         {
             if (latch.CurrentCount == 0)
             {
-                throw fail("Terminated");
+                throw Fail("Terminated");
             }
             return this;
         }
@@ -353,7 +353,7 @@ namespace Reactive4.NET
             long vc = Volatile.Read(ref valueCount);
             if (expected.Length != vc)
             {
-                throw fail("Number of values differ. Expected: " + expected.Length + ", Actual: " + vc);
+                throw Fail("Number of values differ. Expected: " + expected.Length + ", Actual: " + vc);
             }
 
             IEqualityComparer<T> comparer = EqualityComparer<T>.Default;
@@ -361,7 +361,7 @@ namespace Reactive4.NET
             {
                 if (!comparer.Equals(expected[i], values[i]))
                 {
-                    throw fail("Value at " + i + " differs. Expected: " + AsString(expected[i]) + ", Actual: " + AsString(values[i]));
+                    throw Fail("Value at " + i + " differs. Expected: " + AsString(expected[i]) + ", Actual: " + AsString(values[i]));
                 }
             }
             return this;
@@ -385,11 +385,11 @@ namespace Reactive4.NET
                     {
                         if (!comparer.Equals(en.Current, values[i]))
                         {
-                            throw fail("Value at " + i + " differs. Expected: " + AsString(en.Current) + ", Actual: " + AsString(values[i]));
+                            throw Fail("Value at " + i + " differs. Expected: " + AsString(en.Current) + ", Actual: " + AsString(values[i]));
                         }
                         if (!en.MoveNext() && i < vc - 1)
                         {
-                            throw fail("More values present than " + (i + 1));
+                            throw Fail("More values present than " + (i + 1));
                         }
                     }
                 }
@@ -397,7 +397,7 @@ namespace Reactive4.NET
                 {
                     if (vc != 0)
                     {
-                        throw fail("Values present");
+                        throw Fail("Values present");
                     }
                 }
             }
@@ -415,12 +415,12 @@ namespace Reactive4.NET
             AssertSubscribed();
             if (Volatile.Read(ref errorCount) != 0)
             {
-                throw fail("Error(s) present");
+                throw Fail("Error(s) present");
             }
 
             if (Volatile.Read(ref completions) != 1)
             {
-                throw fail("Not (properly) completed");
+                throw Fail("Not (properly) completed");
             }
 
             AssertValues(expected);
@@ -491,7 +491,7 @@ namespace Reactive4.NET
             long vc = Volatile.Read(ref valueCount);
             if (vc != n)
             {
-                throw fail("Different value count; Expected = " + n + ", Actual = " + vc);
+                throw Fail("Different value count; Expected = " + n + ", Actual = " + vc);
             }
             return this;
         }
@@ -505,11 +505,11 @@ namespace Reactive4.NET
             long c = Volatile.Read(ref completions);
             if (c == 0L)
             {
-                throw fail("Not completed");
+                throw Fail("Not completed");
             }
             if (c > 1L)
             {
-                throw fail("Multiple completions");
+                throw Fail("Multiple completions");
             }
             return this;
         }
@@ -523,11 +523,11 @@ namespace Reactive4.NET
             long c = Volatile.Read(ref completions);
             if (c == 1L)
             {
-                throw fail("Completed");
+                throw Fail("Completed");
             }
             if (c > 1L)
             {
-                throw fail("Multiple completions");
+                throw Fail("Multiple completions");
             }
             return this;
         }
@@ -542,13 +542,13 @@ namespace Reactive4.NET
             long ec = Volatile.Read(ref errorCount);
             if (ec == 0)
             {
-                throw fail("No errors present");
+                throw Fail("No errors present");
             }
             if (ec == 1)
             {
                 if (!errorType.IsInstanceOfType(errors[0]))
                 {
-                    throw fail("Different error present");
+                    throw Fail("Different error present");
                 }
             }
             else
@@ -557,10 +557,10 @@ namespace Reactive4.NET
                 {
                     if (!errorType.IsInstanceOfType(errors[i]))
                     {
-                        throw fail("Error found but there are others");
+                        throw Fail("Error found but there are others");
                     }
                 }
-                throw fail("Different errors present");
+                throw Fail("Different errors present");
             }
             return this;
         }
@@ -577,7 +577,7 @@ namespace Reactive4.NET
             string m = errors[0].Message;
             if (m != message)
             {
-                throw fail("Different error message; Expected = " + message + ", Actual: " + m);
+                throw Fail("Different error message; Expected = " + message + ", Actual: " + m);
             }
             return this;
         }
@@ -591,7 +591,7 @@ namespace Reactive4.NET
             long ec = Volatile.Read(ref errorCount);
             if (ec != 0L)
             {
-                throw fail("Error(s) present");
+                throw Fail("Error(s) present");
             }
             return this;
         }
@@ -608,7 +608,7 @@ namespace Reactive4.NET
             {
                 if (!predicate(values[i]))
                 {
-                    throw fail("Item " + i + " failed the predicate");
+                    throw Fail("Item " + i + " failed the predicate");
                 }
             }
             return this;
