@@ -126,7 +126,6 @@ namespace Reactive4.NET
         /// <param name="subscription">The ISubscription from the upstream.</param>
         public void OnSubscribe(ISubscription subscription)
         {
-            CheckSubscribed();
             hasSubscribed = true;
             SubscriptionHelper.DeferredSetOnce(ref upstream, ref requested, subscription);
         }
