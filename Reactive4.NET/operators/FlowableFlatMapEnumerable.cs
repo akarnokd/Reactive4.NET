@@ -313,10 +313,10 @@ namespace Reactive4.NET.operators
                             {
                                 b = false;
                                 ExceptionHelper.AddException(ref error, ex);
-                                DisposeSilently(en);
                             }
                             if (!b)
                             {
+                                DisposeSilently(en);
                                 en = null;
                                 break;
                             }

@@ -16,7 +16,7 @@ namespace Reactive4.NET
         /// <summary>
         /// The default buffer size, prefetch amount, capacity hint.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The default buffer size, positive.</returns>
         public static int BufferSize()
         {
             return 128;
@@ -26,6 +26,13 @@ namespace Reactive4.NET
         // Interop methods
         // ********************************************************************************
 
+        /// <summary>
+        /// Converts an arbitrary Reactive-Streams IPublisher into an IFlowable to
+        /// enable fluent API operations on it.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="publisher">The IPublisher to convert.</param>
+        /// <returns>The new IFlowable instance</returns>
         public static IFlowable<T> ToFlowable<T>(this IPublisher<T> publisher)
         {
             if (publisher is IFlowable<T> f)
@@ -35,41 +42,92 @@ namespace Reactive4.NET
             return new FlowableFromPublisher<T>(publisher);
         }
 
+        /// <summary>
+        /// Converts an arbitrary Reactive-Streams IPublisher into an IFlowable to
+        /// enable fluent API operations on it.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="publisher">The IPublisher to convert.</param>
+        /// <returns>The new IFlowable instance</returns>
         public static IFlowable<T> FromPublisher<T>(IPublisher<T> publisher)
         {
             return publisher.ToFlowable();
         }
 
+        /// <summary>
+        /// Convert a standard IObservable into an IFlowable that is run with the
+        /// specified backpressure strategy.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The IObservable to convert.</param>
+        /// <param name="strategy">The backpressure strategy to apply.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> ToFlowable<T>(this IObservable<T> source, BackpressureStrategy strategy)
         {
             return new FlowableFromObservable<T>(source, strategy);
         }
 
+        /// <summary>
+        /// Convert a standard IObservable into an IFlowable that is run with the
+        /// specified backpressure strategy.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The IObservable to convert.</param>
+        /// <param name="strategy">The backpressure strategy to apply.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> FromObservable<T>(IObservable<T> source, BackpressureStrategy strategy)
         {
             return source.ToFlowable(strategy);
         }
 
+        /// <summary>
+        /// Signals the success or failure of the given (ongoing) Task instance.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="task">The task whose outcome to signal.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> ToFlowable<T>(this Task<T> task)
         {
             return new FlowableFromTask<T>(task);
         }
 
+        /// <summary>
+        /// Signals the success or failure of the given (ongoing) Task instance.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="task">The task whose outcome to signal.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> FromTask<T>(Task<T> task)
         {
             return task.ToFlowable();
         }
 
+        /// <summary>
+        /// Signals the success (via an empty IFlowable) or failure of the given (ongoing) Task instance.
+        /// </summary>
+        /// <param name="task">The task whose outcome to signal.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<object> ToFlowable(this Task task)
         {
             return new FlowableFromTaskVoid(task);
         }
 
+        /// <summary>
+        /// Signals the success (via an empty IFlowable) or failure of the given (ongoing) Task instance.
+        /// </summary>
+        /// <param name="task">The task whose outcome to signal.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<object> FromTask(this Task task)
         {
             return task.ToFlowable();
         }
 
+        /// <summary>
+        /// Convert the IFlowable instance into a standard IObservable.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable to convert.</param>
+        /// <returns>The new IObservable instance.</returns>
         public static IObservable<T> ToObservable<T>(this IFlowable<T> source)
         {
             return new FlowableToObservable<T>(source);
@@ -79,126 +137,305 @@ namespace Reactive4.NET
         // Factory methods
         // ********************************************************************************
 
+        /// <summary>
+        /// Signals a single item.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="item">The item to emit.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Just<T>(T item)
         {
             return new FlowableJust<T>(item);
         }
 
+        /// <summary>
+        /// Repeatedly signals the given item indefinitely.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="item">The item to emit.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> RepeatItem<T>(T item)
         {
             return new FlowableRepeatItem<T>(item);
         }
 
+        /// <summary>
+        /// Signals the given exception instance.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="exception">The exception to signal.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Error<T>(Exception exception)
         {
             return new FlowableError<T>(exception);
         }
 
+        /// <summary>
+        /// Signals the Exception returned by the errorSupplier for each
+        /// individual ISubscriber.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="errorSupplier">The Func that returns the Exception to signal.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Error<T>(Func<Exception> errorSupplier)
         {
             return new FlowableErrorSupplier<T>(errorSupplier);
         }
 
+        /// <summary>
+        /// Signals a normal completion.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Empty<T>()
         {
             return FlowableEmpty<T>.Instance;
         }
 
+        /// <summary>
+        /// Doesn't signal anything.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Never<T>()
         {
             return FlowableNever<T>.Instance;
         }
 
+        /// <summary>
+        /// Signals the only item returned by the function call.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="function">The function to call for an item.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> FromFunction<T>(Func<T> function)
         {
             return new FlowableFromFunction<T>(function);
         }
 
+        /// <summary>
+        /// Repeatedly calls a function and signals the value it returned.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="function">The function called repeatedly.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> RepeatFunction<T>(Func<T> function)
         {
             return new FlowableRepeatFunction<T>(function);
         }
 
+        /// <summary>
+        /// Creates an IFlowable and allows signalling events in an imperative
+        /// push manner.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="emitter">The action called for each incoming ISubscriber to trigger emissions of signals.</param>
+        /// <param name="strategy">The backpressure strategy to use when the emitter overproduces items.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Create<T>(Action<IFlowableEmitter<T>> emitter, BackpressureStrategy strategy)
         {
             return new FlowableCreate<T>(emitter, strategy);
         }
 
+        /// <summary>
+        /// Generates items in a backpressure-aware manner without any per-ISubscriber state.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="emitter">The action called to signal an event for each downstream request.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Generate<T>(Action<IGeneratorEmitter<T>> emitter)
         {
             return Generate<T, object>(() => null, (s, e) => { emitter(e); return null; }, s => { });
         }
 
+        /// <summary>
+        /// Generates items in a backpressure-aware manner with a per-ISubscriber state.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <typeparam name="S">The state type.</typeparam>
+        /// <param name="emitter">The action called to signal an event for each downstream request.</param>
+        /// <param name="stateFactory">The function called to create the initial state per ISubscriber.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Generate<T, S>(Func<S> stateFactory, Action<S, IGeneratorEmitter<T>> emitter)
         {
             return Generate<T, S>(stateFactory, (s, e) => { emitter(s, e); return s; }, s => { });
         }
 
+        /// <summary>
+        /// Generates items in a backpressure-aware manner with a per-ISubscriber state
+        /// and a state cleanup callback.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <typeparam name="S">The state type.</typeparam>
+        /// <param name="emitter">The action called to signal an event for each downstream request.</param>
+        /// <param name="stateFactory">The function called to create the initial state per ISubscriber.</param>
+        /// <param name="stateCleanup">The action called to cleanup the state.</param>
+        /// <param name="eager">If true, the stateCleanup is called before the terminal signal is emitted;
+        /// if false, the stateCleanup is called after the terminal signal is emitted.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Generate<T, S>(Func<S> stateFactory, Action<S, IGeneratorEmitter<T>> emitter, Action<S> stateCleanup, bool eager = false)
         {
             return Generate<T, S>(stateFactory, (s, e) => { emitter(s, e); return s; }, stateCleanup, eager);
         }
 
+        /// <summary>
+        /// Generates items in a backpressure-aware manner with a per-ISubscriber state
+        /// that is updated each time the emitter funtion is invoked.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <typeparam name="S">The state type.</typeparam>
+        /// <param name="emitter">The action called to signal an event for each downstream request.</param>
+        /// <param name="stateFactory">The function called to create the initial state per ISubscriber.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Generate<T, S>(Func<S> stateFactory, Func<S, IGeneratorEmitter<T>, S> emitter)
         {
             return Generate<T, S>(stateFactory, emitter, s => { });
         }
 
+        /// <summary>
+        /// Generates items in a backpressure-aware manner with a per-ISubscriber state
+        /// that is updated each time the emitter funtion is invoked and a state cleanup callback.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <typeparam name="S">The state type.</typeparam>
+        /// <param name="emitter">The action called to signal an event for each downstream request.</param>
+        /// <param name="stateFactory">The function called to create the initial state per ISubscriber.</param>
+        /// <param name="stateCleanup">The action called to cleanup the state.</param>
+        /// <param name="eager">If true, the stateCleanup is called before the terminal signal is emitted;
+        /// if false, the stateCleanup is called after the terminal signal is emitted.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Generate<T, S>(Func<S> stateFactory, Func<S, IGeneratorEmitter<T>, S> emitter, Action<S> stateCleanup, bool eager = false)
         {
             return new FlowableGenerate<T, S>(stateFactory, emitter, stateCleanup, eager);
         }
 
+        /// <summary>
+        /// Emits the items of the given params array.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="items">The items to emit.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> FromArray<T>(params T[] items)
         {
             return new FlowableArray<T>(items);
         }
 
+        /// <summary>
+        /// Emits the items of the given IEnumerable.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="items">The items to emit.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> FromEnumerable<T>(IEnumerable<T> items)
         {
             return new FlowableEnumerable<T>(items);
         }
 
+        /// <summary>
+        /// Emits a range of ints from start (inclusive) to start + count (exclusive).
+        /// </summary>
+        /// <param name="start">The starting value.</param>
+        /// <param name="count">The number of ints to emit.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<int> Range(int start, int count)
         {
             return new FlowableRange(start, start + count);
         }
 
+        /// <summary>
+        /// Defers the creation of the actual IPublisher, allowing a per-ISubscriber
+        /// state and/or individual IPublishers.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="supplier">The function that returns an IPublisher for each ISubscriber.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Defer<T>(Func<IPublisher<T>> supplier)
         {
             return new FlowableDefer<T>(supplier);
         }
 
+        /// <summary>
+        /// Emits 0L after the specified delay running on the Executors.Computation executor.
+        /// </summary>
+        /// <param name="delay">The delay timespan.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<long> Timer(TimeSpan delay)
         {
             return Timer(delay, Executors.Computation);
         }
 
+        /// <summary>
+        /// Emits 0L after the specified delay running on the given executor.
+        /// </summary>
+        /// <param name="delay">The delay timespan.</param>
+        /// <param name="executor">The executor to use for delaying the emission.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<long> Timer(TimeSpan delay, IExecutorService executor)
         {
             return new FlowableTimer(delay, executor);
         }
 
+        /// <summary>
+        /// Emits an ever increasing long values periodically on the Executors.Computation
+        /// executor.
+        /// </summary>
+        /// <param name="period">The initial and periodic delay.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<long> Interval(TimeSpan period)
         {
             return Interval(period, period, Executors.Computation);
         }
 
+        /// <summary>
+        /// Emits an ever increasing long values periodically on the Executors.Computation
+        /// executor.
+        /// </summary>
+        /// <param name="initialDelay">The initial delay.</param>
+        /// <param name="period">The periodic delay.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<long> Interval(TimeSpan initialDelay, TimeSpan period)
         {
             return Interval(initialDelay, period, Executors.Computation);
         }
 
+        /// <summary>
+        /// Emits an ever increasing long values periodically on the given
+        /// executor.
+        /// </summary>
+        /// <param name="period">The initial and periodic delay.</param>
+        /// <param name="executor">The executor to use for delaying the emission.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<long> Interval(TimeSpan period, IExecutorService executor)
         {
             return Interval(period, period, executor);
         }
 
+        /// <summary>
+        /// Emits an ever increasing long values periodically on the given
+        /// executor.
+        /// </summary>
+        /// <param name="initialDelay">The initial delay.</param>
+        /// <param name="period">The periodic delay.</param>
+        /// <param name="executor">The executor to use for delaying the emission.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<long> Interval(TimeSpan initialDelay, TimeSpan period, IExecutorService executor)
         {
             return new FlowableInterval(initialDelay, period, executor);
         }
 
+        /// <summary>
+        /// Creates a per-ISubscriber resource, generates an IPublisher from that resource
+        /// and relays its signals until completion when the resource is cleaned up via a callback.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <typeparam name="D">The resource type.</typeparam>
+        /// <param name="resourceFactory">The function that creates a per-ISubscriber resource.</param>
+        /// <param name="resourceMapper">The function that given the resource, it returns an IPublisher to relay events of.</param>
+        /// <param name="resourceCleanup">The function that cleans up the resource once the IPublisher has terminated or the
+        /// sequence is cancelled</param>
+        /// <param name="eager">If true, the stateCleanup is called before the terminal signal is emitted;
+        /// if false, the stateCleanup is called after the terminal signal is emitted.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Using<T, D>(Func<D> resourceFactory, Func<D, IPublisher<T>> resourceMapper, Action<D> resourceCleanup = null, bool eager = true)
         {
             return new FlowableUsing<T, D>(resourceFactory, resourceMapper, resourceCleanup, eager);
