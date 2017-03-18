@@ -1083,7 +1083,7 @@ namespace Reactive4.NET
             {
                 return Empty<T>();
             }
-            if (n == 1L)
+            if (n == 1)
             {
                 return new FlowableTakeLastOne<T>(source);
             }
@@ -1861,14 +1861,73 @@ namespace Reactive4.NET
             return Zip(source, other, zipper);
         }
 
+        /// <summary>
+        /// Maps the upstream values onto IEnumerables and relays the items in them in a sequential manner.
+        /// </summary>
+        /// <typeparam name="T">The source value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="mapper">The function that maps items to IEnumerables.</param>
+        /// <returns>The new Flowable instance.</returns>
         public static IFlowable<R> FlatMapEnumerable<T, R>(this IFlowable<T> source, Func<T, IEnumerable<R>> mapper)
         {
             return FlatMapEnumerable(source, mapper, BufferSize());
         }
 
+        /// <summary>
+        /// Maps the upstream values onto IEnumerables and relays the items in them in a sequential manner.
+        /// </summary>
+        /// <typeparam name="T">The source value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="mapper">The function that maps items to IEnumerables.</param>
+        /// <param name="prefetch">The number of items to prefetch from the upstream.</param>
+        /// <returns>The new Flowable instance.</returns>
         public static IFlowable<R> FlatMapEnumerable<T, R>(this IFlowable<T> source, Func<T, IEnumerable<R>> mapper, int prefetch)
         {
             return new FlowableFlatMapEnumerable<T, R>(source, mapper, prefetch);
+        }
+
+        /// <summary>
+        /// Takes elements from upstream while the predicate returns true for the
+        /// current item.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="predicate">The function called with the current item and should
+        /// return true for emitting and continuing or false for ending the sequence.</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<T> TakeWhile<T>(this IFlowable<T> source, Func<T, bool> predicate)
+        {
+            return new FlowableTakeWhile<T>(source, predicate);
+        }
+
+        /// <summary>
+        /// Takes items from upstream until the predicate returns true after the
+        /// current item.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="predicate">The predicate that receives the current item
+        /// and should return true to stop the sequence.</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<T> TakeUntil<T>(this IFlowable<T> source, Func<T, bool> predicate)
+        {
+            return new FlowableTakeUntilPredicate<T>(source, predicate);
+        }
+
+        /// <summary>
+        /// Skips the upstream items while the predicate returns true
+        /// then relays the remaining items.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="predicate">The function that takes the current item and returns
+        /// true to skip it or false to relay it and all subsequent items.</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<T> SkipWhile<T>(this IFlowable<T> source, Func<T, bool> predicate)
+        {
+            return new FlowableSkipWhile<T>(source, predicate);
         }
 
         // ********************************************************************************

@@ -95,11 +95,17 @@
     <Compile Include="FlowableCombineLatest1Tck.cs" />
     <Compile Include="FlowableFlatMapEnumerable1Tck.cs" />
     <Compile Include="FlowableConcatMapEager1Tck.cs" />
+    <Compile Include="FlowableSkipWhile2Tck.cs" />
+    <Compile Include="FlowableSkipWhile1Tck.cs" />
     <Compile Include="FlowableSwitchMap2Tck.cs" />
     <Compile Include="FlowableSwitchMap1Tck.cs" />
     <Compile Include="FlowableSkipLast1Tck.cs" />
+    <Compile Include="FlowableTakeUntilPredicate1Tck.cs" />
+    <Compile Include="FlowableTakeWhile1Tck.cs" />
     <Compile Include="FlowableTakeLast1Tck.cs" />
     <Compile Include="FlowableSkipLastTest.cs" />
+    <Compile Include="FlowableTakeUntilTest.cs" />
+    <Compile Include="FlowableTakeWhileTest.cs" />
     <Compile Include="FlowableZip2Tck.cs" />
     <Compile Include="FlowableZip1Tck.cs" />
     <Compile Include="FlowableUsing2Tck.cs" />

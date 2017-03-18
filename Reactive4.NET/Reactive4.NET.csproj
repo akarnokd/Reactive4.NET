@@ -56,6 +56,9 @@
     <Compile Include="operators\FlowableSkipLast.cs" />
     <Compile Include="operators\FlowableSwitchMap.cs" />
     <Compile Include="operators\FlowableTakeLast.cs" />
+    <Compile Include="operators\FlowableSkipWhile.cs" />
+    <Compile Include="operators\FlowableTakeUntilPredicate.cs" />
+    <Compile Include="operators\FlowableTakeWhile.cs" />
     <Compile Include="operators\FlowableZipEnumerable.cs" />
     <Compile Include="operators\FlowableAmbEnumerable.cs" />
     <Compile Include="operators\FlowableAmbArray.cs" />
