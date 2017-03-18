@@ -1586,24 +1586,54 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Consumes the upstream source in an unbounded manner and
+        /// signals InvalidOperationException if the downstream can't
+        /// keep up.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> OnBackpressureError<T>(this IFlowable<T> source)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableOnBackpressureError<T>(source);
         }
 
+        /// <summary>
+        /// Consumes the upstream source in an unbounded manner and
+        /// drops items (calling the onDrop action if available)
+        /// if the downstream can't keep up.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="onDrop">The optional action called when an item is dropped.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> OnBackpressureDrop<T>(this IFlowable<T> source, Action<T> onDrop = null)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableOnBackpressureDrop<T>(source, onDrop);
         }
 
-        public static IFlowable<T> OnBackpressureLatest<T>(this IFlowable<T> source)
+        /// <summary>
+        /// Consumes the upstream source in an unbounded fashion and and the
+        /// downstream picks up the latest available item on its own pace.
+        /// The provided Action will be called with the unclaimed items.
+        /// </summary>
+        /// <typeparam name="T">The element type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="onDrop">The action called with the unclaimed items.</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<T> OnBackpressureLatest<T>(this IFlowable<T> source, Action<T> onDrop = null)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableOnBackpressureLatest<T>(source, onDrop);
         }
 
+        /// <summary>
+        /// Consumes the upsteram source in an unbounded manner and
+        /// buffers all items if the downstream can't keep up.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> OnBackpressureBuffer<T>(this IFlowable<T> source)
         {
             return OnBackpressureBuffer(source, BufferSize(), BufferStrategy.ALL, null);
