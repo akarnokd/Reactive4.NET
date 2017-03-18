@@ -10,39 +10,33 @@ using Reactive4.NET.utils;
 
 namespace Reactive4.NET
 {
+    /// <summary>
+    /// A Processor that allows only one subscriber and buffers items
+    /// until this single subscriber subscribes and after that if the
+    /// subscriber can't keep up.
+    /// </summary>
+    /// <typeparam name="T">The input and output value type.</typeparam>
     public sealed class UnicastProcessor<T> : IFlowableProcessor<T>, IDisposable
     {
-        public bool HasComplete
-        {
-            get
-            {
-                return Volatile.Read(ref done) && error == null;
-            }
-        }
+        /// <summary>
+        /// Indicates that this IFlowableProcessor has completed normally.
+        /// </summary>
+        public bool HasComplete => Volatile.Read(ref done) && error == null;
 
-        public bool HasException
-        {
-            get
-            {
-                return Volatile.Read(ref done) && error != null;
-            }
-        }
+        /// <summary>
+        /// Indicates that this IFlowableProcessor has terminated with an exception.
+        /// </summary>
+        public bool HasException => Volatile.Read(ref done) && error != null;
 
-        public Exception Exception
-        {
-            get
-            {
-                return Volatile.Read(ref done) ? error : null;
-            }
-        }
+        /// <summary>
+        /// Returns the terminal exception if HasException is true, null otherwise.
+        /// </summary>
+        public Exception Exception => Volatile.Read(ref done) ? error : null;
 
-        public bool HasSubscribers
-        {
-            get
-            {
-                return Volatile.Read(ref actual) != null;
-            }
-        }
+        /// <summary>
+        /// Indicates there are any subscribers subscribed to this IFlowableProcessor.
+        /// </summary>
+        public bool HasSubscribers => Volatile.Read(ref actual) != null;
 
         readonly int bufferSize;
 
@@ -67,16 +61,33 @@ namespace Reactive4.NET
 
         long emitted;
 
+        /// <summary>
+        /// Constructs an UnicastProcessor with a default buffer size and
+        /// no termination action.
+        /// </summary>
         public UnicastProcessor() : this(Flowable.BufferSize(), () => { })
         {
 
         }
 
+        /// <summary>
+        /// Constructs an UnicastProcessor with the given buffer size
+        /// and no termination action.
+        /// </summary>
+        /// <param name="bufferSize">The island size of the internal unbounded buffer.</param>
         public UnicastProcessor(int bufferSize) : this(bufferSize, () => { })
         {
 
         }
 
+        /// <summary>
+        /// Constructs an UnicastProcessor with the given buffer size
+        /// and termination action (called at most once on a terminal event
+        /// or when the single subscriber cancels).
+        /// </summary>
+        /// <param name="bufferSize">The island size of the internal unbounded buffer.</param>
+        /// <param name="onTerminate">The action called when this UnicastProcessor
+        /// receives a terminal event or cancellation.</param>
         public UnicastProcessor(int bufferSize, Action onTerminate)
         {
             this.bufferSize = bufferSize;
@@ -90,6 +101,11 @@ namespace Reactive4.NET
             a?.Invoke();
         }
 
+        /// <summary>
+        /// Successful terminal state.
+        /// No further events will be sent even if Reactive.Streams.ISubscription.Request(System.Int64)
+        /// is invoked again.
+        /// </summary>
         public void OnComplete()
         {
             if (Volatile.Read(ref done) || Volatile.Read(ref cancelled))
@@ -101,6 +117,12 @@ namespace Reactive4.NET
             Drain();
         }
 
+        /// <summary>
+        /// Failed terminal state.
+        /// No further events will be sent even if Reactive.Streams.ISubscription.Request(System.Int64)
+        /// is invoked again.
+        /// </summary>
+        /// <param name="cause">The exception signaled.</param>
         public void OnError(Exception cause)
         {
             if (cause == null)
@@ -117,6 +139,11 @@ namespace Reactive4.NET
             Drain();
         }
 
+        /// <summary>
+        /// Data notification sent by the IPublisher in response to requests
+        /// to ISubscription.Request(long).
+        /// </summary>
+        /// <param name="element">The element signaled</param>
         public void OnNext(T element)
         {
             if (element == null)
@@ -131,11 +158,24 @@ namespace Reactive4.NET
             Drain();
         }
 
+        /// <summary>
+        /// Cancels the upstream ISubscription.
+        /// </summary>
         public void Dispose()
         {
             SubscriptionHelper.Cancel(ref upstream);
         }
 
+        /// <summary>
+        /// Invoked after calling IPublisher.Subscribe(ISubscriber).
+        /// No data will start flowing until ISubscription.Request(long)
+        /// is invoked.
+        /// It is the responsibility of this ISubscriber instance to call
+        /// Reactive.Streams.ISubscription.Request(System.Int64) whenever more data is wanted.
+        /// The IPublisher will send notifications only in response to
+        /// Reactive.Streams.ISubscription.Request(System.Int64).
+        /// </summary>
+        /// <param name="subscription">ISubscription that allows requesting data via ISubscription.Request(long)</param>
         public void OnSubscribe(ISubscription subscription)
         {
             if (SubscriptionHelper.SetOnce(ref upstream, subscription, false))
@@ -151,6 +191,16 @@ namespace Reactive4.NET
             }
         }
 
+        /// <summary>
+        /// Request IPublisher to start streaming data.
+        /// This is a "factory method" and can be called multiple times, each time starting
+        /// a new ISubscription.
+        /// Each ISubscription will work for only a single ISubscriber.
+        /// A ISubscriber should only subscribe once to a single IPublisher.
+        /// If IPublisher rejects the subscription attempt or otherwise
+        /// fails it will signal the error via ISubscriber.OnError(Exception).
+        /// </summary>
+        /// <param name="subscriber">The ISubscriber that will consume signals from this IPublisher</param>
         public void Subscribe(ISubscriber<T> subscriber)
         {
             if (subscriber == null)
@@ -351,6 +401,10 @@ namespace Reactive4.NET
             }
         }
 
+        /// <summary>
+        /// Subscribe with the relaxed IFlowableSubscriber instance.
+        /// </summary>
+        /// <param name="subscriber">The IFlowableSubscriber instance, not null.</param>
         public void Subscribe(IFlowableSubscriber<T> subscriber)
         {
             if (Interlocked.CompareExchange(ref once, 1, 0) == 0)

@@ -9,8 +9,16 @@ using System.Threading;
 
 namespace Reactive4.NET
 {
+    /// <summary>
+    /// Multicasts events to subscribers; if a subscriber can't keep up
+    /// it will receive an InvalidOperationException.
+    /// </summary>
+    /// <typeparam name="T">The input and output value type.</typeparam>
     public sealed class DirectProcessor<T> : IFlowableProcessor<T>, IDisposable
     {
+        /// <summary>
+        /// Indicates that this IFlowableProcessor has completed normally.
+        /// </summary>
         public bool HasComplete {
             get
             {
@@ -18,6 +26,9 @@ namespace Reactive4.NET
             }
         }
 
+        /// <summary>
+        /// Indicates that this IFlowableProcessor has terminated with an exception.
+        /// </summary>
         public bool HasException
         {
             get
@@ -26,6 +37,9 @@ namespace Reactive4.NET
             }
         }
 
+        /// <summary>
+        /// Returns the terminal exception if HasException is true, null otherwise.
+        /// </summary>
         public Exception Exception
         {
             get
@@ -34,6 +48,9 @@ namespace Reactive4.NET
             }
         }
 
+        /// <summary>
+        /// Indicates there are any subscribers subscribed to this IFlowableProcessor.
+        /// </summary>
         public bool HasSubscribers
         {
             get
@@ -52,11 +69,19 @@ namespace Reactive4.NET
 
         ISubscription upstream;
 
+        /// <summary>
+        /// Cancels the upstream ISubscription.
+        /// </summary>
         public void Dispose()
         {
             SubscriptionHelper.Cancel(ref upstream);
         }
 
+        /// <summary>
+        /// Successful terminal state.
+        /// No further events will be sent even if Reactive.Streams.ISubscription.Request(System.Int64)
+        /// is invoked again.
+        /// </summary>
         public void OnComplete()
         {
             if (Interlocked.CompareExchange(ref once, 1, 0) == 0)
@@ -68,6 +93,12 @@ namespace Reactive4.NET
             }
         }
 
+        /// <summary>
+        /// Failed terminal state.
+        /// No further events will be sent even if Reactive.Streams.ISubscription.Request(System.Int64)
+        /// is invoked again.
+        /// </summary>
+        /// <param name="cause">The exception signaled.</param>
         public void OnError(Exception cause)
         {
             if (cause == null)
@@ -84,6 +115,11 @@ namespace Reactive4.NET
             }
         }
 
+        /// <summary>
+        /// Data notification sent by the IPublisher in response to requests
+        /// to ISubscription.Request(long).
+        /// </summary>
+        /// <param name="element">The element signaled</param>
         public void OnNext(T element)
         {
             if (element == null)
@@ -96,6 +132,14 @@ namespace Reactive4.NET
             }
         }
 
+        /// <summary>
+        /// Tries to multicast an item if all of the current subscribers
+        /// are ready to receive. Should be called in a sequential manner,
+        /// just like the other OnXXX methods.
+        /// </summary>
+        /// <param name="element">The item to multicast</param>
+        /// <returns>True if the item was multicast successfully, false if
+        /// one or more subscribers are not ready to receive items.</returns>
         public bool Offer(T element)
         {
             if (element == null)
@@ -117,6 +161,16 @@ namespace Reactive4.NET
             return true;
         }
 
+        /// <summary>
+        /// Invoked after calling IPublisher.Subscribe(ISubscriber).
+        /// No data will start flowing until ISubscription.Request(long)
+        /// is invoked.
+        /// It is the responsibility of this ISubscriber instance to call
+        /// Reactive.Streams.ISubscription.Request(System.Int64) whenever more data is wanted.
+        /// The IPublisher will send notifications only in response to
+        /// Reactive.Streams.ISubscription.Request(System.Int64).
+        /// </summary>
+        /// <param name="subscription">ISubscription that allows requesting data via ISubscription.Request(long)</param>
         public void OnSubscribe(ISubscription subscription)
         {
             if (SubscriptionHelper.SetOnce(ref upstream, subscription, crash: false))
@@ -132,6 +186,16 @@ namespace Reactive4.NET
             }
         }
 
+        /// <summary>
+        /// Request IPublisher to start streaming data.
+        /// This is a "factory method" and can be called multiple times, each time starting
+        /// a new ISubscription.
+        /// Each ISubscription will work for only a single ISubscriber.
+        /// A ISubscriber should only subscribe once to a single IPublisher.
+        /// If IPublisher rejects the subscription attempt or otherwise
+        /// fails it will signal the error via ISubscriber.OnError(Exception).
+        /// </summary>
+        /// <param name="subscriber">The ISubscriber that will consume signals from this IPublisher</param>
         public void Subscribe(ISubscriber<T> subscriber)
         {
             if (subscriber == null)
@@ -209,6 +273,10 @@ namespace Reactive4.NET
             }
         }
 
+        /// <summary>
+        /// Subscribe with the relaxed IFlowableSubscriber instance.
+        /// </summary>
+        /// <param name="subscriber">The IFlowableSubscriber instance, not null.</param>
         public void Subscribe(IFlowableSubscriber<T> subscriber)
         {
             ProcessorSubscription ps = new ProcessorSubscription(subscriber, this);

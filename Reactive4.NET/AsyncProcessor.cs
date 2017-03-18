@@ -20,46 +20,22 @@ namespace Reactive4.NET
         /// <summary>
         /// Indicates that this IFlowableProcessor has completed normally.
         /// </summary>
-        public bool HasComplete
-        {
-            get
-            {
-                return Volatile.Read(ref subscribers) == Terminated && error == null;
-            }
-        }
+        public bool HasComplete => Volatile.Read(ref subscribers) == Terminated && error == null;
 
         /// <summary>
         /// Indicates that this IFlowableProcessor has terminated with an exception.
         /// </summary>
-        public bool HasException
-        {
-            get
-            {
-                return Volatile.Read(ref subscribers) == Terminated && error != null;
-            }
-        }
+        public bool HasException => Volatile.Read(ref subscribers) == Terminated && error != null;
 
         /// <summary>
         /// Returns the terminal exception if HasException is true, null otherwise.
         /// </summary>
-        public Exception Exception
-        {
-            get
-            {
-                return Volatile.Read(ref subscribers) == Terminated ? error : null;
-            }
-        }
+        public Exception Exception => Volatile.Read(ref subscribers) == Terminated ? error : null;
 
         /// <summary>
         /// Indicates there are any subscribers subscribed to this IFlowableProcessor.
         /// </summary>
-        public bool HasSubscribers
-        {
-            get
-            {
-                return Volatile.Read(ref subscribers).Length != 0;
-            }
-        }
+        public bool HasSubscribers => Volatile.Read(ref subscribers).Length != 0;
 
         ProcessorSubscription[] subscribers = Empty;
 
