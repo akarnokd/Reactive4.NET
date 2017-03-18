@@ -153,6 +153,7 @@
     <Compile Include="TestExecutor.cs" />
     <Compile Include="utils\AbstractDeferredScalarSubscription.cs" />
     <Compile Include="utils\ActionDisposable.cs" />
+    <Compile Include="utils\ArrayQueue.cs" />
     <Compile Include="utils\BooleanSubscription.cs" />
     <Compile Include="utils\DisposableHelper.cs" />
     <Compile Include="utils\ExceptionHelper.cs" />

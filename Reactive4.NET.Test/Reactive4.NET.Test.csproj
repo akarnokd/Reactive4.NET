@@ -187,6 +187,7 @@
     <Compile Include="FlowableFlatMapEnumerableTest.cs" />
     <Compile Include="FlowableConcatMapEagerTest.cs" />
     <Compile Include="FlowableSwitchMapTest.cs" />
+    <Compile Include="ArrayQueueTest.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Benchmarks.cs" />
   </ItemGroup>

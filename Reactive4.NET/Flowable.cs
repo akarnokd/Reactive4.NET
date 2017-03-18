@@ -991,6 +991,16 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Maps the upstream values into values to be emitted to downstream via
+        /// a mapper function.
+        /// </summary>
+        /// <typeparam name="T">The upstream value type.</typeparam>
+        /// <typeparam name="R">The downstream value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="mapper">The function that maps each upstream value
+        /// into a downstream value.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> Map<T, R>(this IFlowable<T> source, Func<T, R> mapper)
         {
             return new FlowableMap<T, R>(source, mapper);
@@ -1008,6 +1018,16 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Filters the upstream values based on a predicate function and
+        /// allows those passing through for which the predicate returns true.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="predicate">The function that receives each item and
+        /// should return true for those that should be passed onto the 
+        /// downstream.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Filter<T>(this IFlowable<T> source, Func<T, bool> predicate)
         {
             return new FlowableFilter<T>(source, predicate);
@@ -1019,6 +1039,18 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Consumes and relays up to the specified number of items from upstream,
+        /// cancels it and emits a completion signal to the downstream.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="n">The number of items to let pass.</param>
+        /// <param name="limitRequest">If true, the operator doesn't request
+        /// more than <paramref name="n"/>; if false and if the downstream
+        /// requests more than <paramref name="n"/>, the operator requests
+        /// in an unbounded manner.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Take<T>(this IFlowable<T> source, long n, bool limitRequest = false)
         {
             return new FlowableTake<T>(source, n, limitRequest);
@@ -1053,6 +1085,17 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Collects the items of the upstream into a collection provided via 
+        /// a function for each subscriber and via collector function.
+        /// </summary>
+        /// <typeparam name="T">The upstream value type.</typeparam>
+        /// <typeparam name="C">The collection type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="collectionSupplier">The function called for each subscriber to generate
+        /// a per-subscriber collection which will be emitted at the end.</param>
+        /// <param name="collector">The function that "adds" the upstream item into the collection.</param>
+        /// <returns></returns>
         public static IFlowable<C> Collect<T, C>(this IFlowable<T> source, Func<C> collectionSupplier, Action<C, T> collector)
         {
             return new FlowableCollect<T, C>(source, collectionSupplier, collector);
@@ -1068,16 +1111,33 @@ namespace Reactive4.NET
             return new FlowableReduce<T, R>(source, initialSupplier, reducer);
         }
 
+        /// <summary>
+        /// Collects all upstream values into a List and emits it to the downstream.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="capacityHint">The number of items expected from downstream, positive.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<IList<T>> ToList<T>(this IFlowable<T> source, int capacityHint = 10)
         {
             return Collect(source, () => new List<T>(capacityHint), (a, b) => a.Add(b));
         }
 
+        /// <summary>
+        /// Sums up a source of ints into a single int value.
+        /// </summary>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<int> SumInt(this IFlowable<int> source)
         {
             return Reduce(source, (a, b) => a + b);
         }
 
+        /// <summary>
+        /// Sums up a source of longs into a single long value.
+        /// </summary>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<long> SumLong(this IFlowable<long> source)
         {
             return Reduce(source, (a, b) => a + b);
@@ -1113,41 +1173,125 @@ namespace Reactive4.NET
             return Reduce(source, (a, b) => comparer.Compare(a, b) < 0 ? a : b);
         }
 
+        /// <summary>
+        /// Ignores all upstream values and only relay the terminal event.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <returns></returns>
         public static IFlowable<T> IgnoreElements<T>(this IFlowable<T> source)
         {
             return new FlowableIgnoreElements<T>(source);
         }
 
+        /// <summary>
+        /// Maps each upstream value into an IPublisher and merges them
+        /// together in a potentially interleaved fashion.
+        /// </summary>
+        /// <typeparam name="T">The upstream value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="mapper">The function that takes each upstream item
+        /// and turns them into an IPublisher source to be merged.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> FlatMap<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper)
         {
             return FlatMap(source, mapper, BufferSize(), BufferSize());
         }
 
+        /// <summary>
+        /// Maps each upstream value into an IPublisher and merges them
+        /// together in a potentially interleaved fashion, running
+        /// up to the specified number of IPublisher's at a time.
+        /// </summary>
+        /// <typeparam name="T">The upstream value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="mapper">The function that takes each upstream item
+        /// and turns them into an IPublisher source to be merged.</param>
+        /// <param name="maxConcurrency">The maximum number of IPublishers to run at a time.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> FlatMap<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper, int maxConcurrency)
         {
             return FlatMap(source, mapper, maxConcurrency, BufferSize());
         }
 
+        /// <summary>
+        /// Maps each upstream value into an IPublisher and merges them
+        /// together in a potentially interleaved fashion, running
+        /// up to the specified number of IPublisher's at a time
+        /// and prefetches the given number of items from each IPublishers.
+        /// </summary>
+        /// <typeparam name="T">The upstream value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="mapper">The function that takes each upstream item
+        /// and turns them into an IPublisher source to be merged.</param>
+        /// <param name="maxConcurrency">The maximum number of IPublishers to run at a time.</param>
+        /// <param name="bufferSize">The number of items to prefetch and buffer from each inner IPublisher.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> FlatMap<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper, int maxConcurrency, int bufferSize)
         {
             return new FlowableFlatMap<T, R>(source, mapper, maxConcurrency, bufferSize);
         }
 
+        /// <summary>
+        /// Subscribes to and optionally requests on the specified executor's thread.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="executor">The IExecutorService whose IExecutorWorker to use for
+        /// subscribing and requesting.</param>
+        /// <param name="requestOn">If true, requests towards the upstream will be executed on
+        /// the same worker thread; if false, requests are forwarded on the same thread it
+        /// was issued.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> SubscribeOn<T>(this IFlowable<T> source, IExecutorService executor, bool requestOn = true)
         {
             return new FlowableSubscribeOn<T>(source, executor, requestOn);
         }
 
+        /// <summary>
+        /// Makes sure signals from upstream are delivered to the downstream from
+        /// a thread specified by the given IExecutorService's worker.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="executor">The IExecutorService whose worker to use for delivering
+        /// signals to downstream.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> ObserveOn<T>(this IFlowable<T> source, IExecutorService executor)
         {
             return ObserveOn(source, executor, BufferSize());
         }
 
+        /// <summary>
+        /// Makes sure signals from upstream are delivered to the downstream from
+        /// a thread specified by the given IExecutorService's worker and
+        /// using the given buffer size for prefetching and buffering items
+        /// until the downstream can process them.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="executor">The IExecutorService whose worker to use for delivering
+        /// signals to downstream.</param>
+        /// <param name="bufferSize">The number of items to prefetch and hold in the internal buffer.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> ObserveOn<T>(this IFlowable<T> source, IExecutorService executor, int bufferSize)
         {
             return new FlowableObserveOn<T>(source, executor, bufferSize);
         }
 
+        /// <summary>
+        /// Changes the request patter to request the given amount upfront and
+        /// after 75% has been delivered, it request that 75% amount from upstream
+        /// again.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="batchSize">The number of items to prefetch and hold
+        /// in the buffer.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> RebatchRequests<T>(this IFlowable<T> source, int batchSize)
         {
             return ObserveOn(source, Executors.Immediate, batchSize);
