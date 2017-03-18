@@ -4,6 +4,9 @@ using Reactive.Streams;
 
 namespace Reactive4.NET.operators
 {
+    /// <summary>
+    /// Helper utility methods for working with ISubscribers and requests.
+    /// </summary>
     internal static class SubscriptionHelper
     {
         internal static readonly CancelledSubscription Cancelled = new CancelledSubscription();
@@ -182,6 +185,182 @@ namespace Reactive4.NET.operators
             }
         }
 
+        internal static bool PostCompleteSingleRequest<T>(IFlowableSubscriber<T> actual, ref long requested, ref T item, long n, ref bool cancelled)
+        {
+            for (;;)
+            {
+                var r = Volatile.Read(ref requested);
+                if ((r & long.MinValue) != 0L)
+                {
+                    var u = r & long.MaxValue;
+                    var v = long.MinValue + 1;
+                    if (Interlocked.CompareExchange(ref requested, v, r) == r)
+                    {
+                        if (u == 0L && Volatile.Read(ref cancelled))
+                        {
+                            actual.OnNext(item);
+                            if (!Volatile.Read(ref cancelled))
+                            {
+                                actual.OnComplete();
+                            }
+                        }
+                        return true;
+                    }
+                }
+                else
+                {
+                    var v = r + n;
+                    if (v < 0L)
+                    {
+                        v = long.MaxValue;
+                    }
+                    if (Interlocked.CompareExchange(ref requested, v, r) == r)
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        internal static void PostCompleteSingleResult<T>(IFlowableSubscriber<T> actual, ref long requested, ref T item, T value, ref bool cancelled)
+        {
+            for (;;)
+            {
+                long r = Volatile.Read(ref requested);
+                if ((r & long.MinValue) != 0)
+                {
+                    return;
+                }
+                long u = r | long.MinValue;
+                if (r == 0L)
+                {
+                    item = value;
+                }
+                if (Interlocked.CompareExchange(ref requested, u, r) == r)
+                {
+                    if (r != 0L && !Volatile.Read(ref cancelled))
+                    {
+                        actual.OnNext(value);
+                        if (!Volatile.Read(ref cancelled))
+                        {
+                            actual.OnComplete();
+                        }
+                    }
+                    return;
+                }
+            }
+        }
+
+        internal static bool PostCompleteMultiRequest<T>(IFlowableSubscriber<T> actual, ref long requested, ISimpleQueue<T> q, long n, ref bool cancelled)
+        {
+            for (;;)
+            {
+                long r = Volatile.Read(ref requested);
+                if ((r & long.MinValue) != 0L)
+                {
+                    long u = r & long.MaxValue;
+                    long v = u + n;
+                    if (v < 0L)
+                    {
+                        v = long.MaxValue;
+                    }
+                    v = v | long.MinValue;
+                    if (Interlocked.CompareExchange(ref requested, v, r) == r)
+                    {
+                        if (u == 0)
+                        {
+                            PostCompleteMultiDrain(actual, ref requested, q, ref cancelled);
+                        }
+                        return true;
+                    }
+                }
+                else
+                {
+                    long u = r + n;
+                    if (u < 0L)
+                    {
+                        u = long.MaxValue;
+                    }
+                    if (Interlocked.CompareExchange(ref requested, u, r) == r)
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+        internal static void PostCompleteMultiResult<T>(IFlowableSubscriber<T> actual, ref long requested, ISimpleQueue<T> q, ref bool cancelled)
+        {
+            for (;;)
+            {
+                long r = Volatile.Read(ref requested);
+                if ((r & long.MinValue) != 0L)
+                {
+                    return;
+                }
+                long u = r | long.MinValue;
+                if (Interlocked.CompareExchange(ref requested, u, r) == r)
+                {
+                    if (r != 0L)
+                    {
+                        PostCompleteMultiDrain(actual, ref requested, q, ref cancelled);
+                    }
+                    return;
+                }
+            }
+        }
+
+        static void PostCompleteMultiDrain<T>(IFlowableSubscriber<T> actual, ref long requested, ISimpleQueue<T> q, ref bool cancelled)
+        {
+            long r = Volatile.Read(ref requested);
+            long e = long.MinValue;
+            for (;;)
+            {
+                while (e != r)
+                {
+                    if (Volatile.Read(ref cancelled))
+                    {
+                        return;
+                    }
+
+                    bool empty = !q.Poll(out T v);
+
+                    if (empty)
+                    {
+                        actual.OnComplete();
+                        return;
+                    }
+
+                    actual.OnNext(v);
+
+                    e++;
+                }
+
+                if (e == r)
+                {
+                    if (Volatile.Read(ref cancelled))
+                    {
+                        return;
+                    }
+                    if (q.IsEmpty())
+                    {
+                        actual.OnComplete();
+                        return;
+                    }
+                }
+
+                r = Volatile.Read(ref requested);
+                if (r == e)
+                {
+                    r = Interlocked.Add(ref requested, -(e & long.MaxValue));
+                    
+                    if (r == long.MinValue)
+                    {
+                        break;
+                    }
+                    e = long.MinValue;
+                }
+            }
+        }
     }
 
     internal sealed class CancelledSubscription : ISubscription

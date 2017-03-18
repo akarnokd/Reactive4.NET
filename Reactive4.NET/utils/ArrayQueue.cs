@@ -78,5 +78,7 @@ namespace Reactive4.NET.utils
             consumerIndex = ci + 1;
             return true;
         }
+
+        internal long Count => producerIndex - consumerIndex;
     }
 }

@@ -97,6 +97,9 @@
     <Compile Include="FlowableConcatMapEager1Tck.cs" />
     <Compile Include="FlowableSwitchMap2Tck.cs" />
     <Compile Include="FlowableSwitchMap1Tck.cs" />
+    <Compile Include="FlowableSkipLast1Tck.cs" />
+    <Compile Include="FlowableTakeLast1Tck.cs" />
+    <Compile Include="FlowableSkipLastTest.cs" />
     <Compile Include="FlowableZip2Tck.cs" />
     <Compile Include="FlowableZip1Tck.cs" />
     <Compile Include="FlowableUsing2Tck.cs" />
@@ -188,6 +191,7 @@
     <Compile Include="FlowableConcatMapEagerTest.cs" />
     <Compile Include="FlowableSwitchMapTest.cs" />
     <Compile Include="ArrayQueueTest.cs" />
+    <Compile Include="FlowableTakeLastTest.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Benchmarks.cs" />
   </ItemGroup>

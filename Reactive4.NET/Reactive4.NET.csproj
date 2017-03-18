@@ -53,7 +53,9 @@
     <Compile Include="operators\FlowableOnBackpressureLatest.cs" />
     <Compile Include="operators\FlowableOnBackpressureDrop.cs" />
     <Compile Include="operators\FlowableOnBackpressureError.cs" />
+    <Compile Include="operators\FlowableSkipLast.cs" />
     <Compile Include="operators\FlowableSwitchMap.cs" />
+    <Compile Include="operators\FlowableTakeLast.cs" />
     <Compile Include="operators\FlowableZipEnumerable.cs" />
     <Compile Include="operators\FlowableAmbEnumerable.cs" />
     <Compile Include="operators\FlowableAmbArray.cs" />

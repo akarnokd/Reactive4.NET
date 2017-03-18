@@ -1056,12 +1056,28 @@ namespace Reactive4.NET
             return new FlowableTake<T>(source, n, limitRequest);
         }
 
+        /// <summary>
+        /// Skips the given number of items from the source IFlowable and
+        /// relays the rest.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="n">The number of items to skip.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Skip<T>(this IFlowable<T> source, long n)
         {
             return new FlowableSkip<T>(source, n);
         }
 
-        public static IFlowable<T> TakeLast<T>(this IFlowable<T> source, long n)
+        /// <summary>
+        /// Takes the last number of items from the source IFlowable and relays them 
+        /// to downstream.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="n">The number of last items to keep and relay.</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<T> TakeLast<T>(this IFlowable<T> source, int n)
         {
             if (n <= 0)
             {
@@ -1071,18 +1087,23 @@ namespace Reactive4.NET
             {
                 return new FlowableTakeLastOne<T>(source);
             }
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableTakeLast<T>(source, n);
         }
 
-        public static IFlowable<T> SkipLast<T>(this IFlowable<T> source, long n)
+        /// <summary>
+        /// Skips the last given number of items from the source IFlowable.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="n">The number of items to skip from the end of the stream.</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<T> SkipLast<T>(this IFlowable<T> source, int n)
         {
             if (n <= 0)
             {
                 return source;
             }
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableSkipLast<T>(source, n);
         }
 
         /// <summary>
@@ -1389,21 +1410,51 @@ namespace Reactive4.NET
             return new FlowableHide<T>(source);
         }
 
+        /// <summary>
+        /// Relays items that haven't been seen before (based on the default
+        /// IEqualityComparer for the type T).
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source Flowable instance</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Distinct<T>(this IFlowable<T> source)
         {
             return Distinct(source, EqualityComparer<T>.Default);
         }
 
+        /// <summary>
+        /// Relays items that haven't been seen before (based on the 
+        /// provided IEqualityComparer instance).
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source Flowable instance</param>
+        /// <param name="comparer">The comparer to compare items.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Distinct<T>(this IFlowable<T> source, IEqualityComparer<T> comparer)
         {
             return new FlowableDistinct<T>(source, comparer);
         }
 
+        /// <summary>
+        /// Relays items if one item is different from the previous one
+        /// (by comparing with the default IEqualityComparer for type T).
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> DistinctUntilChanged<T>(this IFlowable<T> source)
         {
             return DistinctUntilChanged(source, EqualityComparer<T>.Default);
         }
 
+        /// <summary>
+        /// Relays items if one item is different from the previous one
+        /// (by comparing with the given IEqualityComparer).
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="comparer">The comparer to use for comparing subsequent items.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> DistinctUntilChanged<T>(this IFlowable<T> source, IEqualityComparer<T> comparer)
         {
             return new FlowableDistinctUntilChanged<T>(source, comparer);
@@ -1424,6 +1475,16 @@ namespace Reactive4.NET
             return new FlowableLift<T, R>(source, lifter);
         }
 
+        /// <summary>
+        /// Invokes the composer function with the given source IFlowable
+        /// in a fluent fashion.
+        /// </summary>
+        /// <typeparam name="T">The source value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="composer">The function called with the source IFlowable
+        /// and should produce an IPublisher as a result.</param>
+        /// <returns>The result of the function call.</returns>
         public static IFlowable<R> Compose<T, R>(this IFlowable<T> source, Func<IFlowable<T>, IPublisher<R>> composer)
         {
             return composer(source).ToFlowable();
