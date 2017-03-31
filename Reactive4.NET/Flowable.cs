@@ -1122,11 +1122,33 @@ namespace Reactive4.NET
             return new FlowableCollect<T, C>(source, collectionSupplier, collector);
         }
 
+        /// <summary>
+        /// Reduces the elements of the source via a reducer function into a single
+        /// value (or an empty sequence if the source is empty).
+        /// </summary>
+        /// <typeparam name="T">The input and output value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="reducer">The function that takes the first and second item
+        /// to produce the first output, then takes the third item and the last result
+        /// to produce the second output, and so on.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Reduce<T>(this IFlowable<T> source, Func<T, T, T> reducer)
         {
             return new FlowableReducePlain<T>(source, reducer);
         }
 
+        /// <summary>
+        /// Reduces the values of the source sequence via the help of an accumulator value
+        /// and reducer function, starting with a default accumulator value, into
+        /// a single final accumulated value.
+        /// </summary>
+        /// <typeparam name="T">The input value type.</typeparam>
+        /// <typeparam name="R">The accumulator and output type.</typeparam>
+        /// <param name="source">The source IFlowable sequence.</param>
+        /// <param name="initialSupplier">The function that provides the initial accumulator value.</param>
+        /// <param name="reducer">The function that takes the previous (or first) accumulator value and
+        /// the current item to produce the next accumulator item.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> Reduce<T, R>(this IFlowable<T> source, Func<R> initialSupplier, Func<R, T, R> reducer)
         {
             return new FlowableReduce<T, R>(source, initialSupplier, reducer);
@@ -1164,6 +1186,11 @@ namespace Reactive4.NET
             return Reduce(source, (a, b) => a + b);
         }
 
+        /// <summary>
+        /// Signals the largest integer value of the source.
+        /// </summary>
+        /// <param name="source">The source IFlowable of integers.</param>
+        /// <returns>The new IFlowable instance</returns>
         public static IFlowable<int> MaxInt(this IFlowable<int> source)
         {
             return Reduce(source, (a, b) => Math.Max(a, b));
@@ -1174,16 +1201,31 @@ namespace Reactive4.NET
             return Reduce(source, (a, b) => comparer.Compare(a, b) < 0 ? b : a);
         }
 
+        /// <summary>
+        /// Signals the largest long value of the source.
+        /// </summary>
+        /// <param name="source">The source IFlowable of long.</param>
+        /// <returns>The new IFlowable instance</returns>
         public static IFlowable<long> MaxLong(this IFlowable<long> source)
         {
             return Reduce(source, (a, b) => Math.Max(a, b));
         }
 
+        /// <summary>
+        /// Signals the smallest integer value of the source.
+        /// </summary>
+        /// <param name="source">The source IFlowable of integers.</param>
+        /// <returns>The new IFlowable instance</returns>
         public static IFlowable<int> MinInt(this IFlowable<int> source)
         {
             return Reduce(source, (a, b) => Math.Min(a, b));
         }
 
+        /// <summary>
+        /// Signals the smallest long value of the source.
+        /// </summary>
+        /// <param name="source">The source IFlowable of longs.</param>
+        /// <returns>The new IFlowable instance</returns>
         public static IFlowable<long> MinLong(this IFlowable<long> source)
         {
             return Reduce(source, (a, b) => Math.Min(a, b));
@@ -1199,7 +1241,7 @@ namespace Reactive4.NET
         /// </summary>
         /// <typeparam name="T">The value type.</typeparam>
         /// <param name="source">The source IFlowable instance.</param>
-        /// <returns></returns>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> IgnoreElements<T>(this IFlowable<T> source)
         {
             return new FlowableIgnoreElements<T>(source);
@@ -1318,36 +1360,100 @@ namespace Reactive4.NET
             return ObserveOn(source, Executors.Immediate, batchSize);
         }
 
+        /// <summary>
+        /// Delays the emission of events from the source by the given time amount
+        /// (shifts them in time, but the relative time-distance remains the same).
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="delay">The emission delay timespan.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Delay<T>(this IFlowable<T> source, TimeSpan delay)
         {
             return Delay(source, delay, Executors.Computation);
         }
 
+        /// <summary>
+        /// Delays the emission of events from the source by the given time amount
+        /// (shifts them in time, but the relative time-distance remains the same).
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="delay">The emission delay timespan.</param>
+        /// <param name="executor">The custom executor where the delayed emission happens.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Delay<T>(this IFlowable<T> source, TimeSpan delay, IExecutorService executor)
         {
             return new FlowableDelay<T>(source, delay, executor);
         }
 
+        /// <summary>
+        /// Delays the subscription to the source IFlowable until the other IFlowable
+        /// signals an item or completes.
+        /// </summary>
+        /// <typeparam name="T">The main source's value type.</typeparam>
+        /// <typeparam name="U">The other IPublisher's value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="other">The other IFlowable instance.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> DelaySubscription<T, U>(this IFlowable<T> source, IPublisher<U> other)
         {
             return new FlowableDelaySubscription<T, U>(source, other);
         }
 
+        /// <summary>
+        /// Delays the subscription to the source IFlowable until the specified
+        /// timespan elapses.
+        /// </summary>
+        /// <typeparam name="T">The source value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="delay">The time delay before the actual subscription to source.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> DelaySubscription<T>(this IFlowable<T> source, TimeSpan delay)
         {
             return DelaySubscription(source, Timer(delay, Executors.Computation));
         }
 
-        public static IFlowable<T> DelaySubscription<T, U>(this IFlowable<T> source, TimeSpan delay, IExecutorService executor)
+        /// <summary>
+        /// Delays the subscription to the source IFlowable until the specified
+        /// timespan elapses.
+        /// </summary>
+        /// <typeparam name="T">The source value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="delay">The time delay before the actual subscription to source.</param>
+        /// <param name="executor">The IExecutorService where to wait for the delay.</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<T> DelaySubscription<T>(this IFlowable<T> source, TimeSpan delay, IExecutorService executor)
         {
             return DelaySubscription(source, Timer(delay, executor));
         }
 
+        /// <summary>
+        /// Transforms items of the source into IPublishers and concatenates their items,
+        /// in order and non-overlapping manner into a single sequence.
+        /// </summary>
+        /// <typeparam name="T">The upstream value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="mapper">The function that receives the upstream value and
+        /// returns an IPublisher instance for it.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> ConcatMap<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper)
         {
             return ConcatMap(source, mapper, 2);
         }
 
+        /// <summary>
+        /// Transforms items of the source into IPublishers and concatenates their items,
+        /// in order and non-overlapping manner into a single sequence.
+        /// </summary>
+        /// <typeparam name="T">The upstream value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="mapper">The function that receives the upstream value and
+        /// returns an IPublisher instance for it.</param>
+        /// <param name="prefetch">The number of items to prefetch from the upstream.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> ConcatMap<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper, int prefetch)
         {
             return new FlowableConcatMap<T, R>(source, mapper, prefetch);
@@ -1490,6 +1596,16 @@ namespace Reactive4.NET
             return composer(source).ToFlowable();
         }
 
+        /// <summary>
+        /// Converts the source IFlowable into a value via the given converter function
+        /// to allow fluent conversions.
+        /// </summary>
+        /// <typeparam name="T">The input value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="converter">The function that takes the source IFlowable
+        /// and returns a value to be returned by this operator.</param>
+        /// <returns>The value returned by the converter function.</returns>
         public static R To<T, R>(this IFlowable<T> source, Func<IFlowable<T>, R> converter)
         {
             return converter(source);
@@ -1710,15 +1826,37 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Emits upstream items into an exclusive group represented by an IGroupedFlowable
+        /// based on a key.
+        /// </summary>
+        /// <typeparam name="T">The source value type.</typeparam>
+        /// <typeparam name="K">The key type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="keyMapper">The function that takes an upstream item
+        /// and returns a key value that selects a group to emit the upstream item.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<IGroupedFlowable<K, T>> GroupBy<T, K>(this IFlowable<T> source, Func<T, K> keyMapper)
         {
             return GroupBy<T, K, T>(source, keyMapper, v => v);
         }
 
+        /// <summary>
+        /// Emits a value mapped from each upstream item into an exclusive group represented by an IGroupedFlowable
+        /// based on a key.
+        /// </summary>
+        /// <typeparam name="T">The source value type.</typeparam>
+        /// <typeparam name="K">The key type.</typeparam>
+        /// <typeparam name="V">The group value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="keyMapper">The function that takes an upstream item
+        /// and returns a key value that selects a group to emit the upstream item.</param>
+        /// <param name="valueMapper">The function that takes the upstream value and
+        /// transforms it into the value to be emitted in the selected group.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<IGroupedFlowable<K, V>> GroupBy<T, K, V>(this IFlowable<T> source, Func<T, K> keyMapper, Func<T, V> valueMapper)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableGroupBy<T, K, V>(source, keyMapper, valueMapper);
         }
 
         public static IFlowable<R> WithLatestFrom<T, U, R>(this IFlowable<T> source, IPublisher<U> other, Func<T, U, R> combiner)
@@ -1841,6 +1979,13 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Relays items of the source or the other IFlowable, whichever signals first.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="other">The other IFlowable instance.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> AmbWith<T>(this IFlowable<T> source, IPublisher<T> other)
         {
             return Amb(source, other);
@@ -1968,6 +2113,17 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Automatically call Connect() on the IConnectableFlowable when the number
+        /// of subscribers reaches the specified amount.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="count">The number of ISubscribers to wait for before
+        /// connecting to the source IConnectableFlowable.</param>
+        /// <param name="onConnect">The action called with the connection's disposable
+        /// that allows synchronous cancellation of the connection.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> AutoConnect<T>(this IConnectableFlowable<T> source, int count = 1, Action<IDisposable> onConnect = null)
         {
             if (count == 0)
@@ -1984,6 +2140,13 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Disposes the ISubscription given to the IFlowableProcessor when the
+        /// number of ISubscribers reaches zero.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowableProcessor instance.</param>
+        /// <returns>The new IFlowableProcessor instance</returns>
         public static IFlowableProcessor<T> RefCount<T>(this IFlowableProcessor<T> source)
         {
             if (source is FlowableProcessorRefCount<T>)
@@ -1993,6 +2156,14 @@ namespace Reactive4.NET
             return new FlowableProcessorRefCount<T>(source);
         }
 
+        /// <summary>
+        /// Makes sure calls to OnNext(), OnError() and OnComplete() are properly
+        /// serialized relative to each other and allows calling these methods
+        /// concurrently.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowableProcessor instance.</param>
+        /// <returns>The new IFlowableProcessor instance.</returns>
         public static IFlowableProcessor<T> Serialize<T>(this IFlowableProcessor<T> source)
         {
             if (source is FlowableProcessorSerialize<T> s)
