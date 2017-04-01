@@ -48,6 +48,9 @@
     <Compile Include="BackpressureStrategy.cs" />
     <Compile Include="BufferStrategy.cs" />
     <Compile Include="AsyncProcessor.cs" />
+    <Compile Include="operators\FlowableBufferSizeOverlap.cs" />
+    <Compile Include="operators\FlowableBufferSizeSkip.cs" />
+    <Compile Include="operators\FlowableBufferSizeExact.cs" />
     <Compile Include="operators\FlowableConcatMapEager.cs" />
     <Compile Include="operators\FlowableDefaultIfEmpty.cs" />
     <Compile Include="operators\FlowableFlatMapEnumerable.cs" />
@@ -55,6 +58,9 @@
     <Compile Include="operators\FlowableOnBackpressureLatest.cs" />
     <Compile Include="operators\FlowableOnBackpressureDrop.cs" />
     <Compile Include="operators\FlowableOnBackpressureError.cs" />
+    <Compile Include="operators\FlowableOnErrorComplete.cs" />
+    <Compile Include="operators\FlowableOnErrorResumeNext.cs" />
+    <Compile Include="operators\FlowableOnErrorReturn.cs" />
     <Compile Include="operators\FlowableRetry.cs" />
     <Compile Include="operators\FlowableRepeat.cs" />
     <Compile Include="operators\FlowableSkipLast.cs" />
@@ -102,6 +108,7 @@
     <Compile Include="operators\FlowableTimer.cs" />
     <Compile Include="operators\FlowableUsing.cs" />
     <Compile Include="operators\FlowableZipArray.cs" />
+    <Compile Include="ParallelFlowable.cs" />
     <Compile Include="ReplayProcessor.cs" />
     <Compile Include="schedulers\InterruptibleAction.cs" />
     <Compile Include="schedulers\IWorkerServices.cs" />
@@ -173,6 +180,7 @@
     <Compile Include="utils\ActionDisposable.cs" />
     <Compile Include="utils\ArrayQueue.cs" />
     <Compile Include="utils\BooleanSubscription.cs" />
+    <Compile Include="utils\DelegateHelper.cs" />
     <Compile Include="utils\DisposableHelper.cs" />
     <Compile Include="utils\ExceptionHelper.cs" />
     <Compile Include="subscribers\StrictSubscriber.cs" />

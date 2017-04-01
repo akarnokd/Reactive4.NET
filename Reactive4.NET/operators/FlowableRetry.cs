@@ -65,15 +65,16 @@ namespace Reactive4.NET.operators
                         {
                             return;
                         }
-                        long r = remaining;
-                        if (r == 0)
-                        {
-                            actual.OnComplete();
-                            return;
-                        }
 
                         if (cause != null)
                         {
+                            long r = remaining;
+                            if (r == 0)
+                            {
+                                actual.OnError(cause);
+                                return;
+                            }
+
                             bool b;
 
                             try

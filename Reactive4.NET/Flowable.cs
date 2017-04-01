@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Reactive.Streams;
 using Reactive4.NET.subscribers;
 using System.Threading;
+using Reactive4.NET.utils;
 
 namespace Reactive4.NET
 {
@@ -289,7 +290,7 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Generate<T, S>(Func<S> stateFactory, Func<S, IGeneratorEmitter<T>, S> emitter)
         {
-            return Generate<T, S>(stateFactory, emitter, s => { });
+            return Generate<T, S>(stateFactory, emitter, EmptyConsumer<S>.Instance);
         }
 
         /// <summary>
@@ -517,7 +518,7 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Concat<T>(this IPublisher<IPublisher<T>> sources, int prefetch)
         {
-            return new FlowableConcatMapPublisher<IPublisher<T>, T>(sources, v => v, prefetch);
+            return new FlowableConcatMapPublisher<IPublisher<T>, T>(sources, Identity<IPublisher<T>>.Instance, prefetch);
         }
 
         /// <summary>
@@ -528,7 +529,7 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> ConcatEager<T>(params IPublisher<T>[] sources)
         {
-            return FromArray(sources).ConcatMapEager(v => v);
+            return FromArray(sources).ConcatMapEager(Identity<IPublisher<T>>.Instance);
         }
 
         /// <summary>
@@ -564,7 +565,7 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> ConcatEager<T>(IEnumerable<IPublisher<T>> sources, int maxConcurrency, int prefetch)
         {
-            return FromEnumerable(sources).ConcatMapEager(v => v, maxConcurrency, prefetch);
+            return FromEnumerable(sources).ConcatMapEager(Identity<IPublisher<T>>.Instance, maxConcurrency, prefetch);
         }
 
         /// <summary>
@@ -600,7 +601,7 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> ConcatEager<T>(this IPublisher<IPublisher<T>> sources, int maxConcurrency, int prefetch)
         {
-            return new FlowableConcatMapEagerPublisher<IPublisher<T>, T>(sources, v => v, maxConcurrency, prefetch);
+            return new FlowableConcatMapEagerPublisher<IPublisher<T>, T>(sources, Identity<IPublisher<T>>.Instance, maxConcurrency, prefetch);
         }
 
         /// <summary>
@@ -611,7 +612,7 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Merge<T>(params IPublisher<T>[] sources)
         {
-            return FromArray(sources).FlatMap(v => v);
+            return FromArray(sources).FlatMap(Identity<IPublisher<T>>.Instance);
         }
 
         /// <summary>
@@ -622,7 +623,7 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Merge<T>(IEnumerable<IPublisher<T>> sources)
         {
-            return FromEnumerable(sources).FlatMap(v => v);
+            return FromEnumerable(sources).FlatMap(Identity<IPublisher<T>>.Instance);
         }
 
         /// <summary>
@@ -634,7 +635,7 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Merge<T>(IEnumerable<IPublisher<T>> sources, int maxConcurrency)
         {
-            return FromEnumerable(sources).FlatMap(v => v, maxConcurrency);
+            return FromEnumerable(sources).FlatMap(Identity<IPublisher<T>>.Instance, maxConcurrency);
         }
 
         /// <summary>
@@ -647,7 +648,7 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Merge<T>(IEnumerable<IPublisher<T>> sources, int maxConcurrency, int prefetch)
         {
-            return FromEnumerable(sources).FlatMap(v => v, maxConcurrency, prefetch);
+            return FromEnumerable(sources).FlatMap(Identity<IPublisher<T>>.Instance, maxConcurrency, prefetch);
         }
 
         /// <summary>
@@ -683,7 +684,7 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Merge<T>(this IPublisher<IPublisher<T>> sources, int maxConcurrency, int bufferSize)
         {
-            return new FlowableFlatMapPublisher<IPublisher<T>, T>(sources, v => v, maxConcurrency, bufferSize);
+            return new FlowableFlatMapPublisher<IPublisher<T>, T>(sources, Identity<IPublisher<T>>.Instance, maxConcurrency, bufferSize);
         }
 
         /// <summary>
@@ -968,28 +969,12 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> SwitchOnNext<T>(IPublisher<IPublisher<T>> sources, int prefetch)
         {
-            return new FlowableSwitchMapPublisher<IPublisher<T>, T>(sources, v => v, prefetch);
+            return new FlowableSwitchMapPublisher<IPublisher<T>, T>(sources, Identity<IPublisher<T>>.Instance, prefetch);
         }
 
         // ********************************************************************************
         // Instance operators
         // ********************************************************************************
-
-        public static IParallelFlowable<T> Parallel<T>(this IFlowable<T> source)
-        {
-            return Parallel(source, Environment.ProcessorCount, BufferSize());
-        }
-
-        public static IParallelFlowable<T> Parallel<T>(this IFlowable<T> source, int parallelism)
-        {
-            return Parallel(source, parallelism, BufferSize());
-        }
-
-        public static IParallelFlowable<T> Parallel<T>(this IFlowable<T> source, int parallelism, int bufferSize)
-        {
-            // TODO implement
-            throw new NotImplementedException();
-        }
 
         /// <summary>
         /// Maps the upstream values into values to be emitted to downstream via
@@ -1005,11 +990,21 @@ namespace Reactive4.NET
         {
             return new FlowableMap<T, R>(source, mapper);
         }
-
+        
+        /// <summary>
+        /// Maps each upstream value into an IPublisher, runs them one at a time and after the other
+        /// and takes their first item as the result to be emitted towards the downstream.
+        /// </summary>
+        /// <typeparam name="T">The input value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="mapper">The function that maps an upstream value into an IPublisher,
+        /// runs it and takes its first value as the result to be emitted. An empty IPublisher
+        /// will not trigger any emission.</param>
+        /// <returns></returns>
         public static IFlowable<R> MapAsync<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return MapAsync(source, mapper, Func2Second<T, R>.Instance);
         }
 
         public static IFlowable<R> MapAsync<T, U, R>(this IFlowable<T> source, Func<T, IPublisher<U>> mapper, Func<T, U, R> resultMapper)
@@ -1163,7 +1158,7 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<IList<T>> ToList<T>(this IFlowable<T> source, int capacityHint = 10)
         {
-            return Collect(source, () => new List<T>(capacityHint), (a, b) => a.Add(b));
+            return Collect(source, () => new List<T>(capacityHint), ListAdd<T>.Instance);
         }
 
         /// <summary>
@@ -1173,7 +1168,7 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<int> SumInt(this IFlowable<int> source)
         {
-            return Reduce(source, (a, b) => a + b);
+            return Reduce(source, IntAdd.Instance);
         }
 
         /// <summary>
@@ -1183,7 +1178,7 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<long> SumLong(this IFlowable<long> source)
         {
-            return Reduce(source, (a, b) => a + b);
+            return Reduce(source, LongAdd.Instance);
         }
 
         /// <summary>
@@ -1193,7 +1188,7 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance</returns>
         public static IFlowable<int> MaxInt(this IFlowable<int> source)
         {
-            return Reduce(source, (a, b) => Math.Max(a, b));
+            return Reduce(source, IntMax.Instance);
         }
 
         /// <summary>
@@ -1215,7 +1210,7 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance</returns>
         public static IFlowable<long> MaxLong(this IFlowable<long> source)
         {
-            return Reduce(source, (a, b) => Math.Max(a, b));
+            return Reduce(source, LongMax.Instance);
         }
 
         /// <summary>
@@ -1225,7 +1220,7 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance</returns>
         public static IFlowable<int> MinInt(this IFlowable<int> source)
         {
-            return Reduce(source, (a, b) => Math.Min(a, b));
+            return Reduce(source, IntMax.Instance);
         }
 
         /// <summary>
@@ -1235,7 +1230,7 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance</returns>
         public static IFlowable<long> MinLong(this IFlowable<long> source)
         {
-            return Reduce(source, (a, b) => Math.Min(a, b));
+            return Reduce(source, LongMax.Instance);
         }
 
         /// <summary>
@@ -1756,7 +1751,7 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Repeat<T>(this IFlowable<T> source, long times = long.MaxValue)
         {
-            return Repeat(source, () => false, times);
+            return Repeat(source, AlwaysFalse.Instance, times);
         }
 
         /// <summary>
@@ -1793,7 +1788,7 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Retry<T>(this IFlowable<T> source, long times = long.MaxValue)
         {
-            return Retry<T>(source, e => true, times);
+            return Retry<T>(source, AlwaysTrue<Exception>.Instance, times);
         }
 
         /// <summary>
@@ -1817,28 +1812,55 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Emits the given fallback item and completes when the source signals an error.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="fallbackItem">The item to emit and complete instead of signalling an error.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> OnErrorReturn<T>(this IFlowable<T> source, T fallbackItem)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableOnErrorReturn<T>(source, fallbackItem);
         }
 
+        /// <summary>
+        /// Completes the sequence instead of singalling the upstream error.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> OnErrorComplete<T>(this IFlowable<T> source)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableOnErrorComplete<T>(source);
         }
 
+        /// <summary>
+        /// If the upstream terminates with an error, the sequence is continued with
+        /// the given IPublisher's signals.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="fallback">The fallback IPublisher to continue with if the
+        /// source fails.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> OnErrorResumeNext<T>(this IFlowable<T> source, IPublisher<T> fallback)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return OnErrorResumeNext(source, e => fallback);
         }
 
+        /// <summary>
+        /// If the upstream terminates with an error, the handler function is called
+        /// with the Exception instance which returns an IPublisher to continue with.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="handler">The function that receives the upstream's error
+        /// and should return an IPublisher to continue with.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> OnErrorResumeNext<T>(this IFlowable<T> source, Func<Exception, IPublisher<T>> handler)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableOnErrorResumeNext<T>(source, handler);
         }
 
         public static IFlowable<T> Timeout<T>(this IFlowable<T> source, TimeSpan itemTimeout, IPublisher<T> fallback = null)
@@ -1938,7 +1960,7 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<IGroupedFlowable<K, T>> GroupBy<T, K>(this IFlowable<T> source, Func<T, K> keyMapper)
         {
-            return GroupBy(source, keyMapper, v => v, BufferSize());
+            return GroupBy(source, keyMapper, Identity<T>.Instance, BufferSize());
         }
 
         /// <summary>
@@ -2070,30 +2092,75 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Buffers elements into non-overlapping ILists with the given maximum size.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="size">The maximum number of elements in each list.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<IList<T>> Buffer<T>(this IFlowable<T> source, int size)
         {
-            return Buffer(source, size, size, () => new List<T>());
+            return Buffer(source, size, ListSupplier<T>.Instance);
         }
 
+        /// <summary>
+        /// Buffers elements into non-overlapping ICollection provided by a supplier function
+        /// and each such collection receives at most the given number of items.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <typeparam name="C">The subtype that collects the items.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="size">The maximum number of elements in each list.</param>
+        /// <param name="collectionSupplier">The collection supplier to provide fresh buffers.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<C> Buffer<T, C>(this IFlowable<T> source, int size, Func<C> collectionSupplier) where C : ICollection<T>
         {
-            return Buffer(source, size, size, collectionSupplier);
+            return new FlowableBufferSizeExact<T, C>(source, size, collectionSupplier);
         }
 
+        /// <summary>
+        /// Buffers items into possible overlapping ILists.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="size">The number of items to put into each buffer</param>
+        /// <param name="skip">Multiples of skip will start a fresh buffer, anything
+        /// between will be dropped.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<IList<T>> Buffer<T>(this IFlowable<T> source, int size, int skip)
         {
-            return Buffer(source, size, skip, () => new List<T>());
+            return Buffer(source, size, skip, ListSupplier<T>.Instance);
         }
 
+        /// <summary>
+        /// Buffers items into possible overlapping ILists.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <typeparam name="C">The subtype that collects the items.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="size">The number of items to put into each buffer</param>
+        /// <param name="skip">Multiples of skip will start a fresh buffer, anything
+        /// between will be dropped.</param>
+        /// <param name="collectionSupplier">The collection supplier to provide fresh buffers.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<C> Buffer<T, C>(this IFlowable<T> source, int size, int skip, Func<C> collectionSupplier) where C : ICollection<T>
         {
-            // TODO implement
-            throw new NotImplementedException();
+            if (size == skip)
+            {
+                return Buffer(source, size, collectionSupplier);
+            }
+            else
+            if (size < skip)
+            {
+                return new FlowableBufferSizeSkip<T, C>(source, size, skip, collectionSupplier);
+            }
+            return new FlowableBufferSizeOverlap<T, C>(source, size, skip, collectionSupplier);
         }
 
         public static IFlowable<IList<T>> Buffer<T, U>(this IFlowable<T> source, IPublisher<U> boundary)
         {
-            return Buffer(source, boundary, () => new List<T>());
+            return Buffer(source, boundary, ListSupplier<T>.Instance);
         }
 
         public static IFlowable<C> Buffer<T, U, C>(this IFlowable<T> source, IPublisher<U> boundary, Func<C> collectionSupplier) where C : ICollection<T>
@@ -2490,7 +2557,7 @@ namespace Reactive4.NET
         /// <returns>The IDisposable that allows cancelling the sequence.</returns>
         public static IDisposable Subscribe<T>(this IFlowable<T> source)
         {
-            return Subscribe(source, v => { }, e => { }, () => { });
+            return Subscribe(source, EmptyConsumer<T>.Instance, EmptyConsumer<Exception>.Instance, EmptyAction.Instance);
         }
 
         /// <summary>
@@ -2503,7 +2570,7 @@ namespace Reactive4.NET
         /// <returns>The IDisposable that allows cancelling the sequence.</returns>
         public static IDisposable Subscribe<T>(this IFlowable<T> source, Action<T> onNext)
         {
-            return Subscribe(source, onNext, e => { }, () => { });
+            return Subscribe(source, onNext, EmptyConsumer<Exception>.Instance, EmptyAction.Instance);
         }
 
         /// <summary>
@@ -2517,7 +2584,7 @@ namespace Reactive4.NET
         /// <returns>The IDisposable that allows cancelling the sequence.</returns>
         public static IDisposable Subscribe<T>(this IFlowable<T> source, Action<T> onNext, Action<Exception> onError)
         {
-            return Subscribe(source, onNext, onError, () => { });
+            return Subscribe(source, onNext, onError, EmptyAction.Instance);
         }
 
         /// <summary>
@@ -2670,7 +2737,7 @@ namespace Reactive4.NET
         /// <param name="source">The source IFlowable instance.</param>
         public static void BlockingSubscribe<T>(this IFlowable<T> source)
         {
-            BlockingSubscribe(source, v => { }, e => { }, () => { });
+            BlockingSubscribe(source, EmptyConsumer<T>.Instance, EmptyConsumer<Exception>.Instance, EmptyAction.Instance);
         }
 
         /// <summary>
@@ -2682,7 +2749,7 @@ namespace Reactive4.NET
         /// <param name="onNext">The action to call with the items from the source.</param>
         public static void BlockingSubscribe<T>(this IFlowable<T> source, Action<T> onNext)
         {
-            BlockingSubscribe(source, onNext, e => { }, () => { });
+            BlockingSubscribe(source, onNext, EmptyConsumer<Exception>.Instance, EmptyAction.Instance);
         }
 
         /// <summary>
@@ -2695,7 +2762,7 @@ namespace Reactive4.NET
         /// <param name="onError">The action to call with the error from the source.</param>
         public static void BlockingSubscribe<T>(this IFlowable<T> source, Action<T> onNext, Action<Exception> onError)
         {
-            BlockingSubscribe(source, onNext, onError, () => { });
+            BlockingSubscribe(source, onNext, onError, EmptyAction.Instance);
         }
 
         /// <summary>

@@ -359,13 +359,31 @@ namespace Reactive4.NET
             IEqualityComparer<T> comparer = EqualityComparer<T>.Default;
             for (int i = 0; i < vc; i++)
             {
-                if (!comparer.Equals(expected[i], values[i]))
+                var exp = expected[i];
+                var act = values[i];
+                if (exp is IList lstA && act is IList lstB)
                 {
-                    throw Fail("Value at " + i + " differs. Expected: " + AsString(expected[i]) + ", Actual: " + AsString(values[i]));
+                    if (lstA.Count != lstB.Count)
+                    {
+                        throw Fail("List lengths at " + i + " differs. Expected: " + lstA.Count + ", Actual: " + lstB.Count);
+                    }
+                    for (int j = 0; j < lstA.Count; j++)
+                    {
+                        if (!lstA[j].Equals(lstB[j]))
+                        {
+                            throw Fail("Value at " + i + " differs. Expected: " + AsString(lstA[j]) + ", Actual: " + AsString(lstB[j]));
+                        }
+                    }
+                } else
+                if (!comparer.Equals(exp, act))
+                {
+                    throw Fail("Value at " + i + " differs. Expected: " + AsString(exp) + ", Actual: " + AsString(act));
                 }
             }
             return this;
         }
+
+
 
         /// <summary>
         /// Assert that the TestSubscriber received the given expected array
@@ -434,6 +452,7 @@ namespace Reactive4.NET
                     b.Append(AsString(lst[i]));
                 }
                 b.Append("]");
+                return b.ToString();
             }
 
             return item == null ? "null" : item.ToString();

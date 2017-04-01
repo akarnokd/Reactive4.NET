@@ -58,6 +58,8 @@
     <Compile Include="AsyncProcessor1Tck.cs" />
     <Compile Include="Benchmark.cs" />
     <Compile Include="FlowableAmb2Tck.cs" />
+    <Compile Include="FlowableBufferSizeOverlap1Tck.cs" />
+    <Compile Include="FlowableBufferSizeSkip1Tck.cs" />
     <Compile Include="FlowableConcatArray2Tck.cs" />
     <Compile Include="FlowableConcatMap4Tck.cs" />
     <Compile Include="FlowableConcatMapEager4Tck.cs" />
@@ -102,6 +104,12 @@
     <Compile Include="FlowableConcatMapEager1Tck.cs" />
     <Compile Include="FlowableGroupBy1Tck.cs" />
     <Compile Include="FlowableDefaultIfEmpty1Tck.cs" />
+    <Compile Include="FlowableOnErrorComplete1Tck.cs" />
+    <Compile Include="FlowableOnErrorResumeNext3Tck.cs" />
+    <Compile Include="FlowableOnErrorResumeNext2Tck.cs" />
+    <Compile Include="FlowableOnErrorResumeNext1Tck.cs" />
+    <Compile Include="FlowableOnErrorReturn1Tck.cs" />
+    <Compile Include="FlowableBufferSizeExact1Tck.cs" />
     <Compile Include="FlowableRetry1Tck.cs" />
     <Compile Include="FlowableRepeat1Tck.cs" />
     <Compile Include="FlowableSwitchIfEmptyEnumerable2Tck.cs" />
@@ -218,6 +226,7 @@
     <Compile Include="FlowableTakeLastTest.cs" />
     <Compile Include="FlowableGroupByTest.cs" />
     <Compile Include="FlowableDefaultIfEmptyTest.cs" />
+    <Compile Include="FlowableBufferSizeOverlapTest.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Benchmarks.cs" />
   </ItemGroup>

@@ -80,5 +80,33 @@ namespace Reactive4.NET.utils
         }
 
         internal long Count => producerIndex - consumerIndex;
+
+        internal void ForEach(Action<T> consumer)
+        {
+            var a = array;
+            var m = a.Length - 1;
+            var ci = consumerIndex;
+            var pi = producerIndex;
+            while (ci != pi)
+            {
+                int offset = (int)ci & m;
+                consumer(a[offset]);
+                ci++;
+            }
+        }
+
+        internal void ForEach<S>(S state, Action<S, T> consumer)
+        {
+            var a = array;
+            var m = a.Length - 1;
+            var ci = consumerIndex;
+            var pi = producerIndex;
+            while (ci != pi)
+            {
+                int offset = (int)ci & m;
+                consumer(state, a[offset]);
+                ci++;
+            }
+        }
     }
 }
