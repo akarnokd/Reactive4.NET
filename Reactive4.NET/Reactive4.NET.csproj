@@ -49,12 +49,17 @@
     <Compile Include="BufferStrategy.cs" />
     <Compile Include="AsyncProcessor.cs" />
     <Compile Include="operators\FlowableConcatMapEager.cs" />
+    <Compile Include="operators\FlowableDefaultIfEmpty.cs" />
     <Compile Include="operators\FlowableFlatMapEnumerable.cs" />
     <Compile Include="operators\FlowableGroupBy.cs" />
     <Compile Include="operators\FlowableOnBackpressureLatest.cs" />
     <Compile Include="operators\FlowableOnBackpressureDrop.cs" />
     <Compile Include="operators\FlowableOnBackpressureError.cs" />
+    <Compile Include="operators\FlowableRepeat.cs" />
     <Compile Include="operators\FlowableSkipLast.cs" />
+    <Compile Include="operators\FlowableSwitchIfEmptyEnumerable.cs" />
+    <Compile Include="operators\FlowableSwitchIfEmptyArray.cs" />
+    <Compile Include="operators\FlowableSwitchIfEmpty.cs" />
     <Compile Include="operators\FlowableSwitchMap.cs" />
     <Compile Include="operators\FlowableTakeLast.cs" />
     <Compile Include="operators\FlowableSkipWhile.cs" />

@@ -69,6 +69,7 @@
     <Compile Include="FlowableConcatArray1Tck.cs" />
     <Compile Include="FlowableConcatEnumerableTest.cs" />
     <Compile Include="FlowableCreateErrorl1Tck.cs" />
+    <Compile Include="FlowableDefaultIfEmpty2Tck.cs" />
     <Compile Include="FlowableDelaySubscription2Tck.cs" />
     <Compile Include="FlowableDelayTest.cs" />
     <Compile Include="FlowableDistinct3Tck.cs" />
@@ -100,6 +101,13 @@
     <Compile Include="FlowableFlatMapEnumerable1Tck.cs" />
     <Compile Include="FlowableConcatMapEager1Tck.cs" />
     <Compile Include="FlowableGroupBy1Tck.cs" />
+    <Compile Include="FlowableDefaultIfEmpty1Tck.cs" />
+    <Compile Include="FlowableSwitchIfEmptyEnumerable2Tck.cs" />
+    <Compile Include="FlowableSwitchIfEmptyEnumerable1Tck.cs" />
+    <Compile Include="FlowableSwitchIfEmptyArray2Tck.cs" />
+    <Compile Include="FlowableSwitchIfEmptyArray1Tck.cs" />
+    <Compile Include="FlowableSwitchIfEmpty2Tck.cs" />
+    <Compile Include="FlowableSwitchIfEmpty1Tck.cs" />
     <Compile Include="FlowableWIthLatestFromEnumerable1Tck.cs" />
     <Compile Include="FlowableWIthLatestFromArray1Tck.cs" />
     <Compile Include="FlowableWIthLatestFrom1Tck.cs" />
@@ -207,6 +215,7 @@
     <Compile Include="ArrayQueueTest.cs" />
     <Compile Include="FlowableTakeLastTest.cs" />
     <Compile Include="FlowableGroupByTest.cs" />
+    <Compile Include="FlowableDefaultIfEmptyTest.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Benchmarks.cs" />
   </ItemGroup>

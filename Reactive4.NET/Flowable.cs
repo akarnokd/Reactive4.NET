@@ -1196,6 +1196,13 @@ namespace Reactive4.NET
             return Reduce(source, (a, b) => Math.Max(a, b));
         }
 
+        /// <summary>
+        /// Emits the maximum item from the source IFlowable based on a custom comparer.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="comparer">The comparer receiving the previous and the current item.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Max<T>(this IFlowable<T> source, IComparer<T> comparer)
         {
             return Reduce(source, (a, b) => comparer.Compare(a, b) < 0 ? b : a);
@@ -1231,6 +1238,13 @@ namespace Reactive4.NET
             return Reduce(source, (a, b) => Math.Min(a, b));
         }
 
+        /// <summary>
+        /// Emits the minimum item from the source IFlowable based on a custom comparer.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="comparer">The comparer receiving the previous and the current item.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Min<T>(this IFlowable<T> source, IComparer<T> comparer)
         {
             return Reduce(source, (a, b) => comparer.Compare(a, b) < 0 ? a : b);
@@ -1566,16 +1580,44 @@ namespace Reactive4.NET
             return new FlowableDistinctUntilChanged<T>(source, comparer);
         }
 
+        /// <summary>
+        /// Relays elements from the source IFlowable until the other IPublisher signals an item
+        /// or completes.
+        /// </summary>
+        /// <typeparam name="T">The source value type.</typeparam>
+        /// <typeparam name="U">The other element type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="other">The other IPublisher instance.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> TakeUntil<T, U>(this IFlowable<T> source, IPublisher<U> other)
         {
             return new FlowableTakeUntil<T, U>(source, other);
         }
 
+        /// <summary>
+        /// Skips items from the source IFlowable until the other IPublisher signals an item
+        /// or completes.
+        /// </summary>
+        /// <typeparam name="T">The source value type.</typeparam>
+        /// <typeparam name="U">The other value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="other">The other IPublisher instance.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> SkipUntil<T, U>(this IFlowable<T> source, IPublisher<U> other)
         {
             return new FlowableSkipUntil<T, U>(source, other);
         }
 
+        /// <summary>
+        /// Converts a downstream IFlowableSubscriber into an IFlowableSubscriber to be subscribed
+        /// to the upstream source IFlowable.
+        /// </summary>
+        /// <typeparam name="T">The upstream value type.</typeparam>
+        /// <typeparam name="R">The downstream value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="lifter">The function that receives the downstream IFlowableSubscriber
+        /// and returns an IFlowableSubscriber for the upstream.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> Lift<T, R>(this IFlowable<T> source, Func<IFlowableSubscriber<R>, IFlowableSubscriber<T>> lifter)
         {
             return new FlowableLift<T, R>(source, lifter);
@@ -1657,40 +1699,82 @@ namespace Reactive4.NET
             return new FlowableSwitchMap<T, R>(source, mapper, prefetch);
         }
 
+        /// <summary>
+        /// Emits the default item if the source is empty.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="defaultItem">The item to emit if the source is empty.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> DefaultIfEmpty<T>(this IFlowable<T> source, T defaultItem)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableDefaultIfEmpty<T>(source, defaultItem);
         }
 
+        /// <summary>
+        /// Switches to the fallback IPublisher if the source IFlowable is empty.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="fallback">The fallback IPublisher if the source turns out to be empty.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> SwitchIfEmpty<T>(this IFlowable<T> source, IPublisher<T> fallback)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableSwitchIfEmpty<T>(source, fallback);
         }
 
+        /// <summary>
+        /// Switches to the next fallback IPublisher if the main source or the previous one is empty.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="fallbacks">The params array of fallback IPublishers.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> SwitchIfEmpty<T>(this IFlowable<T> source, params IPublisher<T>[] fallbacks)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableSwitchIfEmptyArray<T>(source, fallbacks);
         }
 
+        /// <summary>
+        /// Switches to the next fallback IPublisher if the main source or the previous one is empty.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="fallbacks">The enumerable sequence of fallback IPublishers.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> SwitchIfEmpty<T>(this IFlowable<T> source, IEnumerable<IPublisher<T>> fallbacks)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableSwitchIfEmptyEnumerable<T>(source, fallbacks);
         }
 
+        /// <summary>
+        /// Repeatedly subscribes to the source IFlowable up to an optional maximum number of times.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="times">The number of times to subscribe to the source.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Repeat<T>(this IFlowable<T> source, long times = long.MaxValue)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return Repeat(source, () => false, times);
         }
 
+        /// <summary>
+        /// Repeatedly subscribes to the source IFlowable up to an optional maximum number of times or
+        /// when the stop function returns true after the current subscription completes.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="stop">The function that should return true to stop repeating the whole sequence.</param>
+        /// <param name="times">The number of times to subscribe to the source.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Repeat<T>(this IFlowable<T> source, Func<bool> stop, long times = long.MaxValue)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            if (times <= 0)
+            {
+                return Empty<T>();
+            }
+            return new FlowableRepeat<T>(source, stop, times);
         }
 
         public static IFlowable<T> RepeatWhen<T, U>(this IFlowable<T> source, Func<IFlowable<object>, IPublisher<U>> handler)

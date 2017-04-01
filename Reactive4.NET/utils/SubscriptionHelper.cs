@@ -196,7 +196,7 @@ namespace Reactive4.NET.operators
                     var v = long.MinValue + 1;
                     if (Interlocked.CompareExchange(ref requested, v, r) == r)
                     {
-                        if (u == 0L && Volatile.Read(ref cancelled))
+                        if (u == 0L && !Volatile.Read(ref cancelled))
                         {
                             actual.OnNext(item);
                             if (!Volatile.Read(ref cancelled))
