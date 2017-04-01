@@ -19,7 +19,7 @@ namespace Reactive4.NET.Test
             Task.Factory.StartNew(() => {
                 while (!pp.HasSubscribers)
                 {
-                    Thread.Sleep(10);
+                    Thread.Sleep(1);
                 }
                 for (int i = 0; i < elements; i++)
                 {

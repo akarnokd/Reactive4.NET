@@ -55,6 +55,7 @@ namespace Reactive4.NET.operators
             bool outputFused;
 
             long requested;
+            long emitted;
 
             int active;
 
@@ -262,7 +263,7 @@ namespace Reactive4.NET.operators
                         a.OnNext(null);
                     }
 
-                    if (d && empty)
+                    if (d)
                     {
                         var ex = error;
                         if (ex == null)
@@ -294,7 +295,90 @@ namespace Reactive4.NET.operators
 
             void DrainNormal()
             {
+                int missed = 1;
+                var a = actual;
+                var q = queue;
+                var e = emitted;
 
+                for (;;)
+                {
+                        long r = Volatile.Read(ref requested);
+
+                    while (e != r)
+                    {
+                        if (Volatile.Read(ref cancelled) != 0)
+                        {
+                            q.Clear();
+                            return;
+                        }
+
+                        bool d = Volatile.Read(ref done);
+                        bool empty = !q.Poll(out var v);
+
+                        if (d && empty)
+                        {
+                            var ex = error;
+                            if (ex != null)
+                            {
+                                a.OnError(ex);
+                            }
+                            else
+                            {
+                                a.OnComplete();
+                            }
+                            return;
+                        }
+
+                        if (empty)
+                        {
+                            break;
+                        }
+
+                        a.OnNext(v);
+
+                        e++;
+                    }
+
+                    if (e == r)
+                    {
+                        if (Volatile.Read(ref cancelled) != 0)
+                        {
+                            q.Clear();
+                            return;
+                        }
+
+                        bool d = Volatile.Read(ref done);
+                        bool empty = q.IsEmpty();
+
+                        if (d && empty)
+                        {
+                            var ex = error;
+                            if (ex != null)
+                            {
+                                a.OnError(ex);
+                            }
+                            else
+                            {
+                                a.OnComplete();
+                            }
+                            return;
+                        }
+                    }
+                    int w = Volatile.Read(ref wip);
+                    if (w == missed)
+                    {
+                        emitted = e;
+                        missed = Interlocked.Add(ref wip, -missed);
+                        if (missed == 0)
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        missed = w;
+                    }
+                }
             }
 
             sealed class GroupedFlowable : IGroupedFlowable<K, V>, IQueueSubscription<V>
@@ -383,7 +467,12 @@ namespace Reactive4.NET.operators
 
                 public bool Poll(out V item)
                 {
-                    return queue.Poll(out item);
+                    if (queue.Poll(out item))
+                    {
+                        parent.RequestInner(1);
+                        return true;
+                    }
+                    return false;
                 }
 
                 public void Request(long n)
@@ -445,7 +534,7 @@ namespace Reactive4.NET.operators
                                 a.OnNext(default(V));
                             }
 
-                            if (d && empty)
+                            if (d)
                             {
                                 actual = null;
                                 var ex = error;
@@ -483,7 +572,7 @@ namespace Reactive4.NET.operators
                 void DrainNormal()
                 {
                     int missed = 1;
-                    var a = actual;
+                    var a = Volatile.Read(ref actual);
                     var q = queue;
                     var e = emitted;
 
@@ -595,6 +684,10 @@ namespace Reactive4.NET.operators
                         if (Volatile.Read(ref cancelled))
                         {
                             Volatile.Write(ref actual, null);
+                        }
+                        else
+                        {
+                            Drain();
                         }
                     }
                     else

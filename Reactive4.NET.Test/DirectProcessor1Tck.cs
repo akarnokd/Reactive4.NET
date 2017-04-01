@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Reactive.Streams;
 using NUnit.Framework;
 using System.Threading;
+using Reactive4.NET.utils;
 
 namespace Reactive4.NET.Test
 {
@@ -23,9 +24,17 @@ namespace Reactive4.NET.Test
                 {
                     Thread.Sleep(10);
                 }
+                long start = SchedulerHelper.NowUTC();
                 for (int i = 0; i < elements; i++)
                 {
-                    while (!dp.Offer(i)) ;
+                    while (!dp.Offer(i))
+                    {
+                        Thread.Sleep(1);
+                        if (SchedulerHelper.NowUTC() - start > 1000)
+                        {
+                            return;
+                        }
+                    }
                 }
                 dp.OnComplete();
             }, TaskCreationOptions.LongRunning);

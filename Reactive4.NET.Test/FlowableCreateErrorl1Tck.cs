@@ -13,6 +13,8 @@ namespace Reactive4.NET.Test
     [TestFixture]
     class FlowableCreateErrorAll1Tck : FlowableVerification<int>
     {
+        public FlowableCreateErrorAll1Tck() : base(100) { }
+
         public override IPublisher<int> CreatePublisher(long elements)
         {
             return Flowable.Create<int>(e =>
@@ -34,7 +36,7 @@ namespace Reactive4.NET.Test
                                 return;
                             }
                             Thread.Sleep(1);
-                            if (SchedulerHelper.NowUTC() - now > 200)
+                            if (SchedulerHelper.NowUTC() - now > 1000)
                             {
                                 return;
                             }

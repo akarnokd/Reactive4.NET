@@ -83,6 +83,10 @@
     <Compile Include="FlowableConcatMap2Tck.cs" />
     <Compile Include="FlowableConcatMap3Tck.cs" />
     <Compile Include="FlowableFlatMapEnumerable2Tck.cs" />
+    <Compile Include="FlowableGroupBy5Tck.cs" />
+    <Compile Include="FlowableGroupBy4Tck.cs" />
+    <Compile Include="FlowableGroupBy3Tck.cs" />
+    <Compile Include="FlowableGroupBy2Tck.cs" />
     <Compile Include="FlowableInterval1Tck.cs" />
     <Compile Include="FlowableDelay1Tck.cs" />
     <Compile Include="FlowableDelaySubscription1Tck.cs" />
@@ -95,6 +99,7 @@
     <Compile Include="FlowableCombineLatest1Tck.cs" />
     <Compile Include="FlowableFlatMapEnumerable1Tck.cs" />
     <Compile Include="FlowableConcatMapEager1Tck.cs" />
+    <Compile Include="FlowableGroupBy1Tck.cs" />
     <Compile Include="FlowableSkipWhile2Tck.cs" />
     <Compile Include="FlowableSkipWhile1Tck.cs" />
     <Compile Include="FlowableSwitchMap2Tck.cs" />
