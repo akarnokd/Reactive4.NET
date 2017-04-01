@@ -198,6 +198,7 @@
     <Compile Include="FlowableSwitchMapTest.cs" />
     <Compile Include="ArrayQueueTest.cs" />
     <Compile Include="FlowableTakeLastTest.cs" />
+    <Compile Include="FlowableGroupByTest.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Benchmarks.cs" />
   </ItemGroup>

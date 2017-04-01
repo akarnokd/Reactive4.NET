@@ -15,16 +15,19 @@ namespace Reactive4.NET.operators
         readonly Func<T, K> keySelector;
 
         readonly Func<T, V> valueSelector;
+
+        readonly int bufferSize;
         
-        public FlowableGroupBy(IFlowable<T> source, Func<T, K> keySelector, Func<T, V> valueSelector) : base(source)
+        public FlowableGroupBy(IFlowable<T> source, Func<T, K> keySelector, Func<T, V> valueSelector, int bufferSize) : base(source)
         {
             this.keySelector = keySelector;
             this.valueSelector = valueSelector;
+            this.bufferSize = bufferSize;
         }
 
         public override void Subscribe(IFlowableSubscriber<IGroupedFlowable<K, V>> subscriber)
         {
-            throw new NotImplementedException();
+            source.Subscribe(new GroupBySubscriber(subscriber, keySelector, valueSelector, bufferSize));
         }
 
         sealed class GroupBySubscriber : IFlowableSubscriber<T>, IQueueSubscription<IGroupedFlowable<K, V>>
@@ -240,7 +243,53 @@ namespace Reactive4.NET.operators
 
             void DrainFused()
             {
+                int missed = 1;
+                var q = queue;
+                var a = actual;
 
+                for (;;)
+                {
+                    if (Volatile.Read(ref cancelled) != 0)
+                    {
+                        q.Clear();
+                        return;
+                    }
+                    bool d = Volatile.Read(ref done);
+                    bool empty = q.IsEmpty();
+
+                    if (!empty)
+                    {
+                        a.OnNext(null);
+                    }
+
+                    if (d && empty)
+                    {
+                        var ex = error;
+                        if (ex == null)
+                        {
+                            a.OnComplete();
+                        }
+                        else
+                        {
+                            a.OnError(ex);
+                        }
+                        return;
+                    }
+
+                    int w = Volatile.Read(ref wip);
+                    if (w == missed)
+                    {
+                        missed = Interlocked.Add(ref wip, -missed);
+                        if (missed == 0)
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        missed = w;
+                    }
+                }
             }
 
             void DrainNormal()
@@ -263,6 +312,7 @@ namespace Reactive4.NET.operators
                 int wip;
 
                 long requested;
+                long emitted;
 
                 bool outputFused;
 
@@ -373,12 +423,167 @@ namespace Reactive4.NET.operators
 
                 void DrainFused()
                 {
+                    int missed = 1;
+                    var q = queue;
+                    var a = Volatile.Read(ref actual);
 
+                    for (;;)
+                    {
+                        if (Volatile.Read(ref cancelled))
+                        {
+                            q.Clear();
+                            actual = null;
+                            return;
+                        }
+                        if (a != null)
+                        {
+                            bool d = Volatile.Read(ref done);
+                            bool empty = q.IsEmpty();
+
+                            if (!empty)
+                            {
+                                a.OnNext(default(V));
+                            }
+
+                            if (d && empty)
+                            {
+                                actual = null;
+                                var ex = error;
+                                if (ex == null)
+                                {
+                                    a.OnComplete();
+                                }
+                                else
+                                {
+                                    a.OnError(ex);
+                                }
+                                return;
+                            }
+                        }
+
+                        int w = Volatile.Read(ref wip);
+                        if (w == missed)
+                        {
+                            missed = Interlocked.Add(ref wip, -missed);
+                            if (missed == 0)
+                            {
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            missed = w;
+                        }
+                        if (a == null) {
+                            a = Volatile.Read(ref actual);
+                        }
+                    }
                 }
 
                 void DrainNormal()
                 {
+                    int missed = 1;
+                    var a = actual;
+                    var q = queue;
+                    var e = emitted;
 
+                    for (;;)
+                    {
+                        if (a != null)
+                        {
+                            int f = 0;
+                            long r = Volatile.Read(ref requested);
+
+                            while (e != r)
+                            {
+                                if (Volatile.Read(ref cancelled))
+                                {
+                                    q.Clear();
+                                    actual = null;
+                                    return;
+                                }
+
+                                bool d = Volatile.Read(ref done);
+                                bool empty = !q.Poll(out V v);
+
+                                if (d && empty)
+                                {
+                                    actual = null;
+                                    var ex = error;
+                                    if (ex != null)
+                                    {
+                                        a.OnError(ex);
+                                    }
+                                    else
+                                    {
+                                        a.OnComplete();
+                                    }
+                                    return;
+                                }
+
+                                if (empty)
+                                {
+                                    break;
+                                }
+
+                                a.OnNext(v);
+
+                                e++;
+                                f++;
+                            }
+
+                            if (e == r)
+                            {
+                                if (Volatile.Read(ref cancelled))
+                                {
+                                    q.Clear();
+                                    actual = null;
+                                    return;
+                                }
+
+                                bool d = Volatile.Read(ref done);
+                                bool empty = q.IsEmpty();
+
+                                if (d && empty)
+                                {
+                                    actual = null;
+                                    var ex = error;
+                                    if (ex != null)
+                                    {
+                                        a.OnError(ex);
+                                    }
+                                    else
+                                    {
+                                        a.OnComplete();
+                                    }
+                                    return;
+                                }
+                            }
+
+                            if (f != 0)
+                            {
+                                parent.RequestInner(f);
+                            }
+                        }
+                        int w = Volatile.Read(ref wip);
+                        if (w == missed)
+                        {
+                            emitted = e;
+                            missed = Interlocked.Add(ref wip, -missed);
+                            if (missed == 0)
+                            {
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            missed = w;
+                        }
+                        if (a == null)
+                        {
+                            a = Volatile.Read(ref actual);
+                        }
+                    }
                 }
 
                 public void Subscribe(IFlowableSubscriber<V> subscriber)

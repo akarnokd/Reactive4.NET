@@ -1838,7 +1838,7 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<IGroupedFlowable<K, T>> GroupBy<T, K>(this IFlowable<T> source, Func<T, K> keyMapper)
         {
-            return GroupBy<T, K, T>(source, keyMapper, v => v);
+            return GroupBy<T, K, T>(source, keyMapper, v => v, BufferSize());
         }
 
         /// <summary>
@@ -1856,7 +1856,25 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<IGroupedFlowable<K, V>> GroupBy<T, K, V>(this IFlowable<T> source, Func<T, K> keyMapper, Func<T, V> valueMapper)
         {
-            return new FlowableGroupBy<T, K, V>(source, keyMapper, valueMapper);
+            return GroupBy(source, keyMapper, valueMapper, BufferSize());
+        }
+        /// <summary>
+        /// Emits a value mapped from each upstream item into an exclusive group represented by an IGroupedFlowable
+        /// based on a key.
+        /// </summary>
+        /// <typeparam name="T">The source value type.</typeparam>
+        /// <typeparam name="K">The key type.</typeparam>
+        /// <typeparam name="V">The group value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="keyMapper">The function that takes an upstream item
+        /// and returns a key value that selects a group to emit the upstream item.</param>
+        /// <param name="valueMapper">The function that takes the upstream value and
+        /// transforms it into the value to be emitted in the selected group.</param>
+        /// <param name="bufferSize">The buffer size for the main groups and each group.</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<IGroupedFlowable<K, V>> GroupBy<T, K, V>(this IFlowable<T> source, Func<T, K> keyMapper, Func<T, V> valueMapper, int bufferSize)
+        {
+            return new FlowableGroupBy<T, K, V>(source, keyMapper, valueMapper, bufferSize);
         }
 
         public static IFlowable<R> WithLatestFrom<T, U, R>(this IFlowable<T> source, IPublisher<U> other, Func<T, U, R> combiner)
