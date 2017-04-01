@@ -91,6 +91,10 @@ namespace Reactive4.NET.operators
                 {
                     do
                     {
+                        if (ArbiterIsCancelled())
+                        {
+                            return;
+                        }
                         if (source == null)
                         {
                             var fs = fallbacks;

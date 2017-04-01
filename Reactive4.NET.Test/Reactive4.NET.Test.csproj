@@ -102,6 +102,7 @@
     <Compile Include="FlowableConcatMapEager1Tck.cs" />
     <Compile Include="FlowableGroupBy1Tck.cs" />
     <Compile Include="FlowableDefaultIfEmpty1Tck.cs" />
+    <Compile Include="FlowableRepeat1Tck.cs" />
     <Compile Include="FlowableSwitchIfEmptyEnumerable2Tck.cs" />
     <Compile Include="FlowableSwitchIfEmptyEnumerable1Tck.cs" />
     <Compile Include="FlowableSwitchIfEmptyArray2Tck.cs" />
