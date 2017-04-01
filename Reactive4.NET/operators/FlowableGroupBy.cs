@@ -32,7 +32,7 @@ namespace Reactive4.NET.operators
 
         sealed class GroupBySubscriber : IFlowableSubscriber<T>, IQueueSubscription<IGroupedFlowable<K, V>>
         {
-            readonly ISubscriber<IGroupedFlowable<K, V>> actual;
+            readonly IFlowableSubscriber<IGroupedFlowable<K, V>> actual;
 
             readonly Func<T, K> keySelector;
 
@@ -59,7 +59,7 @@ namespace Reactive4.NET.operators
 
             int active;
 
-            internal GroupBySubscriber(ISubscriber<IGroupedFlowable<K, V>> actual, Func<T, K> keySelector, Func<T, V> valueSelector, int bufferSize)
+            internal GroupBySubscriber(IFlowableSubscriber<IGroupedFlowable<K, V>> actual, Func<T, K> keySelector, Func<T, V> valueSelector, int bufferSize)
             {
                 this.actual = actual;
                 this.keySelector = keySelector;

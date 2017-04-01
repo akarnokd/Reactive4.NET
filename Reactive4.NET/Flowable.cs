@@ -1838,7 +1838,7 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<IGroupedFlowable<K, T>> GroupBy<T, K>(this IFlowable<T> source, Func<T, K> keyMapper)
         {
-            return GroupBy<T, K, T>(source, keyMapper, v => v, BufferSize());
+            return GroupBy(source, keyMapper, v => v, BufferSize());
         }
 
         /// <summary>
@@ -1877,22 +1877,56 @@ namespace Reactive4.NET
             return new FlowableGroupBy<T, K, V>(source, keyMapper, valueMapper, bufferSize);
         }
 
+        /// <summary>
+        /// Combines the current latest element from the other IPublisher with the source
+        /// via a combiner function to produce the output item.
+        /// </summary>
+        /// <typeparam name="T">The source value type.</typeparam>
+        /// <typeparam name="U">The other value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="other">The other IPublisher instance.</param>
+        /// <param name="combiner">The function receiving each item from the source
+        /// and uses the latest item from the other IPublisher to return a value
+        /// to be emitted.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> WithLatestFrom<T, U, R>(this IFlowable<T> source, IPublisher<U> other, Func<T, U, R> combiner)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableWithLatestFrom<T, U, R>(source, other, combiner);
         }
 
+        /// <summary>
+        /// Combines the current latest element from the array of other IPublishers with the source
+        /// via a combiner function to produce the output item.
+        /// </summary>
+        /// <typeparam name="T">The source value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="others">The params array of other IPublisher instances.</param>
+        /// <param name="combiner">The function receiving each item from the source
+        /// and uses the latest item from the other IPublisher to return a value
+        /// to be emitted.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> WithLatestFrom<T, R>(this IFlowable<T> source, Func<T[], R> combiner, params IPublisher<T>[] others)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableWithLatestFromArray<T, R>(source, others, combiner);
         }
 
-        public static IFlowable<R> WithLatestFrom<T, R>(this IFlowable<T> source, Func<T[], R> combiner, IEnumerable<IPublisher<T>> others)
+        /// <summary>
+        /// Combines the current latest element from the enumerable sequence of other IPublishers with the source
+        /// via a combiner function to produce the output item.
+        /// </summary>
+        /// <typeparam name="T">The source value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="others">The IEnumerable sequence of other IPublisher instances.</param>
+        /// <param name="combiner">The function receiving each item from the source
+        /// and uses the latest item from the other IPublisher to return a value
+        /// to be emitted.</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<R> WithLatestFrom<T, R>(this IFlowable<T> source, IEnumerable<IPublisher<T>> others, Func<T[], R> combiner)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableWithLatestFromEnumerable<T, R>(source, others, combiner);
         }
 
         public static IFlowable<T> Sample<T>(this IFlowable<T> source, TimeSpan period)
@@ -2009,16 +2043,43 @@ namespace Reactive4.NET
             return Amb(source, other);
         }
 
+        /// <summary>
+        /// Concatenates the source sequence with the other IPublisher in order and in a
+        /// non-overlapping fashion.
+        /// </summary>
+        /// <typeparam name="T">The common value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="other">The other IPublisher instance.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> ConcatWith<T>(this IFlowable<T> source, IPublisher<T> other)
         {
             return Concat(source, other);
         }
 
+        /// <summary>
+        /// Merges the source sequence with the other IPublisher without any guarantee of
+        /// item ordering between the two.
+        /// </summary>
+        /// <typeparam name="T">THe common value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="other">The other IPublisher instance.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> MergeWith<T>(this IFlowable<T> source, IPublisher<T> other)
         {
             return Merge(source, other);
         }
 
+        /// <summary>
+        /// Pairwise combines elements from the source and other sequence via a zipper function.
+        /// </summary>
+        /// <typeparam name="T">The source element type.</typeparam>
+        /// <typeparam name="U">The other element type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="other">The other IPublisher instance.</param>
+        /// <param name="zipper">The function that receives one element from the source and
+        /// other sequences and returns their combination as result.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> ZipWith<T, U, R>(this IFlowable<T> source, IPublisher<U> other, Func<T, U, R> zipper)
         {
             return Zip(source, other, zipper);
@@ -2195,51 +2256,123 @@ namespace Reactive4.NET
         // State peeking methods
         // ********************************************************************************
 
+        /// <summary>
+        /// Calls the given action before the downstream receives an OnNext event.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="onNext">The action called with the current item before the downstream.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> DoOnNext<T>(this IFlowable<T> source, Action<T> onNext)
         {
             return FlowablePeek<T>.Create(source, onNext: onNext);
         }
 
+        /// <summary>
+        /// Calls the given action after the downstream received an OnNext event.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="onAfterNext">The action called with the current item after the downstream.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> DoAfterNext<T>(this IFlowable<T> source, Action<T> onAfterNext)
         {
             return FlowablePeek<T>.Create(source, onAfterNext: onAfterNext);
         }
 
+        /// <summary>
+        /// Calls the given action before the downstream receives an OnError event.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="onError">The action called with the error before the downstream receives an OnError.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> DoOnError<T>(this IFlowable<T> source, Action<Exception> onError)
         {
             return FlowablePeek<T>.Create(source, onError: onError);
         }
 
+        /// <summary>
+        /// Calls the given action before the downstream receives an OnComplete event.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="onComplete">The action called before the downstream receives an OnComplete.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> DoOnComplete<T>(this IFlowable<T> source, Action onComplete)
         {
             return FlowablePeek<T>.Create(source, onComplete: onComplete);
         }
 
+        /// <summary>
+        /// Calls the given action before the downstream receives an OnError or OnComplete event.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="onTerminated">The action called before the downstream receives an OnError or OnComplete event.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> DoOnTerminated<T>(this IFlowable<T> source, Action onTerminated)
         {
             return FlowablePeek<T>.Create(source, onTerminated: onTerminated);
         }
 
+        /// <summary>
+        /// Calls the given action after the downstream receives an OnError or OnComplete event.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="onAfterTerminated">The action called after the downstream receives an OnError or OnComplete event.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> DoAfterTerminated<T>(this IFlowable<T> source, Action onAfterTerminated)
         {
             return FlowablePeek<T>.Create(source, onAfterTerminated: onAfterTerminated);
         }
 
+        /// <summary>
+        /// Calls the given action exactly once per ISubscriber after the sequence terminates
+        /// normally, with an error or the downstream cancels.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="onFinally">The action called when the upstream terminates or the downstream cancels.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> DoFinally<T>(this IFlowable<T> source, Action onFinally)
         {
             return new FlowableDoFinally<T>(source, onFinally);
         }
 
+        /// <summary>
+        /// Calls the given action before the downstream receives an OnSubscribe event.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="onSubscribe">The action called with the upstream ISubscription.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> DoOnSubscribe<T>(this IFlowable<T> source, Action<ISubscription> onSubscribe)
         {
             return FlowablePeek<T>.Create(source, onSubscribe: onSubscribe);
         }
 
+        /// <summary>
+        /// Calls the given action before the upstream gets requested.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="onRequest">The action called with the downstream request amount before
+        /// it is relayed to the upstream.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> DoOnRequest<T>(this IFlowable<T> source, Action<long> onRequest)
         {
             return FlowablePeek<T>.Create(source, onRequest: onRequest);
         }
 
+        /// <summary>
+        /// Calls the given action before the upstream gets cancelled.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="onCancel">The action called before the cancellation is forwarded to the upstream.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> DoOnCancel<T>(this IFlowable<T> source, Action onCancel)
         {
             return FlowablePeek<T>.Create(source, onCancel: onCancel);

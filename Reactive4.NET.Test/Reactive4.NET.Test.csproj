@@ -100,6 +100,9 @@
     <Compile Include="FlowableFlatMapEnumerable1Tck.cs" />
     <Compile Include="FlowableConcatMapEager1Tck.cs" />
     <Compile Include="FlowableGroupBy1Tck.cs" />
+    <Compile Include="FlowableWIthLatestFromEnumerable1Tck.cs" />
+    <Compile Include="FlowableWIthLatestFromArray1Tck.cs" />
+    <Compile Include="FlowableWIthLatestFrom1Tck.cs" />
     <Compile Include="FlowableSkipWhile2Tck.cs" />
     <Compile Include="FlowableSkipWhile1Tck.cs" />
     <Compile Include="FlowableSwitchMap2Tck.cs" />
