@@ -1783,16 +1783,32 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Resubscribes to the source if it fails with an exception, optionally only
+        /// a limited number of times.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="times">The number of times to retry.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Retry<T>(this IFlowable<T> source, long times = long.MaxValue)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return Retry<T>(source, e => true, times);
         }
 
+        /// <summary>
+        /// Resubscribes to the source if it fails with an exception, optionally only
+        /// a limited number of times.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="predicate">Called with the exception from the source and if
+        /// returns true, the source is resubscribed.</param>
+        /// <param name="times">The maximum number of times to retry.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Retry<T>(this IFlowable<T> source, Func<Exception, bool> predicate, long times = long.MaxValue)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableRetry<T>(source, predicate, times);
         }
 
         public static IFlowable<T> RetryWhen<T, U>(this IFlowable<T> source, Func<IFlowable<Exception>, IPublisher<U>> handler)

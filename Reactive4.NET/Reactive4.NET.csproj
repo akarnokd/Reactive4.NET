@@ -55,6 +55,7 @@
     <Compile Include="operators\FlowableOnBackpressureLatest.cs" />
     <Compile Include="operators\FlowableOnBackpressureDrop.cs" />
     <Compile Include="operators\FlowableOnBackpressureError.cs" />
+    <Compile Include="operators\FlowableRetry.cs" />
     <Compile Include="operators\FlowableRepeat.cs" />
     <Compile Include="operators\FlowableSkipLast.cs" />
     <Compile Include="operators\FlowableSwitchIfEmptyEnumerable.cs" />
