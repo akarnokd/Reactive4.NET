@@ -175,9 +175,8 @@ namespace Reactive4.NET.operators
 
             public void Request(long n)
             {
-                if (SubscriptionHelper.Validate(n))
+                if (!SubscriptionHelper.PostCompleteMultiRequest(actual, ref requested, queue, n, ref cancelled))
                 {
-                    SubscriptionHelper.AddRequest(ref requested, n);
                     long u = SubscriptionHelper.MultiplyCap(n, size - skip);
                     if (Volatile.Read(ref once) == 0 && Interlocked.CompareExchange(ref once, 1, 0) == 0)
                     {
