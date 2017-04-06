@@ -279,5 +279,38 @@ namespace Reactive4.NET
         /// the IConnectableObservable was fresh.
         /// </summary>
         void Reset();
+
+        /// <summary>
+        /// Returns the current state of this IConnectableFlowable.
+        /// </summary>
+        ConnectionState ConnectionState { get; }
+    }
+
+    /// <summary>
+    /// Represents the current state of the IConnectableFlowable.
+    /// </summary>
+    public enum ConnectionState
+    {
+        /// <summary>
+        /// Indicates that the IConnectableFlowable is not connected yet
+        /// and it is ready to accept ISubscribers. Call Connect() to
+        /// establish a connection.
+        /// </summary>
+        Fresh,
+        /// <summary>
+        /// Indicates that the IConnectableFlowable is connected and
+        /// all current and future ISubscribers can receive signals.
+        /// </summary>
+        Connected,
+        /// <summary>
+        /// Indicates that the IConnectableFlowable has terminated
+        /// normally or with an error. New ISubscribers may receive
+        /// cached items and the terminal signal in this state, 
+        /// depending on the actual implementation. In order
+        /// to prepare for a new run just like when the IConnectableFlowable
+        /// was new and unconnected, call Reset() on it which puts it
+        /// into the Fresh connection state.
+        /// </summary>
+        Terminated
     }
 }
