@@ -57,6 +57,7 @@
     <Compile Include="operators\FlowableGroupBy.cs" />
     <Compile Include="operators\FlowableFilterAsync.cs" />
     <Compile Include="operators\FlowableMapAsync.cs" />
+    <Compile Include="operators\FlowableOnBackpressureBuffer.cs" />
     <Compile Include="operators\FlowableOnBackpressureLatest.cs" />
     <Compile Include="operators\FlowableOnBackpressureDrop.cs" />
     <Compile Include="operators\FlowableOnBackpressureError.cs" />

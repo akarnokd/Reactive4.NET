@@ -2008,7 +2008,7 @@ namespace Reactive4.NET
         }
 
         /// <summary>
-        /// Consumes the upsteram source in an unbounded manner and
+        /// Consumes the upstream source in an unbounded manner and
         /// buffers all items if the downstream can't keep up.
         /// </summary>
         /// <typeparam name="T">The value type.</typeparam>
@@ -2019,14 +2019,26 @@ namespace Reactive4.NET
             return OnBackpressureBuffer(source, BufferSize(), BufferStrategy.ALL, null);
         }
 
+        /// <summary>
+        /// Consumes the upstream source in an unbounded manner into a potentially
+        /// bounded buffer and evicts items based on a buffer strategy and the
+        /// evicted item can be optionally consumed via an Action.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="capacityHint">The number of items to keep in the buffer in case the
+        /// buffer strategy is not ALL, otherwise it is a hint on how to extend the internal buffer.</param>
+        /// <param name="strategy">The strategy determining what should happen in case of a buffer size
+        /// reaching the capacity hint.</param>
+        /// <param name="onDrop">The optional Action called with the item evicted from the buffer.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> OnBackpressureBuffer<T>(this IFlowable<T> source, int capacityHint, BufferStrategy strategy = BufferStrategy.ALL, Action<T> onDrop = null)
         {
             if (strategy == BufferStrategy.ALL)
             {
                 return new FlowableOnBackpressureBufferAll<T>(source, capacityHint);
             }
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableOnBackpressureBuffer<T>(source, capacityHint, strategy, onDrop);
         }
 
         /// <summary>

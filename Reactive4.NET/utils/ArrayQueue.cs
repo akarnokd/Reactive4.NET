@@ -79,6 +79,26 @@ namespace Reactive4.NET.utils
             return true;
         }
 
+        /// <summary>
+        /// Polls for the element last offered.
+        /// </summary>
+        public bool PollLatestOffered(out T item)
+        {
+            var a = array;
+            var n = a.Length;
+            var pi = producerIndex;
+            if (pi == consumerIndex)
+            {
+                item = default(T);
+                return false;
+            }
+            var offset = (int)pi & (n - 1);
+            item = a[offset];
+            a[offset] = default(T);
+            producerIndex = pi - 1;
+            return true;
+        }
+
         internal long Count => producerIndex - consumerIndex;
 
         internal void ForEach(Action<T> consumer)
