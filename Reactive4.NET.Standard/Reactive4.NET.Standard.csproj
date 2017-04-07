@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.6</TargetFramework>
+    <DefineConstants>NETSTANDARD</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\netstandard1.6\Reactive4.NET.Standard.xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\Reactive4.NET\*.cs" />
+    <Compile Include="..\Reactive4.NET\operators\*.cs" />
+    <Compile Include="..\Reactive4.NET\schedulers\*.cs" />
+    <Compile Include="..\Reactive4.NET\subscribers\*.cs" />
+    <Compile Include="..\Reactive4.NET\utils\*.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Reactive.Streams" Version="1.0.2" />
+    <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
+  </ItemGroup>
+</Project>

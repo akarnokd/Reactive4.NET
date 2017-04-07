@@ -51,11 +51,16 @@ namespace Reactive4.NET.schedulers
 
             while (Volatile.Read(ref state) == Interrupting)
             {
+#if NETSTANDARD
+                Thread.Sleep(0);
+#else
                 Thread.Yield();
+#endif
             }
 
             if (Volatile.Read(ref state) == Interrupted)
             {
+#if !NETSTANDARD
                 try
                 {
                     Thread.Sleep(int.MaxValue);
@@ -64,6 +69,7 @@ namespace Reactive4.NET.schedulers
                 {
                     // Ignored
                 }
+#endif
             }
             runner = null;
             parent?.DeleteAction(this);
@@ -76,7 +82,9 @@ namespace Reactive4.NET.schedulers
                 Thread r = runner;
                 if (Interlocked.CompareExchange(ref state, Interrupting, Running) == Running)
                 {
+#if !NETSTANDARD
                     r?.Interrupt();
+#endif
                     Volatile.Write(ref state, Interrupted);
                 }
             }

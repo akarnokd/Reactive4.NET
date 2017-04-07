@@ -5,6 +5,7 @@ using System.Threading;
 using Reactive.Streams;
 using System.Text;
 using System.Collections;
+using System.Reflection;
 using Reactive4.NET.utils;
 
 namespace Reactive4.NET
@@ -557,7 +558,7 @@ namespace Reactive4.NET
             }
             if (ec == 1)
             {
-                if (!errorType.IsInstanceOfType(errors[0]))
+                if (!errorType.GetTypeInfo().IsInstanceOfType(errors[0]))
                 {
                     throw Fail("Different error present");
                 }
@@ -566,7 +567,7 @@ namespace Reactive4.NET
             {
                 for (int i = 0; i < ec; i++)
                 {
-                    if (!errorType.IsInstanceOfType(errors[i]))
+                    if (!errorType.GetTypeInfo().IsInstanceOfType(errors[i]))
                     {
                         throw Fail("Error found but there are others");
                     }
