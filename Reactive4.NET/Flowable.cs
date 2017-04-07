@@ -2279,16 +2279,59 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
-        public static IFlowable<T> Scan<T, R>(this IFlowable<T> source, Func<T, T, T> scanner)
+        /// <summary>
+        /// Performs a rolling accumulation of items via the scanner function where the accumulator
+        /// starts with the first upstream item and the scanner takes the previous accumulator item
+        /// and the current upstream item to return a new accumulator value to be used later and
+        /// also emitted to downstream.
+        /// </summary>
+        /// <typeparam name="T">The source and output value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="scanner">The function called once at least two upstream items have been
+        /// received when the function receives the previous accumulator value (or the very
+        /// first upstream value) and the current upstream value and should return the value
+        /// to be emitted and to become the new accumulator value.</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<T> Scan<T>(this IFlowable<T> source, Func<T, T, T> scanner)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableScan<T>(source, scanner);
         }
 
+        /// <summary>
+        /// Performs a rolling accumulation of items, starting from an initial accumulator value
+        /// and applying a scanner function to the current accumulator value and the current upstream
+        /// value to get the next accumulator value and the item emitted to downstream.
+        /// </summary>
+        /// <typeparam name="T">The source value type.</typeparam>
+        /// <typeparam name="R">The accumulator and result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="initialSupplier">The function returning the fresh initial accumulator value for
+        /// each ISubscriber.</param>
+        /// <param name="scanner">The function called with the initial or current accumulator value
+        /// and the current upstream value and should return the new accumulator value.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> Scan<T, R>(this IFlowable<T> source, Func<R> initialSupplier, Func<R, T, R> scanner)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return Scan<T, R>(source, initialSupplier, scanner, BufferSize());
+        }
+
+        /// <summary>
+        /// Performs a rolling accumulation of items, starting from an initial accumulator value
+        /// and applying a scanner function to the current accumulator value and the current upstream
+        /// value to get the next accumulator value and the item emitted to downstream.
+        /// </summary>
+        /// <typeparam name="T">The source value type.</typeparam>
+        /// <typeparam name="R">The accumulator and result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="initialSupplier">The function returning the fresh initial accumulator value for
+        /// each ISubscriber.</param>
+        /// <param name="scanner">The function called with the initial or current accumulator value
+        /// and the current upstream value and should return the new accumulator value.</param>
+        /// <param name="bufferSize">The number of items to store and prefetch from upstream.</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<R> Scan<T, R>(this IFlowable<T> source, Func<R> initialSupplier, Func<R, T, R> scanner, int bufferSize)
+        {
+            return new FlowableScanWith<T, R>(source, initialSupplier, scanner, bufferSize);
         }
 
         /// <summary>

@@ -115,6 +115,8 @@
     <Compile Include="FlowableBufferSizeExact1Tck.cs" />
     <Compile Include="FlowableMapAsync1Tck.cs" />
     <Compile Include="FlowableOnBackpressureBuffer1Tck.cs" />
+    <Compile Include="FlowableScanWith1Tck.cs" />
+    <Compile Include="FlowableScan1Tck.cs" />
     <Compile Include="FlowableRetry1Tck.cs" />
     <Compile Include="FlowableRepeat1Tck.cs" />
     <Compile Include="FlowableSwitchIfEmptyEnumerable2Tck.cs" />

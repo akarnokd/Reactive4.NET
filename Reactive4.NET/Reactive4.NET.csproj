@@ -66,6 +66,8 @@
     <Compile Include="operators\FlowableOnErrorReturn.cs" />
     <Compile Include="operators\FlowableRetry.cs" />
     <Compile Include="operators\FlowableRepeat.cs" />
+    <Compile Include="operators\FlowableScan.cs" />
+    <Compile Include="operators\FlowableScanWith.cs" />
     <Compile Include="operators\FlowableSkipLast.cs" />
     <Compile Include="operators\FlowableSwitchIfEmptyEnumerable.cs" />
     <Compile Include="operators\FlowableSwitchIfEmptyArray.cs" />
