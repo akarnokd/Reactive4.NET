@@ -55,6 +55,7 @@
     <Compile Include="operators\FlowableDefaultIfEmpty.cs" />
     <Compile Include="operators\FlowableFlatMapEnumerable.cs" />
     <Compile Include="operators\FlowableGroupBy.cs" />
+    <Compile Include="operators\FlowableFilterAsync.cs" />
     <Compile Include="operators\FlowableMapAsync.cs" />
     <Compile Include="operators\FlowableOnBackpressureLatest.cs" />
     <Compile Include="operators\FlowableOnBackpressureDrop.cs" />

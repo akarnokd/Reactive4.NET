@@ -85,6 +85,7 @@
     <Compile Include="FlowableConcatMap1Tck.cs" />
     <Compile Include="FlowableConcatMap2Tck.cs" />
     <Compile Include="FlowableConcatMap3Tck.cs" />
+    <Compile Include="FlowableFilterAsync2Tck.cs" />
     <Compile Include="FlowableFlatMapEnumerable2Tck.cs" />
     <Compile Include="FlowableGroupBy5Tck.cs" />
     <Compile Include="FlowableGroupBy4Tck.cs" />
@@ -95,6 +96,7 @@
     <Compile Include="FlowableDelaySubscription1Tck.cs" />
     <Compile Include="FlowableDistinct1Tck.cs" />
     <Compile Include="FlowableCreateBufferl1Tck.cs" />
+    <Compile Include="FlowableFilterAsync1Tck.cs" />
     <Compile Include="FlowableMapAsync2Tck.cs" />
     <Compile Include="FlowableOnBackpressureBufferAll2Tck.cs" />
     <Compile Include="FlowableOnBackpressureBufferAll1Tck.cs" />

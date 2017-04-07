@@ -9,33 +9,28 @@ using System.Threading.Tasks;
 
 namespace Reactive4.NET.operators
 {
-    sealed class FlowableMapAsync<T, U, R> : AbstractFlowableOperator<T, R>
+    sealed class FlowableFilterAsync<T> : AbstractFlowableOperator<T, T>
     {
-        readonly Func<T, IPublisher<U>> mapper;
-
-        readonly Func<T, U, R> combiner;
+        readonly Func<T, IPublisher<bool>> predicate;
 
         readonly int bufferSize;
 
-        public FlowableMapAsync(IFlowable<T> source, Func<T, IPublisher<U>> mapper, Func<T, U, R> combiner, int bufferSize) : base(source)
+        public FlowableFilterAsync(IFlowable<T> source, Func<T, IPublisher<bool>> predicate, int bufferSize) : base(source)
         {
-            this.mapper = mapper;
-            this.combiner = combiner;
+            this.predicate = predicate;
             this.bufferSize = bufferSize;
         }
 
-        public override void Subscribe(IFlowableSubscriber<R> subscriber)
+        public override void Subscribe(IFlowableSubscriber<T> subscriber)
         {
-            source.Subscribe(new MapAsyncSubscriber(subscriber, mapper, combiner, bufferSize));
+            source.Subscribe(new FilterAsyncSubscriber(subscriber, predicate, bufferSize));
         }
 
-        sealed class MapAsyncSubscriber : IFlowableSubscriber<T>, ISubscription
+        sealed class FilterAsyncSubscriber : IFlowableSubscriber<T>, ISubscription
         {
-            readonly IFlowableSubscriber<R> actual;
+            readonly IFlowableSubscriber<T> actual;
 
-            readonly Func<T, IPublisher<U>> mapper;
-
-            readonly Func<T, U, R> combiner;
+            readonly Func<T, IPublisher<bool>> predicate;
 
             readonly int bufferSize;
 
@@ -69,16 +64,13 @@ namespace Reactive4.NET.operators
 
             InnerSubscriber inner;
 
-            U innerValue;
-
             static readonly InnerSubscriber Cancelled = new InnerSubscriber(null);
 
-            internal MapAsyncSubscriber(IFlowableSubscriber<R> actual, Func<T, IPublisher<U>> mapper,
-                Func<T, U, R> combiner, int bufferSize)
+            internal FilterAsyncSubscriber(IFlowableSubscriber<T> actual, Func<T, IPublisher<bool>> predicate,
+                int bufferSize)
             {
                 this.actual = actual;
-                this.mapper = mapper;
-                this.combiner = combiner;
+                this.predicate = predicate;
                 this.bufferSize = bufferSize;
                 this.limit = bufferSize - (bufferSize >> 2);
                 int c = QueueHelper.Pow2(bufferSize);
@@ -148,16 +140,9 @@ namespace Reactive4.NET.operators
                 }
             }
 
-            void InnerComplete(U item)
+            void InnerComplete(bool item)
             {
-                this.innerValue = item;
-                Volatile.Write(ref state, STATE_RESULT_VALUE);
-                Drain();
-            }
-
-            void InnerComplete()
-            {
-                Volatile.Write(ref state, STATE_RESULT_EMPTY);
+                Volatile.Write(ref state, item ? STATE_RESULT_VALUE : STATE_RESULT_EMPTY);
                 Drain();
             }
 
@@ -226,10 +211,10 @@ namespace Reactive4.NET.operators
 
                         if (s == STATE_FRESH)
                         {
-                            IPublisher<U> pub;
+                            IPublisher<bool> pub;
                             try
                             {
-                                pub = mapper(t);
+                                pub = predicate(t);
                             }
                             catch (Exception ex)
                             {
@@ -238,31 +223,19 @@ namespace Reactive4.NET.operators
                                 return;
                             }
 
-                            if (pub is IVariableSource<U> vu)
+                            if (pub is IVariableSource<bool> vu)
                             {
                                 q[offset].item = default(T);
                                 q[offset].state = 0;
 
-                                if (vu.Value(out U u))
+                                if (vu.Value(out bool u))
                                 {
-                                    R result;
-
-                                    try
+                                    if (u)
                                     {
-                                        result = combiner(t, u);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        upstream.Cancel();
-                                        ExceptionHelper.AddException(ref error, ex);
-                                        ex = ExceptionHelper.Terminate(ref error);
-                                        a.OnError(ex);
-                                        return;
-                                    }
+                                        a.OnNext(t);
 
-                                    a.OnNext(result);
-
-                                    e++;
+                                        e++;
+                                    }
                                 }
                                 ci++;
 
@@ -281,7 +254,8 @@ namespace Reactive4.NET.operators
                                     pub.Subscribe(sub);
                                 }
                             }
-                        } else
+                        }
+                        else
                         if (s == STATE_RESULT_EMPTY)
                         {
                             q[offset].item = default(T);
@@ -294,31 +268,14 @@ namespace Reactive4.NET.operators
                                 c = 0;
                                 upstream.Request(lim);
                             }
-                        } else
+                        }
+                        else
                         if (s == STATE_RESULT_VALUE)
                         {
                             q[offset].item = default(T);
                             q[offset].state = 0;
 
-                            U u = innerValue;
-                            innerValue = default(U);
-
-                            R result;
-
-                            try
-                            {
-                                result = combiner(t, u);
-                            }
-                            catch (Exception ex)
-                            {
-                                upstream.Cancel();
-                                ExceptionHelper.AddException(ref error, ex);
-                                ex = ExceptionHelper.Terminate(ref error);
-                                a.OnError(ex);
-                                return;
-                            }
-
-                            a.OnNext(result);
+                            a.OnNext(t);
 
                             e++;
                             ci++;
@@ -402,15 +359,15 @@ namespace Reactive4.NET.operators
                 internal T item;
             }
 
-            internal class InnerSubscriber : IFlowableSubscriber<U>
+            internal class InnerSubscriber : IFlowableSubscriber<bool>
             {
-                readonly MapAsyncSubscriber parent;
+                readonly FilterAsyncSubscriber parent;
 
                 ISubscription upstream;
 
                 bool done;
 
-                internal InnerSubscriber(MapAsyncSubscriber parent)
+                internal InnerSubscriber(FilterAsyncSubscriber parent)
                 {
                     this.parent = parent;
                 }
@@ -420,7 +377,7 @@ namespace Reactive4.NET.operators
                     if (!done)
                     {
                         done = true;
-                        parent.InnerComplete();
+                        parent.InnerComplete(false);
                     }
                 }
 
@@ -433,7 +390,7 @@ namespace Reactive4.NET.operators
                     }
                 }
 
-                public void OnNext(U element)
+                public void OnNext(bool element)
                 {
                     if (!done)
                     {

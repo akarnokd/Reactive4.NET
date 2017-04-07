@@ -1084,15 +1084,35 @@ namespace Reactive4.NET
             return new FlowableFilter<T>(source, predicate);
         }
 
+        /// <summary>
+        /// Maps each upstream value into an IPublisher, runs them one-by-one and after each other
+        /// and in case they emit a true, the original upstream value is passed to downstream.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="predicate">The function that receives the upstream item and should
+        /// return an IPublisher whose first boolean value determines if the upstream value
+        /// is passed to the downstream. Empty IPublisher is considered false.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> FilterAsync<T>(this IFlowable<T> source, Func<T, IPublisher<bool>> predicate)
         {
             return FilterAsync(source, predicate, BufferSize());
         }
 
+        /// <summary>
+        /// Maps each upstream value into an IPublisher, runs them one-by-one and after each other
+        /// and in case they emit a true, the original upstream value is passed to downstream.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="predicate">The function that receives the upstream item and should
+        /// return an IPublisher whose first boolean value determines if the upstream value
+        /// is passed to the downstream. Empty IPublisher is considered false.</param>
+        /// <param name="bufferSize">The number of items to prefetch and store from upstream.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> FilterAsync<T>(this IFlowable<T> source, Func<T, IPublisher<bool>> predicate, int bufferSize)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableFilterAsync<T>(source, predicate, bufferSize);
         }
 
         /// <summary>
