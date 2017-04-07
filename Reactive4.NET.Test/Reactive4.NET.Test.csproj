@@ -95,6 +95,7 @@
     <Compile Include="FlowableDelaySubscription1Tck.cs" />
     <Compile Include="FlowableDistinct1Tck.cs" />
     <Compile Include="FlowableCreateBufferl1Tck.cs" />
+    <Compile Include="FlowableMapAsync2Tck.cs" />
     <Compile Include="FlowableOnBackpressureBufferAll2Tck.cs" />
     <Compile Include="FlowableOnBackpressureBufferAll1Tck.cs" />
     <Compile Include="FlowableGenerate1Tck.cs" />
@@ -110,6 +111,7 @@
     <Compile Include="FlowableOnErrorResumeNext1Tck.cs" />
     <Compile Include="FlowableOnErrorReturn1Tck.cs" />
     <Compile Include="FlowableBufferSizeExact1Tck.cs" />
+    <Compile Include="FlowableMapAsync1Tck.cs" />
     <Compile Include="FlowableRetry1Tck.cs" />
     <Compile Include="FlowableRepeat1Tck.cs" />
     <Compile Include="FlowableSwitchIfEmptyEnumerable2Tck.cs" />

@@ -1001,16 +1001,72 @@ namespace Reactive4.NET
         /// <param name="mapper">The function that maps an upstream value into an IPublisher,
         /// runs it and takes its first value as the result to be emitted. An empty IPublisher
         /// will not trigger any emission.</param>
-        /// <returns></returns>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> MapAsync<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper)
         {
-            return MapAsync(source, mapper, Func2Second<T, R>.Instance);
+            return MapAsync(source, mapper, Func2Second<T, R>.Instance, BufferSize());
         }
 
+        /// <summary>
+        /// Maps each upstream value into an IPublisher, runs them one at a time and after the other
+        /// and takes their first item as the result to be emitted towards the downstream.
+        /// </summary>
+        /// <typeparam name="T">The input value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="mapper">The function that maps an upstream value into an IPublisher,
+        /// runs it and takes its first value as the result to be emitted. An empty IPublisher
+        /// will not trigger any emission.</param>
+        /// <param name="bufferSize">The size of the internal buffer and the prefetch amount of upstream
+        /// values; upstream items are held in a buffer until each of them gets a response from the mapped IPublisher.</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<R> MapAsync<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper, int bufferSize)
+        {
+            return MapAsync(source, mapper, Func2Second<T, R>.Instance, bufferSize);
+        }
+
+        /// <summary>
+        /// Maps each upstream value into an IPublisher, runs them one at a time and after the other
+        /// and takes their first item as the input to a result-mapper function that takes both the
+        /// original upstream item and the response from the IPublisher to create the result emitted
+        /// towards the downstream.
+        /// </summary>
+        /// <typeparam name="T">The input value type.</typeparam>
+        /// <typeparam name="U">The intermediate type of the async mapped result</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="mapper">The function that maps an upstream value into an IPublisher,
+        /// runs it and takes its first value as the result to be emitted. An empty IPublisher
+        /// will not trigger any emission.</param>
+        /// <param name="resultMapper">The function that takes the original upstream item and the
+        /// single value returned by the associated IPublisher and returns the value to be emitted.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> MapAsync<T, U, R>(this IFlowable<T> source, Func<T, IPublisher<U>> mapper, Func<T, U, R> resultMapper)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableMapAsync<T, U, R>(source, mapper, resultMapper, BufferSize());
+        }
+
+        /// <summary>
+        /// Maps each upstream value into an IPublisher, runs them one at a time and after the other
+        /// and takes their first item as the input to a result-mapper function that takes both the
+        /// original upstream item and the response from the IPublisher to create the result emitted
+        /// towards the downstream.
+        /// </summary>
+        /// <typeparam name="T">The input value type.</typeparam>
+        /// <typeparam name="U">The intermediate type of the async mapped result</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="mapper">The function that maps an upstream value into an IPublisher,
+        /// runs it and takes its first value as the result to be emitted. An empty IPublisher
+        /// will not trigger any emission.</param>
+        /// <param name="resultMapper">The function that takes the original upstream item and the
+        /// single value returned by the associated IPublisher and returns the value to be emitted.</param>
+        /// <param name="bufferSize">The size of the internal buffer and the prefetch amount of upstream
+        /// values; upstream items are held in a buffer until each of them gets a response from the mapped IPublisher.</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<R> MapAsync<T, U, R>(this IFlowable<T> source, Func<T, IPublisher<U>> mapper, Func<T, U, R> resultMapper, int bufferSize)
+        {
+            return new FlowableMapAsync<T, U, R>(source, mapper, resultMapper, bufferSize);
         }
 
         /// <summary>
@@ -1029,6 +1085,11 @@ namespace Reactive4.NET
         }
 
         public static IFlowable<T> FilterAsync<T>(this IFlowable<T> source, Func<T, IPublisher<bool>> predicate)
+        {
+            return FilterAsync(source, predicate, BufferSize());
+        }
+
+        public static IFlowable<T> FilterAsync<T>(this IFlowable<T> source, Func<T, IPublisher<bool>> predicate, int bufferSize)
         {
             // TODO implement
             throw new NotImplementedException();
