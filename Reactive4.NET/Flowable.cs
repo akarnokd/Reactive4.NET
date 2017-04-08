@@ -1853,10 +1853,22 @@ namespace Reactive4.NET
             return new FlowableRepeat<T>(source, stop, times);
         }
 
+        /// <summary>
+        /// Repeats the source if the IPublisher returned by the handler function signals
+        /// an item in response to the completion of the source. 
+        /// If that IPublisher signals a terminal event, the downstream is terminated
+        /// with the same terminal event.
+        /// </summary>
+        /// <typeparam name="T">The source and result value type.</typeparam>
+        /// <typeparam name="U">The handler's item type (not relevant)</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="handler">The handler function which receives an IFlowable
+        /// which emits an item if the source completed normally and should return an IPublisher
+        /// that emits an item at some point in time in response to indicate repeat should happen.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> RepeatWhen<T, U>(this IFlowable<T> source, Func<IFlowable<object>, IPublisher<U>> handler)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableRepeatWhen<T, U>(source, handler);
         }
 
         /// <summary>
@@ -1887,10 +1899,22 @@ namespace Reactive4.NET
             return new FlowableRetry<T>(source, predicate, times);
         }
 
+        /// <summary>
+        /// Retries the source if the IPublisher returned by the handler function signals
+        /// an item in response to the Exception the source emitted. 
+        /// If that IPublisher signals a terminal event, the downstream is terminated
+        /// with the same terminal event.
+        /// </summary>
+        /// <typeparam name="T">The source and result value type.</typeparam>
+        /// <typeparam name="U">The handler's item type (not relevant)</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="handler">The handler function which receives an IFlowable
+        /// which emits the Exception that caused the source failure and should return an IPublisher
+        /// that emits an item at some point in time in response to indicate retry should happen.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> RetryWhen<T, U>(this IFlowable<T> source, Func<IFlowable<Exception>, IPublisher<U>> handler)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableRetryWhen<T, U>(source, handler);
         }
 
         /// <summary>
@@ -2653,6 +2677,8 @@ namespace Reactive4.NET
         /// be freely subscribed to multiple times without causing multiple subscriptions
         /// to the source IFlowable and should return an IPublisher representing the result
         /// whose signals will be relayed to downstream.</param>
+        /// <param name="processorSupplier">The function asked to return a fresh IFlowableProcessor
+        /// instance to be used for sharing the connection to the source.</param>
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> Multicast<T, R>(this IFlowable<T> source, Func<IFlowable<T>, IPublisher<R>> handler, Func<IFlowableProcessor<T>> processorSupplier)
         {
