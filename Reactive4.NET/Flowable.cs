@@ -2144,21 +2144,50 @@ namespace Reactive4.NET
             return new FlowableWithLatestFromEnumerable<T, R>(source, others, combiner);
         }
 
-        public static IFlowable<T> Sample<T>(this IFlowable<T> source, TimeSpan period)
+        /// <summary>
+        /// Periodically samples the latest value of the source and emits this item, optionally
+        /// emitting the very last item if the source completes before the next period.
+        /// </summary>
+        /// <typeparam name="T">The source value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="period">The sampling period.</param>
+        /// <param name="emitLast">If true, the very last not-yet sampled item is emitted before completion.</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<T> Sample<T>(this IFlowable<T> source, TimeSpan period, bool emitLast = true)
         {
-            return Sample(source, period, Executors.Computation);
+            return Sample(source, Interval(period), emitLast);
         }
 
-        public static IFlowable<T> Sample<T>(this IFlowable<T> source, TimeSpan period, IExecutorService executor)
+        /// <summary>
+        /// Periodically samples the latest value, from the given executor, of the source and emits this item, optionally
+        /// emitting the very last item if the source completes before the next period.
+        /// </summary>
+        /// <typeparam name="T">The source value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="period">The sampling period.</param>
+        /// <param name="executor">The IExecutorService to use for the timed sampling.</param>
+        /// <param name="emitLast">If true, the very last not-yet sampled item is emitted before completion.</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<T> Sample<T>(this IFlowable<T> source, TimeSpan period, IExecutorService executor, bool emitLast = true)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return Sample(source, Interval(period, executor), emitLast);
         }
-
-        public static IFlowable<T> Sample<T, U>(this IFlowable<T> source, IPublisher<U> sampler)
+        /// <summary>
+        /// Emits the latest value of the upstream source when the sampler IPublisher signals an item,
+        /// optionally emitting the last item if the upstream terminates before the sampler IPublisher
+        /// signals its next item. If the sampler IPublisher terminates, the sequence whole terminates.
+        /// </summary>
+        /// <typeparam name="T">The upstream and result value type.</typeparam>
+        /// <typeparam name="U">The element type of the other IPublisher (not relevant).</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="sampler">The IPublisher whose items trigger a sampling and emission
+        /// of the latest item of the upstream source.</param>
+        /// <param name="emitLast">If true, the latest item from upstream is emitted when
+        /// the upstream or sampler terminates.</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<T> Sample<T, U>(this IFlowable<T> source, IPublisher<U> sampler, bool emitLast = true)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableSample<T, U>(source, sampler, emitLast);
         }
 
         public static IFlowable<T> Debounce<T>(this IFlowable<T> source, TimeSpan delay)
@@ -2461,38 +2490,173 @@ namespace Reactive4.NET
         // IConnectableFlowable related
         // ********************************************************************************
 
+        /// <summary>
+        /// Multicasts upstream items from upstream to multiple ISubscribers by sharing
+        /// the same underlying subscription to upstream. Items are emitted in a lockstep
+        /// fashion, in other words, when all currently subscribed ISubscribers are ready
+        /// to receive. Call Connect() to establish a connection.
+        /// </summary>
+        /// <typeparam name="T">The element type.</typeparam>
+        /// <param name="source">The upstream IFlowable source.</param>
+        /// <returns>The new IConnectableFlowable instance.</returns>
         public static IConnectableFlowable<T> Publish<T>(this IFlowable<T> source)
         {
             return Publish(source, BufferSize());
         }
 
+        /// <summary>
+        /// Multicasts upstream items from upstream to multiple ISubscribers by sharing
+        /// the same underlying subscription to upstream. Items are emitted in a lockstep
+        /// fashion, in other words, when all currently subscribed ISubscribers are ready
+        /// to receive. Call Connect() to establish a connection.
+        /// </summary>
+        /// <typeparam name="T">The element type.</typeparam>
+        /// <param name="source">The upstream IFlowable source.</param>
+        /// <param name="bufferSize">The number of items to prefetch and keep buffered from upstream.</param>
+        /// <returns>The new IConnectableFlowable instance.</returns>
         public static IConnectableFlowable<T> Publish<T>(this IFlowable<T> source, int bufferSize)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return Multicast(source, () => new PublishProcessor<T>(bufferSize));
         }
 
+        /// <summary>
+        /// Shares a single connection to the upstream IFlowable for the duration of the handler
+        /// function where the IFlowable provided can be subscribed to multiple times without
+        /// causing new connections to the upstream source and multicast signals to all
+        /// ISubscribers.
+        /// </summary>
+        /// <typeparam name="T">The source value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="handler">The handler that receives an IFlowable that can
+        /// be freely subscribed to multiple times without causing multiple subscriptions
+        /// to the source IFlowable and should return an IPublisher representing the result
+        /// whose signals will be relayed to downstream.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> Publish<T, R>(this IFlowable<T> source, Func<IFlowable<T>, IPublisher<R>> handler)
         {
             return Publish(source, handler, BufferSize());
         }
 
+        /// <summary>
+        /// Shares a single connection to the upstream IFlowable for the duration of the handler
+        /// function where the IFlowable provided can be subscribed to multiple times without
+        /// causing new connections to the upstream source and multicast signals to all
+        /// ISubscribers.
+        /// </summary>
+        /// <typeparam name="T">The source value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="handler">The handler that receives an IFlowable that can
+        /// be freely subscribed to multiple times without causing multiple subscriptions
+        /// to the source IFlowable and should return an IPublisher representing the result
+        /// whose signals will be relayed to downstream.</param>
+        /// <param name="bufferSize">The number of items to prefetch and buffer at a time.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> Publish<T, R>(this IFlowable<T> source, Func<IFlowable<T>, IPublisher<R>> handler, int bufferSize)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return Multicast(source, handler, () => new PublishProcessor<T>(bufferSize));
         }
 
+        /// <summary>
+        /// Multicasts the items of the upstream source IFlowable by sharing the same underlying
+        /// connection to it and relaying/replaying all elements to current and future ISubscribers.
+        /// </summary>
+        /// <typeparam name="T">The input and output value type</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <returns>The new IConnectableFlowable instance.</returns>
         public static IConnectableFlowable<T> Replay<T>(this IFlowable<T> source)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return Multicast(source, () => new ReplayProcessor<T>());
         }
 
-        public static IConnectableFlowable<R> Replay<T, R>(this IFlowable<T> source, Func<IFlowable<T>, IPublisher<R>> handler)
+
+        /// <summary>
+        /// Multicasts the items of the upstream source IFlowable by sharing the same underlying
+        /// connection to it and relaying all elements for current subscribers but
+        /// only the specified last number of elements to future ISubscribers.
+        /// </summary>
+        /// <typeparam name="T">The input and output value type</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="maxSize">The maximum number of items to cache for late ISubscribers.</param>
+        /// <returns>The new IConnectableFlowable instance.</returns>
+        public static IConnectableFlowable<T> Replay<T>(this IFlowable<T> source, int maxSize)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return Multicast(source, () => new ReplayProcessor<T>(maxSize));
+        }
+
+        /// <summary>
+        /// Shares a single connection to the upstream IFlowable for the duration of the handler
+        /// function where the IFlowable provided can be subscribed to multiple times without
+        /// causing new connections to the upstream source and relays/replays all signals to all
+        /// ISubscribers.
+        /// </summary>
+        /// <typeparam name="T">The source value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="handler">The handler that receives an IFlowable that can
+        /// be freely subscribed to multiple times without causing multiple subscriptions
+        /// to the source IFlowable and should return an IPublisher representing the result
+        /// whose signals will be relayed to downstream.</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<R> Replay<T, R>(this IFlowable<T> source, Func<IFlowable<T>, IPublisher<R>> handler)
+        {
+            return Multicast(source, handler, () => new ReplayProcessor<T>());
+        }
+
+        /// <summary>
+        /// Shares a single connection to the upstream IFlowable for the duration of the handler
+        /// function where the IFlowable provided can be subscribed to multiple times without
+        /// causing new connections to the upstream source and relays all signals to early
+        /// ISubscribers and the last given number of signals to late ISubscribers.
+        /// </summary>
+        /// <typeparam name="T">The source value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="handler">The handler that receives an IFlowable that can
+        /// be freely subscribed to multiple times without causing multiple subscriptions
+        /// to the source IFlowable and should return an IPublisher representing the result
+        /// whose signals will be relayed to downstream.</param>
+        /// <param name="maxSize">The maximum number of items to replay to late subscribers.</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<R> Replay<T, R>(this IFlowable<T> source, Func<IFlowable<T>, IPublisher<R>> handler, int maxSize)
+        {
+            return Multicast(source, handler, () => new ReplayProcessor<T>(maxSize));
+        }
+
+        /// <summary>
+        /// Multicasts the items of the upstream source IFlowable by sharing the same underlying
+        /// connection to it and routing events through the 
+        /// IFlowableProcessor supplied via a function.
+        /// </summary>
+        /// <typeparam name="T">The input and output value type</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="processorSupplier">The function asked to return a fresh IFlowableProcessor
+        /// instance to be used for sharing the connection to the source.</param>
+        /// <returns>The new IConnectableFlowable instance.</returns>
+        public static IConnectableFlowable<T> Multicast<T>(this IFlowable<T> source, Func<IFlowableProcessor<T>> processorSupplier)
+        {
+            return new ConnectableFlowableMulticast<T>(source, processorSupplier);
+        }
+
+        /// <summary>
+        /// Shares a single connection to the upstream IFlowable 
+        /// through an IFlowableProcessor supplied by the given function
+        /// for the duration of the handler
+        /// function where the IFlowable provided can be subscribed to multiple times without
+        /// causing new connections to the upstream source.
+        /// </summary>
+        /// <typeparam name="T">The source value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="handler">The handler that receives an IFlowable that can
+        /// be freely subscribed to multiple times without causing multiple subscriptions
+        /// to the source IFlowable and should return an IPublisher representing the result
+        /// whose signals will be relayed to downstream.</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<R> Multicast<T, R>(this IFlowable<T> source, Func<IFlowable<T>, IPublisher<R>> handler, Func<IFlowableProcessor<T>> processorSupplier)
+        {
+            return new FlowableMulticast<T, R>(source, handler, processorSupplier);
         }
 
         /// <summary>

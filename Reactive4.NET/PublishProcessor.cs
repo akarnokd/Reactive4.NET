@@ -60,6 +60,8 @@ namespace Reactive4.NET
 
         int consumed;
 
+        long emitted;
+
         /// <summary>
         /// Creates a PublishProcessor with a default prefetch amount.
         /// </summary>
@@ -308,6 +310,7 @@ namespace Reactive4.NET
             int f = consumed;
             int lim = limit;
             var q = Volatile.Read(ref queue);
+            var e = emitted;
 
             for (;;)
             {
@@ -322,9 +325,15 @@ namespace Reactive4.NET
                         {
                             r = Math.Min(r, s[i].Requested());
                         }
+                        bool changed = false;
 
-                        while (r != 0L)
+                        while (e != r)
                         {
+                            if (Volatile.Read(ref subscribers) != s)
+                            {
+                                changed = true;
+                                break;
+                            }
                             bool d = Volatile.Read(ref done);
                             bool empty = !q.Poll(out T v);
 
@@ -357,19 +366,28 @@ namespace Reactive4.NET
                                 inner.OnNext(v);
                             }
                             
-                            r--;
-                            if (++f == lim)
+                            e++;
+                            if (fusionMode != FusionSupport.SYNC)
                             {
-                                f = 0;
-                                if (fusionMode != FusionSupport.SYNC)
+                                if (++f == lim)
                                 {
+                                    f = 0;
                                     upstream.Request(lim);
                                 }
                             }
                         }
 
-                        if (r == 0)
+                        if (changed)
                         {
+                            continue;
+                        }
+
+                        if (e == r)
+                        {
+                            if (Volatile.Read(ref subscribers) != s)
+                            {
+                                continue;
+                            }
                             if (Volatile.Read(ref done) && q.IsEmpty())
                             {
                                 Exception ex = error;
@@ -396,6 +414,7 @@ namespace Reactive4.NET
                 if (w == missed)
                 {
                     consumed = f;
+                    emitted = e;
                     missed = Interlocked.Add(ref wip, -missed);
                     if (missed == 0)
                     {
@@ -454,6 +473,11 @@ namespace Reactive4.NET
             OnError(new OperationCanceledException());
         }
 
+        /// <summary>
+        /// Returns true if the upstream ISubscription has been disposed.
+        /// </summary>
+        public bool IsDisposed => SubscriptionHelper.IsCancelled(ref upstream);
+
         sealed class ProcessorSubscription : ISubscription
         {
             readonly IFlowableSubscriber<T> actual;
@@ -461,8 +485,6 @@ namespace Reactive4.NET
             readonly PublishProcessor<T> parent;
 
             long requested;
-
-            long emitted;
 
             internal ProcessorSubscription(IFlowableSubscriber<T> actual, PublishProcessor<T> parent)
             {
@@ -477,7 +499,7 @@ namespace Reactive4.NET
 
             internal long Requested()
             {
-                return Volatile.Read(ref requested) - emitted;
+                return Volatile.Read(ref requested);
             }
             public void Cancel()
             {
@@ -518,7 +540,6 @@ namespace Reactive4.NET
                 if (Volatile.Read(ref requested) != long.MinValue)
                 {
                     actual.OnNext(element);
-                    emitted++;
                 }
             }
 

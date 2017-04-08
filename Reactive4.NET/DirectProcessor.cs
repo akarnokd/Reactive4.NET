@@ -78,6 +78,11 @@ namespace Reactive4.NET
         }
 
         /// <summary>
+        /// Returns true if the upstream ISubscription has been disposed.
+        /// </summary>
+        public bool IsDisposed => SubscriptionHelper.IsCancelled(ref upstream);
+
+        /// <summary>
         /// Successful terminal state.
         /// No further events will be sent even if Reactive.Streams.ISubscription.Request(System.Int64)
         /// is invoked again.

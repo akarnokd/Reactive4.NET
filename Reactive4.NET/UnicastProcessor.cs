@@ -167,6 +167,11 @@ namespace Reactive4.NET
         }
 
         /// <summary>
+        /// Returns true if the upstream ISubscription has been disposed.
+        /// </summary>
+        public bool IsDisposed => SubscriptionHelper.IsCancelled(ref upstream);
+
+        /// <summary>
         /// Invoked after calling IPublisher.Subscribe(ISubscriber).
         /// No data will start flowing until ISubscription.Request(long)
         /// is invoked.

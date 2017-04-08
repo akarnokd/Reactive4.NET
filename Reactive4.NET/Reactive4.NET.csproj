@@ -48,6 +48,7 @@
     <Compile Include="BackpressureStrategy.cs" />
     <Compile Include="BufferStrategy.cs" />
     <Compile Include="AsyncProcessor.cs" />
+    <Compile Include="operators\ConnectableFlowableMulticast.cs" />
     <Compile Include="operators\FlowableBufferSizeOverlap.cs" />
     <Compile Include="operators\FlowableBufferSizeSkip.cs" />
     <Compile Include="operators\FlowableBufferSizeExact.cs" />
@@ -64,8 +65,10 @@
     <Compile Include="operators\FlowableOnErrorComplete.cs" />
     <Compile Include="operators\FlowableOnErrorResumeNext.cs" />
     <Compile Include="operators\FlowableOnErrorReturn.cs" />
+    <Compile Include="operators\FlowableMulticast.cs" />
     <Compile Include="operators\FlowableRetry.cs" />
     <Compile Include="operators\FlowableRepeat.cs" />
+    <Compile Include="operators\FlowableSample.cs" />
     <Compile Include="operators\FlowableScan.cs" />
     <Compile Include="operators\FlowableScanWith.cs" />
     <Compile Include="operators\FlowableSkipLast.cs" />
@@ -131,6 +134,8 @@
     <Compile Include="subscribers\BlockingSubscriber.cs" />
     <Compile Include="subscribers\BlockingLambdaSubscriber.cs" />
     <Compile Include="subscribers\BlockingEnumeratorSubscriber.cs" />
+    <Compile Include="subscribers\HalfSerializedConditionalSubscriber.cs" />
+    <Compile Include="subscribers\HalfSerializedSubscriber.cs" />
     <Compile Include="subscribers\TaskLastSubscriber.cs" />
     <Compile Include="subscribers\TaskFirstSubscriber.cs" />
     <Compile Include="subscribers\TaskIgnoreElementsSubscriber.cs" />

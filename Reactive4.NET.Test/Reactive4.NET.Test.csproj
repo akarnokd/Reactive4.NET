@@ -57,6 +57,7 @@
     <Compile Include="AsyncProcessor2Tck.cs" />
     <Compile Include="AsyncProcessor1Tck.cs" />
     <Compile Include="Benchmark.cs" />
+    <Compile Include="ConnectableFlowableReplay1Tck.cs" />
     <Compile Include="FlowableAmb2Tck.cs" />
     <Compile Include="FlowableBufferSizeOverlap1Tck.cs" />
     <Compile Include="FlowableBufferSizeSkip1Tck.cs" />
@@ -115,6 +116,7 @@
     <Compile Include="FlowableBufferSizeExact1Tck.cs" />
     <Compile Include="FlowableMapAsync1Tck.cs" />
     <Compile Include="FlowableOnBackpressureBuffer1Tck.cs" />
+    <Compile Include="ConnectableFlowablePublish1Tck.cs" />
     <Compile Include="FlowableScanWith1Tck.cs" />
     <Compile Include="FlowableScan1Tck.cs" />
     <Compile Include="FlowableRetry1Tck.cs" />
@@ -235,6 +237,9 @@
     <Compile Include="FlowableDefaultIfEmptyTest.cs" />
     <Compile Include="FlowableBufferSizeOverlapTest.cs" />
     <Compile Include="ComputationTest.cs" />
+    <Compile Include="FlowableSampleTest.cs" />
+    <Compile Include="ConnectableFlowablePublishTest.cs" />
+    <Compile Include="FlowableMulticastTest.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Benchmarks.cs" />
   </ItemGroup>

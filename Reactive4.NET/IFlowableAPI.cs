@@ -204,6 +204,11 @@ namespace Reactive4.NET
         /// Indicates there are any subscribers subscribed to this IFlowableProcessor.
         /// </summary>
         bool HasSubscribers { get; }
+
+        /// <summary>
+        /// Indicates this IFlowableProcessor has been manually disposed.
+        /// </summary>
+        bool IsDisposed { get; }
     }
 
     /// <summary>

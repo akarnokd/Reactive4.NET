@@ -35,6 +35,11 @@ namespace Reactive4.NET.operators
             }
         }
 
+        /// <summary>
+        /// Returns true if the source IFlowableProcessor has been disposed.
+        /// </summary>
+        public bool IsDisposed => Volatile.Read(ref count) == int.MinValue;
+
         public void OnComplete()
         {
             if (Interlocked.Exchange(ref count, int.MinValue) != int.MinValue)

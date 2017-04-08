@@ -194,5 +194,10 @@ namespace Reactive4.NET.operators
         {
             Cancel();
         }
+
+        /// <summary>
+        /// Returns true if the upstream ISubscription has been disposed.
+        /// </summary>
+        public bool IsDisposed => Volatile.Read(ref cancelled);
     }
 }
