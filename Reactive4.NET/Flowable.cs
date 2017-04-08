@@ -1968,26 +1968,74 @@ namespace Reactive4.NET
             return new FlowableOnErrorResumeNext<T>(source, handler);
         }
 
+        /// <summary>
+        /// Switches to the fallback IPublisher or signals a TimeoutException if the next item from
+        /// the source IFlowable doesn't arrive within te specified itemTimeout.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance</param>
+        /// <param name="itemTimeout">The timeout value for the first and subsequent items relative
+        /// to the last emission.</param>
+        /// <param name="fallback">The optional IPublisher to switch to if there is a timeout, if
+        /// null, a TimeoutException is signalled instead.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Timeout<T>(this IFlowable<T> source, TimeSpan itemTimeout, IPublisher<T> fallback = null)
         {
-            return Timeout<T>(source, itemTimeout, Executors.Computation, fallback);
+            return Timeout(source, itemTimeout, itemTimeout, Executors.Computation, fallback);
         }
 
+        /// <summary>
+        /// Switches to the fallback IPublisher or signals a TimeoutException if the next item from
+        /// the source IFlowable doesn't arrive within te specified itemTimeout.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance</param>
+        /// <param name="itemTimeout">The timeout value for the first and subsequent items relative
+        /// to the last emission.</param>
+        /// <param name="executor">The IExecutorService where the wait should happen.</param>
+        /// <param name="fallback">The optional IPublisher to switch to if there is a timeout, if
+        /// null, a TimeoutException is signalled instead.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Timeout<T>(this IFlowable<T> source, TimeSpan itemTimeout, IExecutorService executor, IPublisher<T> fallback = null)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return Timeout(source, itemTimeout, itemTimeout, executor, fallback);
         }
 
+        /// <summary>
+        /// Switches to the fallback IPublisher or signals a TimeoutException if the next item from
+        /// the source IFlowable doesn't arrive within te specified itemTimeout.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance</param>
+        /// <param name="firstTimeout">The timeout for the first item relative to when the subscription
+        /// happened.</param>
+        /// <param name="itemTimeout">The timeout value for the subsequent items relative
+        /// to the last emission.</param>
+        /// <param name="fallback">The optional IPublisher to switch to if there is a timeout, if
+        /// null, a TimeoutException is signalled instead.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Timeout<T>(this IFlowable<T> source, TimeSpan firstTimeout, TimeSpan itemTimeout, IPublisher<T> fallback = null)
         {
-            return Timeout<T>(source, firstTimeout, itemTimeout, Executors.Computation, fallback);
+            return Timeout(source, firstTimeout, itemTimeout, Executors.Computation, fallback);
         }
 
+        /// <summary>
+        /// Switches to the fallback IPublisher or signals a TimeoutException if the next item from
+        /// the source IFlowable doesn't arrive within te specified itemTimeout.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance</param>
+        /// <param name="firstTimeout">The timeout for the first item relative to when the subscription
+        /// happened.</param>
+        /// <param name="itemTimeout">The timeout value for the subsequent items relative
+        /// to the last emission.</param>
+        /// <param name="executor">The IExecutorService where the wait should happen.</param>
+        /// <param name="fallback">The optional IPublisher to switch to if there is a timeout, if
+        /// null, a TimeoutException is signalled instead.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Timeout<T>(this IFlowable<T> source, TimeSpan firstTimeout, TimeSpan itemTimeout, IExecutorService executor, IPublisher<T> fallback = null)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableTimeout<T>(source, firstTimeout, itemTimeout, executor, fallback);
         }
 
         /// <summary>

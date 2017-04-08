@@ -32,7 +32,7 @@ namespace Reactive4.NET.schedulers
             long due = SchedulerHelper.NowUTC() + (long)delay.TotalMilliseconds;
             long id = Interlocked.Increment(ref index);
 
-            var tt = new TimedTask(action, due, id);
+            var tt = new TimedTask(action, due, id, queue);
             if (Offer(tt))
             {
                 return tt;
@@ -61,14 +61,14 @@ namespace Reactive4.NET.schedulers
                 action();
                 var duePeriod = due + (long)(++count[0] * period.TotalMilliseconds);
                 var idPeriod = Interlocked.Increment(ref index);
-                var periodTT = new TimedTask(recursive, duePeriod, idPeriod);
+                var periodTT = new TimedTask(recursive, duePeriod, idPeriod, queue);
                 if (Offer(periodTT))
                 {
                     outer.Replace(periodTT);
                 }
             };
 
-            var tt = new TimedTask(recursive, due, id);
+            var tt = new TimedTask(recursive, due, id, queue);
 
             if (Offer(tt))
             {
@@ -150,6 +150,12 @@ namespace Reactive4.NET.schedulers
                                 q.Remove(tt);
                             }
                             else
+                            if (Volatile.Read(ref tt.action) == null)
+                            {
+                                q.Remove(tt);
+                                continue;
+                            }
+                            else
                             {
                                 next = (int)Math.Max(0, tt.due - now);
                                 tt = null;
@@ -171,16 +177,14 @@ namespace Reactive4.NET.schedulers
                             }
                             return;
                         }
-                        if (!Volatile.Read(ref tt.cancelled))
+                        var a = Volatile.Read(ref tt.action);
+                        try
                         {
-                            try
-                            {
-                                tt.action();
-                            }
-                            catch
-                            {
-                                // TODO what should happen here?
-                            }
+                            a?.Invoke();
+                        }
+                        catch
+                        {
+                            // TODO what should happen here?
                         }
                     }
                     else
@@ -205,19 +209,20 @@ namespace Reactive4.NET.schedulers
 
         sealed class TimedTask : IComparable<TimedTask>, IDisposable
         {
-            internal readonly Action action;
-
             internal readonly long due;
 
             internal readonly long index;
 
-            internal bool cancelled;
+            SortedSet<TimedTask> queue;
 
-            internal TimedTask(Action action, long due, long index)
+            internal Action action;
+
+            internal TimedTask(Action action, long due, long index, SortedSet<TimedTask> queue)
             {
                 this.action = action;
                 this.due = due;
                 this.index = index;
+                this.queue = queue;
             }
 
             public int CompareTo(TimedTask other)
@@ -231,7 +236,16 @@ namespace Reactive4.NET.schedulers
 
             public void Dispose()
             {
-                Volatile.Write(ref cancelled, true);
+                if (Interlocked.Exchange(ref action, null) != null)
+                {
+                    var q = queue;
+                    queue = null;
+
+                    lock (q)
+                    {
+                        q.Remove(this);
+                    }
+                }
             }
         }
     }

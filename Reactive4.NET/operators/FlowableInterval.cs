@@ -50,7 +50,6 @@ namespace Reactive4.NET.operators
             internal IntervalSubscription(IFlowableSubscriber<long> actual)
             {
                 this.actual = actual;
-                this.available = -1L;
             }
 
             public void Cancel()

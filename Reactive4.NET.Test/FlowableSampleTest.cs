@@ -13,7 +13,10 @@ namespace Reactive4.NET.Test
         public void Normal()
         {
             Flowable.Interval(TimeSpan.FromMilliseconds(2))
-                .Map(v => 1)
+                .Map(v => {
+                    Console.WriteLine(1);
+                    return 1;
+                })
                 .Sample(TimeSpan.FromMilliseconds(10))
                 .Take(10)
                 .Test()

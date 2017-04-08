@@ -60,8 +60,6 @@ namespace Reactive4.NET
 
         int consumed;
 
-        long emitted;
-
         /// <summary>
         /// Creates a PublishProcessor with a default prefetch amount.
         /// </summary>
@@ -310,7 +308,6 @@ namespace Reactive4.NET
             int f = consumed;
             int lim = limit;
             var q = Volatile.Read(ref queue);
-            var e = emitted;
 
             for (;;)
             {
@@ -320,14 +317,25 @@ namespace Reactive4.NET
                     int n = s.Length;
                     if (n != 0)
                     {
-                        long r = s[0].Requested();
-                        for (int i = 1; i < n; i++)
+                        long r = -1L;
+                        for (int i = 0; i < n; i++)
                         {
-                            r = Math.Min(r, s[i].Requested());
+                            var ra = s[i].Requested();
+                            if (ra >= 0L)
+                            {
+                                if (r == -1L)
+                                {
+                                    r = ra;
+                                }
+                                else
+                                {
+                                    r = Math.Min(r, ra);
+                                }
+                            }
                         }
                         bool changed = false;
 
-                        while (e != r)
+                        while (r > 0L)
                         {
                             if (Volatile.Read(ref subscribers) != s)
                             {
@@ -366,7 +374,7 @@ namespace Reactive4.NET
                                 inner.OnNext(v);
                             }
                             
-                            e++;
+                            r--;
                             if (fusionMode != FusionSupport.SYNC)
                             {
                                 if (++f == lim)
@@ -382,7 +390,7 @@ namespace Reactive4.NET
                             continue;
                         }
 
-                        if (e == r)
+                        if (r == 0)
                         {
                             if (Volatile.Read(ref subscribers) != s)
                             {
@@ -414,7 +422,6 @@ namespace Reactive4.NET
                 if (w == missed)
                 {
                     consumed = f;
-                    emitted = e;
                     missed = Interlocked.Add(ref wip, -missed);
                     if (missed == 0)
                     {
@@ -486,6 +493,8 @@ namespace Reactive4.NET
 
             long requested;
 
+            long emitted;
+
             internal ProcessorSubscription(IFlowableSubscriber<T> actual, PublishProcessor<T> parent)
             {
                 this.actual = actual;
@@ -499,7 +508,7 @@ namespace Reactive4.NET
 
             internal long Requested()
             {
-                return Volatile.Read(ref requested);
+                return Volatile.Read(ref requested) - emitted;
             }
             public void Cancel()
             {
@@ -539,6 +548,7 @@ namespace Reactive4.NET
             {
                 if (Volatile.Read(ref requested) != long.MinValue)
                 {
+                    emitted++;
                     actual.OnNext(element);
                 }
             }

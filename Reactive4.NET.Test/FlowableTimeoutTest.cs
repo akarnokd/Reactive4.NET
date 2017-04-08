@@ -1,36 +1,49 @@
 ﻿using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Reactive4.NET.Test
 {
     [TestFixture]
-    class FlowableDelayTest
+    public class FlowableTimeoutTest
     {
         [Test]
         public void Normal()
         {
-            Flowable.Range(1, 100)
-                .Delay(TimeSpan.FromMilliseconds(1), Executors.Single)
+            Flowable.Range(1, 5).Timeout(TimeSpan.FromMinutes(5))
                 .Test()
-                .AwaitDone(TimeSpan.FromSeconds(5))
-                .AssertResult(Enumerable.Range(1, 100).ToArray());
+                .AssertResult(1, 2, 3, 4, 5);
         }
 
+        [Test]
+        public void Fallback()
+        {
+            Flowable.Never<int>().Timeout(TimeSpan.FromMilliseconds(100), Flowable.Range(1, 5))
+                .Test()
+                .AwaitDone(TimeSpan.FromSeconds(5))
+                .AssertResult(1, 2, 3, 4, 5);
+        }
+
+        [Test]
+        public void Fallback2()
+        {
+            Flowable.Just(0)
+                .ConcatWith(Flowable.Never<int>())
+                .Timeout(TimeSpan.FromMilliseconds(100), Flowable.Range(1, 5))
+                .Test()
+                .AwaitDone(TimeSpan.FromSeconds(5))
+                .AssertResult(0, 1, 2, 3, 4, 5);
+        }
 
         WeakReference<TestSubscriber<int>> RunLeak()
         {
             TestSubscriber<int> ts = new TestSubscriber<int>(1);
             WeakReference<TestSubscriber<int>> wr = new WeakReference<TestSubscriber<int>>(ts);
 
-            Flowable.Range(1, 3).Delay(TimeSpan.FromMilliseconds(1), Executors.Single)
-            .Subscribe(ts);
-
-            Thread.Sleep(25);
+            //Flowable.Range(1, 10)
+                Flowable.Never<int>().Timeout(TimeSpan.FromSeconds(100))
+                .Subscribe(ts);
 
             ts.Cancel();
 

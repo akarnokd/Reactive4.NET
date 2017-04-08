@@ -83,6 +83,7 @@
     <Compile Include="operators\FlowableSkipWhile.cs" />
     <Compile Include="operators\FlowableTakeUntilPredicate.cs" />
     <Compile Include="operators\FlowableTakeWhile.cs" />
+    <Compile Include="operators\FlowableTimeout.cs" />
     <Compile Include="operators\FlowableWithLatestFromEnumerable.cs" />
     <Compile Include="operators\FlowableWithLatestFromArray.cs" />
     <Compile Include="operators\FlowableWithLatestFrom.cs" />
@@ -153,7 +154,6 @@
     <Compile Include="IFlowableAPI.cs" />
     <Compile Include="IFlowableEmitter.cs" />
     <Compile Include="IGeneratorEmitter.cs" />
-    <Compile Include="IParallelFlowable.cs" />
     <Compile Include="operators\AbstractFlowable.cs" />
     <Compile Include="operators\FlowableEnumerable.cs" />
     <Compile Include="operators\FlowableDefer.cs" />

@@ -93,20 +93,19 @@ namespace Reactive4.NET.schedulers
             if (Prepare())
             {
                 var run = runner;
-                var cts = new CancellationTokenSource();
-
                 var t = new InterruptibleAction(task);
                 t.parent = worker;
-                t.resource = cts;
-                cts.Token.Register(t.Dispose);
-
-                var d = timed.Schedule(() =>
+                if (worker == null || worker.AddAction(t))
                 {
-                    run.Offer(t.Run);
-                }, delay);
-                cts.Token.Register(d.Dispose);
+                    var d = timed.Schedule(() =>
+                    {
+                        run.Offer(t.Run);
+                    }, delay);
 
-                return cts;
+                    DisposableHelper.Replace(ref t.resource, d);
+
+                    return t;
+                }
             }
             return EmptyDisposable.Instance;
         }
@@ -118,24 +117,22 @@ namespace Reactive4.NET.schedulers
                 var run = runner;
                 var cts = new CancellationTokenSource();
 
-                var t = new InterruptibleAction(task);
+                var t = new InterruptibleAction(task, true);
                 t.parent = worker;
-                t.resource = cts;
-                cts.Token.Register(t.Dispose);
 
-                var d = timed.Schedule(() =>
+                if (worker == null || worker.AddAction(t))
                 {
-                    if (worker == null || worker.AddAction(t))
+                    var d = timed.Schedule(() =>
                     {
                         if (t.Reset())
                         {
                             run.Offer(t.Run);
                         }
-                    }
-                }, initialDelay, period);
-                cts.Token.Register(d.Dispose);
+                    }, initialDelay, period);
+                    DisposableHelper.Replace(ref t.resource, d);
 
-                return cts;
+                    return t;
+                }
             }
             return EmptyDisposable.Instance;
         }

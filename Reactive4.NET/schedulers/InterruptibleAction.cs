@@ -9,7 +9,9 @@ namespace Reactive4.NET.schedulers
 {
     internal sealed class InterruptibleAction : IDisposable
     {
-        readonly Action action;
+        readonly bool periodic;
+
+        Action action;
 
         int state;
         static readonly int Fresh = 0;
@@ -25,9 +27,10 @@ namespace Reactive4.NET.schedulers
 
         internal IDisposable resource;
 
-        internal InterruptibleAction(Action action)
+        internal InterruptibleAction(Action action, bool periodic = false)
         {
             this.action = action;
+            this.periodic = periodic;
         }
 
         internal void Run()
@@ -35,11 +38,15 @@ namespace Reactive4.NET.schedulers
             Volatile.Write(ref runner, Thread.CurrentThread);
             if (Interlocked.CompareExchange(ref state, Running, Fresh) == Fresh)
             {
-                action();
+                Volatile.Read(ref action)?.Invoke();
                 if (Interlocked.CompareExchange(ref state, Completed, Running) == Running)
                 {
                     runner = null;
-                    parent?.DeleteAction(this);
+                    if (!periodic)
+                    {
+                        action = null;
+                        parent?.DeleteAction(this);
+                    }
                     return;
                 }
             }
@@ -72,7 +79,11 @@ namespace Reactive4.NET.schedulers
 #endif
             }
             runner = null;
-            parent?.DeleteAction(this);
+            if (!periodic)
+            {
+                action = null;
+                parent?.DeleteAction(this);
+            }
         }
 
         public void Dispose()
@@ -88,6 +99,7 @@ namespace Reactive4.NET.schedulers
                     Volatile.Write(ref state, Interrupted);
                 }
             }
+            Interlocked.Exchange(ref action, null);
             Interlocked.Exchange(ref parent, null)?.DeleteAction(this);
             Interlocked.Exchange(ref resource, null)?.Dispose();
         }
