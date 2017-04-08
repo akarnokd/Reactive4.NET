@@ -234,6 +234,7 @@
     <Compile Include="FlowableGroupByTest.cs" />
     <Compile Include="FlowableDefaultIfEmptyTest.cs" />
     <Compile Include="FlowableBufferSizeOverlapTest.cs" />
+    <Compile Include="ComputationTest.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Benchmarks.cs" />
   </ItemGroup>

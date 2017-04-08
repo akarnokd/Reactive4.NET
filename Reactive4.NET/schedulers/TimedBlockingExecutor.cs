@@ -133,6 +133,7 @@ namespace Reactive4.NET.schedulers
                     {
                         q.Clear();
                     }
+                    break;
                 }
                 else
                 {
@@ -150,7 +151,8 @@ namespace Reactive4.NET.schedulers
                             }
                             else
                             {
-                                next = (int)Math.Max(int.MaxValue, tt.due - now);
+                                next = (int)Math.Max(0, tt.due - now);
+                                tt = null;
                             }
                         }
                         else
@@ -180,8 +182,17 @@ namespace Reactive4.NET.schedulers
                                 // TODO what should happen here?
                             }
                         }
-                    } else
+                    }
+                    else
                     {
+                        if (Volatile.Read(ref shutdown))
+                        {
+                            lock (q)
+                            {
+                                q.Clear();
+                            }
+                            return;
+                        }
                         if (Monitor.TryEnter(this))
                         {
                             Monitor.Wait(this, next);
