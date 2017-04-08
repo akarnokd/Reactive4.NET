@@ -2680,10 +2680,19 @@ namespace Reactive4.NET
             return new FlowableAutoConnect<T>(source, count, onConnect);
         }
 
+        /// <summary>
+        /// Connects to the IConnectableFlowable when the ISubscriber count passes the given
+        /// count (default 1) and disconnects if all ISubscribers cancel their subscriptions,
+        /// allowing to repeat this process as necessary.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IConnectableFlowable instance.</param>
+        /// <param name="count">The number of ISubscribers required to connect the
+        /// given IConnectableFlowable instance.</param>
+        /// <returns>The new IFlowable instnace.</returns>
         public static IFlowable<T> RefCount<T>(this IConnectableFlowable<T> source, int count = 1)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableRefCount<T>(source, count);
         }
 
         /// <summary>

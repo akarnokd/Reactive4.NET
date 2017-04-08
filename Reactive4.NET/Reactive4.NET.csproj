@@ -66,6 +66,7 @@
     <Compile Include="operators\FlowableOnErrorResumeNext.cs" />
     <Compile Include="operators\FlowableOnErrorReturn.cs" />
     <Compile Include="operators\FlowableMulticast.cs" />
+    <Compile Include="operators\FlowableRefCount.cs" />
     <Compile Include="operators\FlowableRetry.cs" />
     <Compile Include="operators\FlowableRepeat.cs" />
     <Compile Include="operators\FlowableSample.cs" />

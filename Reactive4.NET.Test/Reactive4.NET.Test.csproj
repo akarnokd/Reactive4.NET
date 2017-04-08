@@ -117,6 +117,7 @@
     <Compile Include="FlowableMapAsync1Tck.cs" />
     <Compile Include="FlowableOnBackpressureBuffer1Tck.cs" />
     <Compile Include="ConnectableFlowablePublish1Tck.cs" />
+    <Compile Include="FlowableRefCount1Tck.cs" />
     <Compile Include="FlowableScanWith1Tck.cs" />
     <Compile Include="FlowableScan1Tck.cs" />
     <Compile Include="FlowableRetry1Tck.cs" />
@@ -240,6 +241,7 @@
     <Compile Include="FlowableSampleTest.cs" />
     <Compile Include="ConnectableFlowablePublishTest.cs" />
     <Compile Include="FlowableMulticastTest.cs" />
+    <Compile Include="FlowableRefCountTest.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Benchmarks.cs" />
   </ItemGroup>
