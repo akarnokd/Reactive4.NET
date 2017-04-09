@@ -42,10 +42,18 @@ namespace Reactive4.NET
             return Parallel(source, parallelism, Flowable.BufferSize());
         }
 
+        /// <summary>
+        /// Creates an IParallelFlowable with the provided parallelism
+        /// and prefetch/buffer amount.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="parallelism">The number of parallel 'rail's to create, positive.</param>
+        /// <param name="bufferSize">The prefetch/buffer amount towards the downstream.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
         public static IParallelFlowable<T> Parallel<T>(this IFlowable<T> source, int parallelism, int bufferSize)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new ParallelFlowableFork<T>(source, parallelism, bufferSize);
         }
 
         /// <summary>
@@ -76,15 +84,29 @@ namespace Reactive4.NET
             return new ParallelFlowableRunOn<T>(source, executor, bufferSize);
         }
 
+        /// <summary>
+        /// Consumes all rails of the IParallelFlowable and serializes them back into a
+        /// single sequential IFlowable in a round-robin fashion.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Sequential<T>(this IParallelFlowable<T> source)
         {
             return Sequential(source, Flowable.BufferSize());
         }
 
+        /// <summary>
+        /// Consumes all rails of the IParallelFlowable and serializes them back into a
+        /// single sequential IFlowable in a round-robin fashion.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="prefetch">The prefetch amount and buffer size for consuming each rail.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Sequential<T>(this IParallelFlowable<T> source, int prefetch)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new ParallelFlowableJoin<T>(source, prefetch);
         }
 
         public static IParallelFlowable<R> Map<T, R>(this IParallelFlowable<T> source, Func<T, R> mapper)

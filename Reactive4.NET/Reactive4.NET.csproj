@@ -129,6 +129,8 @@
     <Compile Include="operators\FlowableUsing.cs" />
     <Compile Include="operators\FlowableZipArray.cs" />
     <Compile Include="operators\ParallelFlowableArray.cs" />
+    <Compile Include="operators\ParallelFlowableFork.cs" />
+    <Compile Include="operators\ParallelFlowableJoin.cs" />
     <Compile Include="operators\ParallelFlowableRunOn.cs" />
     <Compile Include="ParallelFlowable.cs" />
     <Compile Include="ReplayProcessor.cs" />

@@ -638,6 +638,33 @@ namespace Reactive4.NET
         }
 
         /// <summary>
+        /// Assert that all values received are in the set and 
+        /// all values in the set have been received.
+        /// </summary>
+        /// <param name="set">The set to check for equal value count (but any order).</param>
+        /// <returns>this</returns>
+        public TestSubscriber<T> AssertValueSet(ISet<T> set)
+        {
+            var vc = Volatile.Read(ref valueCount);
+            int n = set.Count;
+            if (vc != n)
+            {
+                throw Fail("Different value count; Expected = " + n + ", Actual = " + vc);
+            }
+
+            for (int i = 0; i < n; i++)
+            {
+                var v = values[i];
+                if (!set.Contains(v))
+                {
+                    throw Fail("Value at " + i + " [" + AsString(v) + "] is not in the set");
+                }
+            }
+
+            return this;
+        }
+
+        /// <summary>
         /// The current received value count.
         /// </summary>
         public long ValueCount => Volatile.Read(ref valueCount);

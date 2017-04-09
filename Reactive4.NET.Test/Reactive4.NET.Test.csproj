@@ -258,6 +258,7 @@
     <Compile Include="FlowableThrottleFirstTest.cs" />
     <Compile Include="FlowableWindowTest.cs" />
     <Compile Include="FlowableBufferBoundaryTest.cs" />
+    <Compile Include="ParallelFlowableTest.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Benchmarks.cs" />
   </ItemGroup>
