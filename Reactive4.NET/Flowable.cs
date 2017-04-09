@@ -2262,10 +2262,33 @@ namespace Reactive4.NET
             return new FlowableSample<T, U>(source, sampler, emitLast);
         }
 
+        /// <summary>
+        /// Emits the latest item if there are no newer items from upstream arriving within
+        /// the delay window. Otherwise the grace period start over with the new item.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="delay">The grace period where no newer items should arrive from upstream
+        /// in order to emit the latest item.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Debounce<T>(this IFlowable<T> source, TimeSpan delay)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return Debounce(source, delay, Executors.Computation);
+        }
+
+        /// <summary>
+        /// Emits the latest item if there are no newer items from upstream arriving within
+        /// the delay window. Otherwise the grace period start over with the new item.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="delay">The grace period where no newer items should arrive from upstream
+        /// in order to emit the latest item.</param>
+        /// <param name="executor">The IExecutorService to use for the timing and emission</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<T> Debounce<T>(this IFlowable<T> source, TimeSpan delay, IExecutorService executor)
+        {
+            return new FlowableDebounce<T>(source, delay, executor);
         }
 
         public static IFlowable<T> ThrottleFirst<T>(this IFlowable<T> source, TimeSpan delay)
@@ -2274,16 +2297,66 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
-        public static IFlowable<T> ThrottleLast<T>(this IFlowable<T> source, TimeSpan delay)
+        public static IFlowable<T> ThrottleFirst<T>(this IFlowable<T> source, TimeSpan delay, IExecutorService executor)
         {
             // TODO implement
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Emits the latest value from upstream at the specified time intervals.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="delay">The periodicity at which the latest item should be emitted
+        /// (each such item only once).</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<T> ThrottleLast<T>(this IFlowable<T> source, TimeSpan delay)
+        {
+            return Sample(source, delay, Executors.Computation);
+        }
+
+        /// <summary>
+        /// Emits the latest value from upstream at the specified time intervals.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="delay">The periodicity at which the latest item should be emitted
+        /// (each such item only once).</param>
+        /// <param name="executor">The IExecutorService to use for the timing and emission</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<T> ThrottleLast<T>(this IFlowable<T> source, TimeSpan delay, IExecutorService executor)
+        {
+            return Sample(source, delay, executor);
+        }
+
+        /// <summary>
+        /// Emits the latest item if there are no newer items from upstream arriving within
+        /// the delay window. Otherwise the grace period start over with the new item.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="delay">The grace period where no newer items should arrive from upstream
+        /// in order to emit the latest item.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> ThrottleWithTimeout<T>(this IFlowable<T> source, TimeSpan delay)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return Debounce(source, delay, Executors.Computation);
+        }
+
+        /// <summary>
+        /// Emits the latest item if there are no newer items from upstream arriving within
+        /// the delay window. Otherwise the grace period start over with the new item.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="delay">The grace period where no newer items should arrive from upstream
+        /// in order to emit the latest item.</param>
+        /// <param name="executor">The IExecutorService to use for the timing and emission</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<T> ThrottleWithTimeout<T>(this IFlowable<T> source, TimeSpan delay, IExecutorService executor)
+        {
+            return Debounce(source, delay, executor);
         }
 
         /// <summary>

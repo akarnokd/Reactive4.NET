@@ -53,6 +53,7 @@
     <Compile Include="operators\FlowableBufferSizeSkip.cs" />
     <Compile Include="operators\FlowableBufferSizeExact.cs" />
     <Compile Include="operators\FlowableConcatMapEager.cs" />
+    <Compile Include="operators\FlowableDebounce.cs" />
     <Compile Include="operators\FlowableDefaultIfEmpty.cs" />
     <Compile Include="operators\FlowableFlatMapEnumerable.cs" />
     <Compile Include="operators\FlowableGroupBy.cs" />
