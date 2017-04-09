@@ -132,5 +132,91 @@ namespace Reactive4.NET.Test
                 }
             }
         }
+
+        [Test]
+        public void Map()
+        {
+            for (int j = 0; j <= 100; j++)
+            {
+                for (int i = 1; i < 33; i++)
+                {
+                    Flowable.Range(1, j)
+                        .Parallel(i)
+                        .Map(v => v + 1)
+                        .Sequential()
+                        .Test()
+                        .WithTag("len=" + j + ", i=" + i)
+                        .AssertValueCount(j)
+                        .AssertValues(Enumerable.Range(2, j))
+                        .AssertNoError()
+                        .AssertComplete();
+                }
+            }
+        }
+
+        [Test]
+        public void MapConditional()
+        {
+            for (int j = 0; j <= 100; j++)
+            {
+                for (int i = 1; i < 33; i++)
+                {
+                    Flowable.Range(1, j)
+                        .Parallel(i)
+                        .Map(v => v + 1)
+                        .Filter(v => true)
+                        .Sequential()
+                        .Test()
+                        .WithTag("len=" + j + ", i=" + i)
+                        .AssertValueCount(j)
+                        .AssertValues(Enumerable.Range(2, j))
+                        .AssertNoError()
+                        .AssertComplete();
+                }
+            }
+        }
+
+        [Test]
+        public void Filter()
+        {
+            for (int j = 0; j <= 100; j++)
+            {
+                for (int i = 1; i < 33; i++)
+                {
+                    Flowable.Range(1, j)
+                        .Parallel(i)
+                        .Filter(v => true)
+                        .Sequential()
+                        .Test()
+                        .WithTag("len=" + j + ", i=" + i)
+                        .AssertValueCount(j)
+                        .AssertValues(Enumerable.Range(1, j))
+                        .AssertNoError()
+                        .AssertComplete();
+                }
+            }
+        }
+
+        [Test]
+        public void FilterConditional()
+        {
+            for (int j = 0; j <= 100; j++)
+            {
+                for (int i = 1; i < 33; i++)
+                {
+                    Flowable.Range(1, j)
+                        .Parallel(i)
+                        .Filter(v => true)
+                        .Filter(v => true)
+                        .Sequential()
+                        .Test()
+                        .WithTag("len=" + j + ", i=" + i)
+                        .AssertValueCount(j)
+                        .AssertValues(Enumerable.Range(1, j))
+                        .AssertNoError()
+                        .AssertComplete();
+                }
+            }
+        }
     }
 }

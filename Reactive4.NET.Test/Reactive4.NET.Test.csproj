@@ -59,6 +59,10 @@
     <Compile Include="Benchmark.cs" />
     <Compile Include="ConnectableFlowableReplay1Tck.cs" />
     <Compile Include="FlowableAmb2Tck.cs" />
+    <Compile Include="FlowableParallel4Tck.cs" />
+    <Compile Include="FlowableParallel3Tck.cs" />
+    <Compile Include="FlowableParallel2Tck.cs" />
+    <Compile Include="FlowableParallel1Tck.cs" />
     <Compile Include="FlowableWindowBoundaryTest.cs" />
     <Compile Include="FlowableBufferSizeOverlap1Tck.cs" />
     <Compile Include="FlowableBufferSizeSkip1Tck.cs" />

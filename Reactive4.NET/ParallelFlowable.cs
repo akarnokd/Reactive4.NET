@@ -109,40 +109,123 @@ namespace Reactive4.NET
             return new ParallelFlowableJoin<T>(source, prefetch);
         }
 
+        /// <summary>
+        /// Maps the values on each rail into another value via the shared mapper function.
+        /// </summary>
+        /// <typeparam name="T">The input value type on each rail.</typeparam>
+        /// <typeparam name="R">The output value type on each rail.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="mapper">The shared function that receives a value and should return another
+        /// one.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
         public static IParallelFlowable<R> Map<T, R>(this IParallelFlowable<T> source, Func<T, R> mapper)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new ParallelFlowableMap<T, R>(source, mapper);
         }
 
+        /// <summary>
+        /// Filters out items on each rail where the predicate returns false for that particular
+        /// item.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="predicate">The function that receives an item on each rail
+        /// and should return true to let it pass.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
         public static IParallelFlowable<T> Filter<T>(this IParallelFlowable<T> source, Func<T, bool> predicate)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new ParallelFlowableFilter<T>(source, predicate);
         }
 
+        /// <summary>
+        /// Peeks into the flow on each rail and calls the given shared Action.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="onNext">The action called with the current item before the item is
+        /// relayed to the downstream.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
         public static IParallelFlowable<T> DoOnNext<T>(this IParallelFlowable<T> source, Action<T> onNext)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return ParallelFlowablePeek<T>.Create(source, onNext: onNext);
         }
 
+        /// <summary>
+        /// Peeks into the flow on each rail and calls the given shared Action.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="onAfterNext">The action called with the current item after the item
+        /// has been relayed to the downstream.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
+        public static IParallelFlowable<T> DoAfterNext<T>(this IParallelFlowable<T> source, Action<T> onAfterNext)
+        {
+            return ParallelFlowablePeek<T>.Create(source, onAfterNext: onAfterNext);
+        }
+
+        /// <summary>
+        /// Peeks into the flow on each rail and calls the given shared Action.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="onError">The action called with the Exception before the
+        /// Exception is relayed to the downstream.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
         public static IParallelFlowable<T> DoOnError<T>(this IParallelFlowable<T> source, Action<Exception> onError)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return ParallelFlowablePeek<T>.Create(source, onError: onError);
         }
 
+        /// <summary>
+        /// Peeks into the flow on each rail and calls the given shared Action.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="onComplete">The action called before the completion signal is relayed
+        /// to the downstream.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
         public static IParallelFlowable<T> DoOnComplete<T>(this IParallelFlowable<T> source, Action onComplete)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return ParallelFlowablePeek<T>.Create(source, onComplete: onComplete);
         }
 
+        /// <summary>
+        /// Peeks into the flow on each rail and calls the given shared Action.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="onTerminated">The action called before the error or completion
+        /// signal is relayed to the downstream.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
+        public static IParallelFlowable<T> DoOnTerminated<T>(this IParallelFlowable<T> source, Action onTerminated)
+        {
+            return ParallelFlowablePeek<T>.Create(source, onTerminated: onTerminated);
+        }
+
+        /// <summary>
+        /// Peeks into the flow on each rail and calls the given shared Action.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="onAfterTerminated">The action called after the error or completion
+        /// signal has been relayed to the downstream.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
+        public static IParallelFlowable<T> DoAfterTerminated<T>(this IParallelFlowable<T> source, Action onAfterTerminated)
+        {
+            return ParallelFlowablePeek<T>.Create(source, onAfterTerminated: onAfterTerminated);
+        }
+
+        /// <summary>
+        /// Calls the given shared Action exaclty once on each rail, when the rail
+        /// completes normally, terminates with an error or the rail gets cancelled.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="onFinally">The action called when a rail terminates or gets cancelled.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
         public static IParallelFlowable<T> DoFinally<T>(this IParallelFlowable<T> source, Action onFinally)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new ParallelFlowableDoFinally<T>(source, onFinally);
         }
 
         public static IParallelFlowable<T> Reduce<T>(this IParallelFlowable<T> source, Func<T, T, T> reducer)
