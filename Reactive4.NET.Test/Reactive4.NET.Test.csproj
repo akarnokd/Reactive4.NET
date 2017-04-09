@@ -251,6 +251,7 @@
     <Compile Include="FlowableTimeoutTest.cs" />
     <Compile Include="FlowableIntervalTest.cs" />
     <Compile Include="FlowableDebounceTest.cs" />
+    <Compile Include="FlowableThrottleFirstTest.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Benchmarks.cs" />
   </ItemGroup>

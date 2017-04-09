@@ -2291,16 +2291,32 @@ namespace Reactive4.NET
             return new FlowableDebounce<T>(source, delay, executor);
         }
 
+        /// <summary>
+        /// Emits an item and then blocks out subsequent upstream items for the specified delay duration.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="delay">The length of the time window after the the next item will
+        /// start the next blockout window.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> ThrottleFirst<T>(this IFlowable<T> source, TimeSpan delay)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return ThrottleFirst(source, delay, Executors.Computation);
         }
 
+        /// <summary>
+        /// Emits an item and then blocks out subsequent upstream items for the specified delay duration.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="delay">The length of the time window after the the next item will
+        /// start the next blockout window.</param>
+        /// <param name="executor">The Executor to take timing information from; the
+        /// the first item in a window is emitted on the same thread of the upstream.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> ThrottleFirst<T>(this IFlowable<T> source, TimeSpan delay, IExecutorService executor)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableThrottleFirst<T>(source, delay, executor);
         }
 
         /// <summary>

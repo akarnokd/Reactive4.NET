@@ -84,6 +84,7 @@
     <Compile Include="operators\FlowableSkipWhile.cs" />
     <Compile Include="operators\FlowableTakeUntilPredicate.cs" />
     <Compile Include="operators\FlowableTakeWhile.cs" />
+    <Compile Include="operators\FlowableThrottleFirst.cs" />
     <Compile Include="operators\FlowableTimeout.cs" />
     <Compile Include="operators\FlowableWithLatestFromEnumerable.cs" />
     <Compile Include="operators\FlowableWithLatestFromArray.cs" />
