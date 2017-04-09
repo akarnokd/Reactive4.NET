@@ -19,7 +19,7 @@ namespace Reactive4.NET.utils
 
         public SpscLinkedArrayQueue(int bufferSize)
         {
-            int c = QueueHelper.Pow2(bufferSize);
+            int c = QueueHelper.Pow2(Math.Max(2, bufferSize));
             var q = new QueueSection(c);
             producerQueue = q;
             Volatile.Write(ref consumerQueue, q);

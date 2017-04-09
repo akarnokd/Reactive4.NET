@@ -652,7 +652,7 @@ namespace Reactive4.NET
         }
 
         /// <summary>
-        /// Merges an array of IPublishers.
+        /// Merges an IPublisher sequence of IPublishers.
         /// </summary>
         /// <typeparam name="T">The value type.</typeparam>
         /// <param name="sources">The IPublisher of inner IPublisher instances.</param>
@@ -663,7 +663,7 @@ namespace Reactive4.NET
         }
 
         /// <summary>
-        /// Merges an array of IPublishers up to a maximum at a time.
+        /// Merges an IPublisher sequence of IPublishers up to a maximum at a time.
         /// </summary>
         /// <typeparam name="T">The value type.</typeparam>
         /// <param name="sources">The IPublisher of inner IPublisher instances.</param>
@@ -675,7 +675,8 @@ namespace Reactive4.NET
         }
 
         /// <summary>
-        /// Merges an array of IPublishers up to a maximum at a time.
+        /// Merges an IPublisher sequence of IPublishers up to a maximum at a time
+        /// and using the specified bufferSize to prefetch items from the inner IPublishers.
         /// </summary>
         /// <typeparam name="T">The value type.</typeparam>
         /// <param name="sources">The IPublisher of inner IPublisher instances.</param>
@@ -2452,15 +2453,39 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Splits up the source IFlowable into consecutive, non-overlapping sub IFlowable windows
+        /// of the given size (the last one might be shorter).
+        /// </summary>
+        /// <typeparam name="T">The value type of the upstream and the windows.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="size">The maximum number of items in each window.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<IFlowable<T>> Window<T>(this IFlowable<T> source, int size)
         {
-            return Window(source, size, size);
+            return new FlowableWindowSizeExact<T>(source, size);
         }
 
+        /// <summary>
+        /// Splits up the source IFlowable into potentially skipping or overlapping sub IFlowable
+        /// windows with the given size.
+        /// </summary>
+        /// <typeparam name="T">The value type of the upstream and the windows.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="size">The maximum number of items in each window.</param>
+        /// <param name="skip">The number of items to skip before starting a new window.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<IFlowable<T>> Window<T>(this IFlowable<T> source, int size, int skip)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            if (size == skip)
+            {
+                return Window(source, size);
+            }
+            if (size < skip)
+            {
+                return new FlowableWindowSizeSkip<T>(source, size, skip);
+            }
+            return new FlowableWindowSizeOverlap<T>(source, size, skip);
         }
 
         public static IFlowable<IFlowable<T>> Window<T, U>(this IFlowable<T> source, IPublisher<U> boundary)
@@ -2662,7 +2687,7 @@ namespace Reactive4.NET
         /// <returns>The new IConnectableFlowable instance.</returns>
         public static IConnectableFlowable<T> Publish<T>(this IFlowable<T> source)
         {
-            return Publish(source, BufferSize());
+            return Multicast(source, PublishProcessorSupplier<T>.Instance);
         }
 
         /// <summary>
@@ -2696,7 +2721,7 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> Publish<T, R>(this IFlowable<T> source, Func<IFlowable<T>, IPublisher<R>> handler)
         {
-            return Publish(source, handler, BufferSize());
+            return Multicast(source, handler, PublishProcessorSupplier<T>.Instance);
         }
 
         /// <summary>
@@ -2728,7 +2753,7 @@ namespace Reactive4.NET
         /// <returns>The new IConnectableFlowable instance.</returns>
         public static IConnectableFlowable<T> Replay<T>(this IFlowable<T> source)
         {
-            return Multicast(source, () => new ReplayProcessor<T>());
+            return Multicast(source, ReplayProcessorSupplier<T>.Instance);
         }
 
 
@@ -2762,7 +2787,7 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> Replay<T, R>(this IFlowable<T> source, Func<IFlowable<T>, IPublisher<R>> handler)
         {
-            return Multicast(source, handler, () => new ReplayProcessor<T>());
+            return Multicast(source, handler, ReplayProcessorSupplier<T>.Instance);
         }
 
         /// <summary>

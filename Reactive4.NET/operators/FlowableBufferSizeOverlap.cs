@@ -60,7 +60,7 @@ namespace Reactive4.NET.operators
 
             ISubscription upstream;
 
-            int once;
+            int firstRequest;
 
             bool done;
             bool cancelled;
@@ -178,7 +178,7 @@ namespace Reactive4.NET.operators
                 if (!SubscriptionHelper.PostCompleteMultiRequest(actual, ref requested, queue, n, ref cancelled))
                 {
                     long u = SubscriptionHelper.MultiplyCap(n, size - skip);
-                    if (Volatile.Read(ref once) == 0 && Interlocked.CompareExchange(ref once, 1, 0) == 0)
+                    if (Volatile.Read(ref firstRequest) == 0 && Interlocked.CompareExchange(ref firstRequest, 1, 0) == 0)
                     {
                         u += skip;
                         if (u < 0L)

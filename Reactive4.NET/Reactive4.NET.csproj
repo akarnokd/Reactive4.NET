@@ -86,6 +86,9 @@
     <Compile Include="operators\FlowableTakeWhile.cs" />
     <Compile Include="operators\FlowableThrottleFirst.cs" />
     <Compile Include="operators\FlowableTimeout.cs" />
+    <Compile Include="operators\FlowableWindowSizeOverlap.cs" />
+    <Compile Include="operators\FlowableWindowSizeSkip.cs" />
+    <Compile Include="operators\FlowableWindowSizeExact.cs" />
     <Compile Include="operators\FlowableWithLatestFromEnumerable.cs" />
     <Compile Include="operators\FlowableWithLatestFromArray.cs" />
     <Compile Include="operators\FlowableWithLatestFrom.cs" />

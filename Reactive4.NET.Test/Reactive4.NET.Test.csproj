@@ -117,6 +117,9 @@
     <Compile Include="FlowableMapAsync1Tck.cs" />
     <Compile Include="FlowableOnBackpressureBuffer1Tck.cs" />
     <Compile Include="ConnectableFlowablePublish1Tck.cs" />
+    <Compile Include="FlowableWindow3Tck.cs" />
+    <Compile Include="FlowableWindow2Tck.cs" />
+    <Compile Include="FlowableWindow1Tck.cs" />
     <Compile Include="FlowableTimeout2Tck.cs" />
     <Compile Include="FlowableTimeout1Tck.cs" />
     <Compile Include="FlowableRetryWhenTest.cs" />
@@ -252,6 +255,7 @@
     <Compile Include="FlowableIntervalTest.cs" />
     <Compile Include="FlowableDebounceTest.cs" />
     <Compile Include="FlowableThrottleFirstTest.cs" />
+    <Compile Include="FlowableWindowTest.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Benchmarks.cs" />
   </ItemGroup>

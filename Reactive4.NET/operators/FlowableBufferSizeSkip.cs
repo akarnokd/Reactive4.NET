@@ -56,7 +56,7 @@ namespace Reactive4.NET.operators
 
             ISubscription upstream;
 
-            int once;
+            int firstRequest;
 
             internal BufferSizeExactSubscriber(IFlowableSubscriber<C> actual, C buffer, Func<C> collectionSupplier, int size, int skip)
             {
@@ -145,15 +145,18 @@ namespace Reactive4.NET.operators
 
             public void Request(long n)
             {
-                long u = SubscriptionHelper.MultiplyCap(n, skip);
-                if (Volatile.Read(ref once) == 0 && Interlocked.CompareExchange(ref once, 1, 0) == 0)
+                if (SubscriptionHelper.Validate(n))
                 {
-                    if (u != long.MaxValue)
+                    long u = SubscriptionHelper.MultiplyCap(n, skip);
+                    if (Volatile.Read(ref firstRequest) == 0 && Interlocked.CompareExchange(ref firstRequest, 1, 0) == 0)
                     {
-                        u -= (skip - size);
+                        if (u != long.MaxValue)
+                        {
+                            u -= (skip - size);
+                        }
                     }
+                    upstream.Request(u);
                 }
-                upstream.Request(u);
             }
         }
     }

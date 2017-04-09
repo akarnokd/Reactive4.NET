@@ -361,6 +361,155 @@ namespace Reactive4.NET.operators
                 }
             }
         }
+
+        internal static void QueueDrain<T>(IFlowableSubscriber<T> a, 
+            ref int wip, ISimpleQueue<T> q, 
+            ref long requested, ref long emitted, ref bool cancelled, ref bool done, ref Exception error)
+        {
+            if (Interlocked.Increment(ref wip) != 1)
+            {
+                return;
+            }
+
+            int missed = 1;
+            var e = emitted;
+
+            for (;;)
+            {
+
+                long r = Volatile.Read(ref requested);
+
+                while (e != r)
+                {
+                    if (Volatile.Read(ref cancelled))
+                    {
+                        q.Clear();
+                        return;
+                    }
+
+                    bool d = Volatile.Read(ref done);
+                    bool empty = !q.Poll(out var item);
+
+                    if (d && empty)
+                    {
+                        var ex = error;
+                        if (ex == null)
+                        {
+                            a.OnComplete();
+                        }
+                        else
+                        {
+                            a.OnError(ex);
+                        }
+                        return;
+                    }
+
+                    if (empty)
+                    {
+                        break;
+                    }
+
+                    a.OnNext(item);
+
+                    e++;
+                }
+
+                if (e == r)
+                {
+                    if (Volatile.Read(ref cancelled))
+                    {
+                        q.Clear();
+                        return;
+                    }
+
+                    bool d = Volatile.Read(ref done);
+                    bool empty = q.IsEmpty();
+
+                    if (d && empty)
+                    {
+                        var ex = error;
+                        if (ex == null)
+                        {
+                            a.OnComplete();
+                        }
+                        else
+                        {
+                            a.OnError(ex);
+                        }
+                        return;
+                    }
+                }
+
+                int w = Volatile.Read(ref wip);
+                if (w == missed)
+                {
+                    emitted = e;
+                    missed = Interlocked.Add(ref wip, -missed);
+                    if (missed == 0)
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    missed = w;
+                }
+            }
+        }
+
+        internal static void QueueDrainFused<T>(IFlowableSubscriber<T> a,
+            ref int wip, ISimpleQueue<T> q, ref bool cancelled, ref bool done, ref Exception error)
+        {
+            if (Interlocked.Increment(ref wip) != 1)
+            {
+                return;
+            }
+
+            int missed = 1;
+
+            for (;;)
+            {
+                if (Volatile.Read(ref cancelled))
+                {
+                    q.Clear();
+                    return;
+                }
+                bool d = Volatile.Read(ref done);
+                bool empty = q.IsEmpty();
+
+                if (!empty)
+                {
+                    a.OnNext(default(T));
+                }
+
+                if (d)
+                {
+                    var ex = error;
+                    if (ex == null)
+                    {
+                        a.OnComplete();
+                    }
+                    else
+                    {
+                        a.OnError(ex);
+                    }
+                }
+
+                int w = Volatile.Read(ref wip);
+                if (w == missed)
+                {
+                    missed = Interlocked.Add(ref wip, -missed);
+                    if (missed == 0)
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    missed = w;
+                }
+            }
+        }
     }
 
     internal sealed class CancelledSubscription : ISubscription

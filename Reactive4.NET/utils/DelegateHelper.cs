@@ -85,4 +85,14 @@ namespace Reactive4.NET.utils
     {
         internal static readonly Func<bool> Instance = () => true;
     }
+
+    internal static class PublishProcessorSupplier<T>
+    {
+        internal static readonly Func<PublishProcessor<T>> Instance = () => new PublishProcessor<T>();
+    }
+
+    internal static class ReplayProcessorSupplier<T>
+    {
+        internal static readonly Func<ReplayProcessor<T>> Instance = () => new ReplayProcessor<T>();
+    }
 }
