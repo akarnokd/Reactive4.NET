@@ -48,7 +48,9 @@
     <Compile Include="BackpressureStrategy.cs" />
     <Compile Include="BufferStrategy.cs" />
     <Compile Include="AsyncProcessor.cs" />
+    <Compile Include="operators\AbstractParallelFlowable.cs" />
     <Compile Include="operators\ConnectableFlowableMulticast.cs" />
+    <Compile Include="operators\FlowableBufferBoundary.cs" />
     <Compile Include="operators\FlowableBufferSizeOverlap.cs" />
     <Compile Include="operators\FlowableBufferSizeSkip.cs" />
     <Compile Include="operators\FlowableBufferSizeExact.cs" />
@@ -86,6 +88,7 @@
     <Compile Include="operators\FlowableTakeWhile.cs" />
     <Compile Include="operators\FlowableThrottleFirst.cs" />
     <Compile Include="operators\FlowableTimeout.cs" />
+    <Compile Include="operators\FlowableWindowBoundary.cs" />
     <Compile Include="operators\FlowableWindowSizeOverlap.cs" />
     <Compile Include="operators\FlowableWindowSizeSkip.cs" />
     <Compile Include="operators\FlowableWindowSizeExact.cs" />
@@ -125,6 +128,8 @@
     <Compile Include="operators\FlowableTimer.cs" />
     <Compile Include="operators\FlowableUsing.cs" />
     <Compile Include="operators\FlowableZipArray.cs" />
+    <Compile Include="operators\ParallelFlowableArray.cs" />
+    <Compile Include="operators\ParallelFlowableRunOn.cs" />
     <Compile Include="ParallelFlowable.cs" />
     <Compile Include="ReplayProcessor.cs" />
     <Compile Include="schedulers\InterruptibleAction.cs" />

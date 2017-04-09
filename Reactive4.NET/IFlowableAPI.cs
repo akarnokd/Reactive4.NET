@@ -121,9 +121,9 @@ namespace Reactive4.NET
     public interface IQueueSubscription<T> : ISubscription, ISimpleQueue<T>
     {
         /// <summary>
-        /// Request a fusion mode, see the FusionSupport constants.
+        /// Request a fusion mode, see the <see cref="FusionSupport"/> constants.
         /// </summary>
-        /// <param name="mode">The fusion mode requested. See the FusionSupport constants.</param>
+        /// <param name="mode">The fusion mode requested. See the <see cref="FusionSupport"/> constants.</param>
         /// <returns>The established fusion mode: NONE, SYNC or ASYNC.</returns>
         int RequestFusion(int mode);
     }

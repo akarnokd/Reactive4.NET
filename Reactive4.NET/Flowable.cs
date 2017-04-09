@@ -2442,15 +2442,37 @@ namespace Reactive4.NET
             return new FlowableBufferSizeOverlap<T, C>(source, size, skip, collectionSupplier);
         }
 
+        /// <summary>
+        /// Buffers items into consecutive, non-overlapping ILists where the buffer boundary is
+        /// marked by an emission from the boundary IPublisher.
+        /// </summary>
+        /// <typeparam name="T">The upstream and list item type.</typeparam>
+        /// <typeparam name="U">The value type of the boundary (not relevant)</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="boundary">The IPublisher whose items indicate a buffer boundary
+        /// and triggers emission.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<IList<T>> Buffer<T, U>(this IFlowable<T> source, IPublisher<U> boundary)
         {
             return Buffer(source, boundary, ListSupplier<T>.Instance);
         }
 
+        /// <summary>
+        /// Buffers items into consecutive, non-overlapping collections, supplied by
+        /// the collectionSupplier function, where the buffer boundary is
+        /// marked by an emission from the boundary IPublisher.
+        /// </summary>
+        /// <typeparam name="T">The upstream and list item type.</typeparam>
+        /// <typeparam name="U">The value type of the boundary (not relevant)</typeparam>
+        /// <typeparam name="C">The buffer type, any subtype of ICollection&lt;T>.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="boundary">The IPublisher whose items indicate a buffer boundary
+        /// and triggers emission.</param>
+        /// <param name="collectionSupplier">The function that returns a fresh collection buffer.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<C> Buffer<T, U, C>(this IFlowable<T> source, IPublisher<U> boundary, Func<C> collectionSupplier) where C : ICollection<T>
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new FlowableBufferBoundary<T, U, C>(source, boundary, collectionSupplier);
         }
 
         /// <summary>
@@ -2488,10 +2510,37 @@ namespace Reactive4.NET
             return new FlowableWindowSizeOverlap<T>(source, size, skip);
         }
 
+        /// <summary>
+        /// Splits up the source IFlowable into consecutive, non-overlapping sub IFlowable
+        /// windows where the window boundary is determined by an item emission from the given
+        /// boundary IPublisher.
+        /// </summary>
+        /// <typeparam name="T">The source value type.</typeparam>
+        /// <typeparam name="U">The boundary element type (not relevant).</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="boundary">The IPublisher instance which when signals an item,
+        /// ends the previous window and starts a new window.</param>
+        /// <returns>The new IFlowable instance</returns>
         public static IFlowable<IFlowable<T>> Window<T, U>(this IFlowable<T> source, IPublisher<U> boundary)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return Window<T, U>(source, boundary, BufferSize());
+        }
+
+        /// <summary>
+        /// Splits up the source IFlowable into consecutive, non-overlapping sub IFlowable
+        /// windows where the window boundary is determined by an item emission from the given
+        /// boundary IPublisher.
+        /// </summary>
+        /// <typeparam name="T">The source value type.</typeparam>
+        /// <typeparam name="U">The boundary element type (not relevant).</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="boundary">The IPublisher instance which when signals an item,
+        /// ends the previous window and starts a new window.</param>
+        /// <param name="bufferSize">The capacity hint for the inner windows.</param>
+        /// <returns>The new IFlowable instance</returns>
+        public static IFlowable<IFlowable<T>> Window<T, U>(this IFlowable<T> source, IPublisher<U> boundary, int bufferSize)
+        {
+            return new FlowableWindowBoundary<T, U>(source, boundary, bufferSize);
         }
 
         /// <summary>

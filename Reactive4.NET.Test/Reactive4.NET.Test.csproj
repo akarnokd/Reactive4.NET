@@ -59,6 +59,7 @@
     <Compile Include="Benchmark.cs" />
     <Compile Include="ConnectableFlowableReplay1Tck.cs" />
     <Compile Include="FlowableAmb2Tck.cs" />
+    <Compile Include="FlowableWindowBoundaryTest.cs" />
     <Compile Include="FlowableBufferSizeOverlap1Tck.cs" />
     <Compile Include="FlowableBufferSizeSkip1Tck.cs" />
     <Compile Include="FlowableConcatArray2Tck.cs" />
@@ -256,6 +257,7 @@
     <Compile Include="FlowableDebounceTest.cs" />
     <Compile Include="FlowableThrottleFirstTest.cs" />
     <Compile Include="FlowableWindowTest.cs" />
+    <Compile Include="FlowableBufferBoundaryTest.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Benchmarks.cs" />
   </ItemGroup>

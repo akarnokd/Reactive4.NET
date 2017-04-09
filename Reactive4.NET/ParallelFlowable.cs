@@ -1,4 +1,5 @@
 ﻿using Reactive.Streams;
+using Reactive4.NET.operators;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,11 +17,26 @@ namespace Reactive4.NET
         // Instance operators
         // ********************************************************************************
 
+        /// <summary>
+        /// Creates an IParallelFlowable with parallelism equal to the number of
+        /// available processors and default prefetch amount.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
         public static IParallelFlowable<T> Parallel<T>(this IFlowable<T> source)
         {
             return Parallel(source, Environment.ProcessorCount, Flowable.BufferSize());
         }
 
+        /// <summary>
+        /// Creates an IParallelFlowable with the provided parallelism
+        /// and default prefetch amount.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="parallelism">The number of parallel 'rail's to create, positive.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
         public static IParallelFlowable<T> Parallel<T>(this IFlowable<T> source, int parallelism)
         {
             return Parallel(source, parallelism, Flowable.BufferSize());
@@ -32,15 +48,32 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Runs each rail on its own worker of the given IExecutorService, similar
+        /// to how Flowable.observeOn operates.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="executor">The IExecutorService that will provide the workers for each rail.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
         public static IParallelFlowable<T> RunOn<T>(this IParallelFlowable<T> source, IExecutorService executor)
         {
             return RunOn(source, executor, Flowable.BufferSize());
         }
 
+        /// <summary>
+        /// Runs each rail on its own worker of the given IExecutorService, similar
+        /// to how Flowable.observeOn operates.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="executor">The IExecutorService that will provide the workers for each rail.</param>
+        /// <param name="bufferSize">The number of items to prefetch and keep in the buffer while crossing
+        /// the (async) boundary of the worker.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
         public static IParallelFlowable<T> RunOn<T>(this IParallelFlowable<T> source, IExecutorService executor, int bufferSize)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new ParallelFlowableRunOn<T>(source, executor, bufferSize);
         }
 
         public static IFlowable<T> Sequential<T>(this IParallelFlowable<T> source)
@@ -193,9 +226,16 @@ namespace Reactive4.NET
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Turns the array of IPublishers into an IParallelFlowable where the number
+        /// of rails is equal to the number of array items and each rail
+        /// will subscribe to the specific IPublisher.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="sources">The params array of IPublishers to turn into an IParallelFlowable.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
         public static IParallelFlowable<T> FromArray<T>(params IPublisher<T>[] sources) {
-            // TODO implement
-            throw new NotImplementedException();
+            return new ParallelFlowableArray<T>(sources);
         }
     }
 }
