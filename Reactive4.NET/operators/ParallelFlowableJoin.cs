@@ -48,8 +48,6 @@ namespace Reactive4.NET.operators
             int done;
             Exception error;
 
-            int index;
-
             internal JoinSubscription(IFlowableSubscriber<T> actual, int n, int bufferSize)
             {
                 this.actual = actual;
@@ -110,7 +108,6 @@ namespace Reactive4.NET.operators
                 var subs = subscribers;
                 var n = subs.Length;
                 var e = emitted;
-                var idx = index;
                 var lim = limit;
 
                 for (;;)
@@ -118,7 +115,6 @@ namespace Reactive4.NET.operators
 
                     long r = Volatile.Read(ref requested);
 
-                    int notReady = 0;
                     while (e != r)
                     {
                         if (Volatile.Read(ref cancelled))
@@ -129,55 +125,46 @@ namespace Reactive4.NET.operators
 
                         bool d = Volatile.Read(ref done) == 0;
 
-                        var inner = subs[idx];
-
-                        var q = inner.Queue();
-
-                        if (q == null)
+                        bool empty = true;
+                        bool noRequest = false;
+                        foreach (var inner in subs)
                         {
-                            notReady++;
-                        }
-                        else
-                        {
-                            bool empty = !q.Poll(out T t);
+                            var q = inner.Queue();
 
-                            if (!empty)
+                            if (q != null)
                             {
-                                notReady = 0;
+                                if (q.Poll(out T t))
+                                {
+                                    empty = false;
+                                    a.OnNext(t);
 
-                                a.OnNext(t);
+                                    if (++e == r)
+                                    {
+                                        noRequest = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
 
-                                e++;
-                                inner.Produced(lim);
+                        if (d && empty)
+                        {
+                            var ex = ExceptionHelper.Terminate(ref error);
+                            if (ex == null)
+                            {
+                                a.OnComplete();
                             }
                             else
                             {
-                                notReady++;
+                                a.OnError(ex);
                             }
+                            return;
                         }
 
-                        if (notReady == n)
+                        if (empty || noRequest)
                         {
-                            if (d)
-                            {
-                                var ex = ExceptionHelper.Terminate(ref error);
-                                if (ex == null)
-                                {
-                                    a.OnComplete();
-                                }
-                                else
-                                {
-                                    a.OnError(ex);
-                                }
-                                return;
-                            }
                             break;
                         }
-
-                        if (++idx == n)
-                        {
-                            idx = 0;
-                        } 
                     }
 
                     if (e == r)
@@ -221,7 +208,6 @@ namespace Reactive4.NET.operators
                     if (w == missed)
                     {
                         emitted = e;
-                        index = idx;
                         missed = Interlocked.Add(ref wip, -missed);
                         if (missed == 0)
                         {
