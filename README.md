@@ -143,13 +143,135 @@ namespace demo {
 
 TBD
 
+### `Just`
+
+### `FromArray`
+
+### `FromEnumerable`
+
+### `FromObservable`
+
+### `Amb`
+
+### `Concat`, `ConcatEager`
+
+### `Merge`
+
+### `CombineLatest`
+
+### `Switch`
+
+### `Zip`
+
+### `Using`
+
 ## Manipulating `IFlowable`s
 
 TBD
 
+### `Map`
+
+### `Filter`
+
+### `DoOnXXX`
+
+### `FlatMap`
+
+### `ConcatMap`, `ConcatMapEager`
+
+### `SwitchMap`
+
+### `Take`
+
+### `Skip`
+
+### `OnErrorXXX`
+
+### `Timeout`
+
+### `Buffer`, `Window`
+
+### `XXXWith`
+
+### `IgnoreElements`
+
+### `DefaultIfEmpty`, `SwitchIfEmpty`
+
+### `Scan`
+
+### `Reduce`
+
+### `Collect`
+
 ## Consuming `IFlowable`s
 
+### `Subscribe`
+
+### `Test`
+
+### `BlockingFirst`
+
+### `BlockingLast`
+
+### `BlockingEnumerable`
+
 TBD
+
+## Parallel extensions
+
+### `Parallel`
+
+### `Sequential`
+
+### `RunOn`
+
+### `Map`
+
+### `Filter`
+
+### `DoOnXXX`
+
+### `Sorted`
+
+### `ToSortedList`
+
+### `Reduce`, `ReduceAll`
+
+### `Collect`
+
+### `ConcatMap`
+
+### `FlatMap`
+
+## `Processor`s
+
+TBD
+
+### `AsyncProcessor`
+
+### `DirectProcessor`
+
+### `PublishProcessor`
+
+### `ReplayProcessor`
+
+### `UnicastProcessor`
+
+## Executors
+
+TBD
+
+### `Executors.Single`
+
+### `Executors.Computation`
+
+### `Executors.IO`
+
+### `Executors.Trampoline`
+
+### `Executors.Thread`
+
+### `Executors.Task`
 
 # Contact
 
