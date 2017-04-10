@@ -65,6 +65,16 @@ namespace Reactive4.NET.utils
             return false;
         }
 
+        public bool IsFull()
+        {
+            Entry[] a = array;
+            int m = a.Length - 1;
+            long pi = producerIndex;
+            int offset = (int)pi & m;
+
+            return Volatile.Read(ref a[offset].state) != 0;
+        }
+
         struct Entry
         {
             internal int state;
