@@ -135,7 +135,7 @@ namespace Reactive4.NET.subscribers
 
         public void Reset()
         {
-            throw new NotImplementedException();
+            throw new InvalidOperationException("This IEnumerator doesn't support Reset().");
         }
     }
 }

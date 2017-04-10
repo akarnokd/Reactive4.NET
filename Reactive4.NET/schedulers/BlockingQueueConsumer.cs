@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Reactive4.NET.subscribers
+namespace Reactive4.NET.schedulers
 {
     sealed class BlockingQueueConsumer
     {

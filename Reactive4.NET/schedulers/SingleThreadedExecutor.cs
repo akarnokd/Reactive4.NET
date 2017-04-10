@@ -118,7 +118,6 @@ namespace Reactive4.NET.schedulers
             if (Prepare())
             {
                 var run = runner;
-                var cts = new CancellationTokenSource();
 
                 var t = new InterruptibleAction(task, true);
                 t.parent = worker;

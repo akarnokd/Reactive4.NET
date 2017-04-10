@@ -471,5 +471,98 @@ namespace Reactive4.NET
         public static IParallelFlowable<T> FromArray<T>(params IPublisher<T>[] sources) {
             return new ParallelFlowableArray<T>(sources);
         }
+
+        /// <summary>
+        /// Maps the values on each rail into another value via the shared mapper function
+        /// and if the function fails, the given failure handling mode (<see cref="ParallelFailureMode"/>) is applied.
+        /// </summary>
+        /// <typeparam name="T">The input value type on each rail.</typeparam>
+        /// <typeparam name="R">The output value type on each rail.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="mapper">The shared function that receives a value and should return another
+        /// one.</param>
+        /// <param name="failureMode">The failure handling mode of the enum <see cref="ParallelFailureMode"/>.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
+        public static IParallelFlowable<R> Map<T, R>(this IParallelFlowable<T> source, Func<T, R> mapper, ParallelFailureMode failureMode)
+        {
+            return Map(source, mapper, ParallelFailureHandler.Values[(int)failureMode]);
+        }
+
+        /// <summary>
+        /// Maps the values on each rail into another value via the shared mapper function
+        /// and if the function fails, the given failure handling mode (<see cref="ParallelFailureMode"/>) is applied.
+        /// </summary>
+        /// <typeparam name="T">The input value type on each rail.</typeparam>
+        /// <typeparam name="R">The output value type on each rail.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="mapper">The shared function that receives a value and should return another
+        /// one.</param>
+        /// <param name="failureHandler">The function called with the current repeat count and the Exception
+        /// and should return a handling mode of the enum <see cref="ParallelFailureMode"/>.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
+        public static IParallelFlowable<R> Map<T, R>(this IParallelFlowable<T> source, Func<T, R> mapper, Func<long, Exception, ParallelFailureMode> failureHandler)
+        {
+            return new ParallelFlowableMapTry<T, R>(source, mapper, failureHandler);
+        }
+
+        /// <summary>
+        /// Filters out items on each rail where the predicate returns false for that particular
+        /// item.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="predicate">The function that receives an item on each rail
+        /// and should return true to let it pass.</param>
+        /// <param name="failureMode">The failure handling mode of the enum <see cref="ParallelFailureMode"/>.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
+        public static IParallelFlowable<T> Filter<T>(this IParallelFlowable<T> source, Func<T, bool> predicate, ParallelFailureMode failureMode)
+        {
+            return Filter(source, predicate, ParallelFailureHandler.Values[(int)failureMode]);
+        }
+
+        /// <summary>
+        /// Filters out items on each rail where the predicate returns false for that particular
+        /// item.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="predicate">The function that receives an item on each rail
+        /// and should return true to let it pass.</param>
+        /// <param name="failureHandler">The function called with the current repeat count and the Exception
+        /// and should return a handling mode of the enum <see cref="ParallelFailureMode"/>.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
+        public static IParallelFlowable<T> Filter<T>(this IParallelFlowable<T> source, Func<T, bool> predicate, Func<long, Exception, ParallelFailureMode> failureHandler)
+        {
+            return new ParallelFlowableFilterTry<T>(source, predicate, failureHandler);
+        }
+
+        /// <summary>
+        /// Peeks into the flow on each rail and calls the given shared Action.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="onNext">The action called with the current item before the item is
+        /// relayed to the downstream.</param>
+        /// <param name="failureMode">The failure handling mode of the enum <see cref="ParallelFailureMode"/>.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
+        public static IParallelFlowable<T> DoOnNext<T>(this IParallelFlowable<T> source, Action<T> onNext, ParallelFailureMode failureMode)
+        {
+            return DoOnNext(source, onNext, ParallelFailureHandler.Values[(int)failureMode]);
+        }
+
+        /// <summary>
+        /// Peeks into the flow on each rail and calls the given shared Action.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="onNext">The action called with the current item before the item is
+        /// relayed to the downstream.</param>
+        /// <param name="failureHandler">The function called with the current repeat count and the Exception
+        /// and should return a handling mode of the enum <see cref="ParallelFailureMode"/>.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
+        public static IParallelFlowable<T> DoOnNext<T>(this IParallelFlowable<T> source, Action<T> onNext, Func<long, Exception, ParallelFailureMode> failureHandler)
+        {
+            return new ParallelFlowableDoOnNextTry<T>(source, onNext, failureHandler);
+        }
     }
 }

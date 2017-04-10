@@ -132,6 +132,9 @@
     <Compile Include="operators\ParallelFlowableDoFinally.cs" />
     <Compile Include="operators\ParallelFlowableConcatMap.cs" />
     <Compile Include="operators\ParallelFlowableCollect.cs" />
+    <Compile Include="operators\ParallelFlowableFilterTry.cs" />
+    <Compile Include="operators\ParallelFlowableDoOnNextTry.cs" />
+    <Compile Include="operators\ParallelFlowableMapTry.cs" />
     <Compile Include="operators\ParallelFlowableReduce.cs" />
     <Compile Include="operators\ParallelFlowableReduceAll.cs" />
     <Compile Include="operators\ParallelFlowableReducePlain.cs" />
@@ -145,6 +148,7 @@
     <Compile Include="operators\ParallelFlowableSorted.cs" />
     <Compile Include="ParallelFlowable.cs" />
     <Compile Include="ReplayProcessor.cs" />
+    <Compile Include="schedulers\BlockingExecutorService.cs" />
     <Compile Include="schedulers\InterruptibleAction.cs" />
     <Compile Include="schedulers\IWorkerServices.cs" />
     <Compile Include="schedulers\ParallelExecutorService.cs" />
@@ -232,7 +236,6 @@
     <Compile Include="utils\SubscriptionArbiter.cs" />
     <Compile Include="utils\SubscriptionHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReactiveStreamsAPI.cs" />
     <Compile Include="TestSubscriber.cs" />
   </ItemGroup>
   <ItemGroup>

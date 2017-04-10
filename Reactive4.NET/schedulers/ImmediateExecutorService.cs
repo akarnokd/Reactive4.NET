@@ -30,12 +30,12 @@ namespace Reactive4.NET.schedulers
 
         public IDisposable Schedule(Action task, TimeSpan delay)
         {
-            throw new NotImplementedException("Should not be called!");
+            throw new InvalidOperationException("Should not be called!");
         }
 
         public IDisposable Schedule(Action task, TimeSpan initialDelay, TimeSpan period)
         {
-            throw new NotImplementedException("Should not be called!");
+            throw new InvalidOperationException("Should not be called!");
         }
 
         public void Shutdown()

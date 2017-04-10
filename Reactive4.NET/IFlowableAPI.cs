@@ -337,4 +337,30 @@ namespace Reactive4.NET
         /// <param name="subscribers">The array of subscribers to subscribe with.</param>
         void Subscribe(IFlowableSubscriber<T>[] subscribers);
     }
+
+    /// <summary>
+    /// Indicates what should happen if a parallel, user defined action
+    /// or function failed.
+    /// </summary>
+    public enum ParallelFailureMode
+    {
+        /// <summary>
+        /// The error should be reported, making the rail unusable for further processing.
+        /// </summary>
+        Error,
+        /// <summary>
+        /// The failing element should be ignored/skipped and the processing on the rail
+        /// should be resumed with the next element.
+        /// </summary>
+        Skip,
+        /// <summary>
+        /// The failing element should be ignored/skipped and the processing of the rail
+        /// should complete.
+        /// </summary>
+        Complete,
+        /// <summary>
+        /// The failing element should be retried once more.
+        /// </summary>
+        Retry
+    }
 }

@@ -158,30 +158,31 @@ namespace Reactive4.NET
         }
 
         /// <summary>
-        /// Creates an IExecutorService which when started,
-        /// uses the current thread and blocks for tasks to
-        /// be executed on the current thread.
-        /// To let the current thread go a call to Shutdown() is
-        /// necessary.
-        /// </summary>
-        /// <returns>The new IExecutorService instance.</returns>
-        public static IExecutorService NewBlocking()
-        {
-            return null; // TODO return proper
-        }
-
-        /// <summary>
-        /// Creates an IExecutorService which when started,
+        /// Creates an IExecutorService which when Start()-ed
+        /// explicitly,
         /// uses the current thread, executes the initial
         /// action and blocks for further tasks to
         /// be executed on the current thread.
         /// To let the current thread go a call to Shutdown() is
         /// necessary.
         /// </summary>
+        /// <param name="initialTask">The optional initial task that gets executed first
+        /// and receives the BlockingExecutorService instance itself.</param>
+        /// <param name="name">The name to use for naming the thread that gets blocked, null
+        /// will use the BlockingExecutorService-N where N is an unique index.</param>
+        /// <param name="ownTimer">If true, the BlockingExecutorService will use its own, separate
+        /// timer thread for delayed and repeating tasks. If false, one of the standard
+        /// helper threads will be used.</param>
+        /// <param name="daemon">If true, thread this executor will block on is turned into a daemon thread.</param>
         /// <returns>The new IExecutorService instance.</returns>
-        public static IExecutorService NewBlocking(Action initialTask)
+        public static IExecutorService NewBlocking(Action<IExecutorService> initialTask = null, string name = null, bool ownTimer = false, bool daemon = false)
         {
-            return null; // TODO return proper
+            var b = new BlockingExecutorService(name, ownTimer, daemon);
+            if (initialTask != null)
+            {
+                b.Schedule(() => initialTask(b));
+            }
+            return b;
         }
     }
 }

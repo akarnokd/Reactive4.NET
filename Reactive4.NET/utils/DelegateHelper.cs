@@ -125,4 +125,20 @@ namespace Reactive4.NET.utils
             return result;
         }
     }
+
+    internal static class ParallelFailureHandler
+    {
+        internal static readonly Func<long, Exception, ParallelFailureMode> Error = (a, b) => ParallelFailureMode.Error;
+
+        internal static readonly Func<long, Exception, ParallelFailureMode> Skip = (a, b) => ParallelFailureMode.Skip;
+
+        internal static readonly Func<long, Exception, ParallelFailureMode> Complete = (a, b) => ParallelFailureMode.Complete;
+
+        internal static readonly Func<long, Exception, ParallelFailureMode> Retry = (a, b) => ParallelFailureMode.Retry;
+
+        internal static readonly Func<long, Exception, ParallelFailureMode>[] Values =
+        {
+            Error, Skip, Complete, Retry
+        };
+    }
 }
