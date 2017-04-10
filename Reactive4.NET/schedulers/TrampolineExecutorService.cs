@@ -106,7 +106,7 @@ namespace Reactive4.NET.schedulers
 
                 SchedulerHelper.ScheduleTask(() =>
                 {
-                    if (t.Reset())
+                    if (!t.IsDisposed)
                     {
                         queue.Offer(t);
                         Drain();

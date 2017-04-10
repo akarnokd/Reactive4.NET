@@ -20,7 +20,7 @@ namespace Reactive4.NET.schedulers
             pools = new TimedBlockingExecutor[PoolCount];
             for (int i = 0; i < PoolCount; i++)
             {
-                pools[i] = new TimedBlockingExecutor();
+                pools[i] = new TimedBlockingExecutor("TimedExecutorWorker-" + (i + 1));
             }
         }
 

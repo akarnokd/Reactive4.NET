@@ -148,6 +148,7 @@
     <Compile Include="schedulers\InterruptibleAction.cs" />
     <Compile Include="schedulers\IWorkerServices.cs" />
     <Compile Include="schedulers\ParallelExecutorService.cs" />
+    <Compile Include="schedulers\SharedExecutorService.cs" />
     <Compile Include="schedulers\SingleExecutorWorker.cs" />
     <Compile Include="schedulers\SingleThreadedExecutor.cs" />
     <Compile Include="schedulers\TimedBlockingExecutor.cs" />

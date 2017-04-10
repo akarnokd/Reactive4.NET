@@ -16,9 +16,14 @@ namespace Reactive4.NET.schedulers
 
         SingleThreadedExecutor executor;
 
-        internal SingleExecutorService()
+        static long index;
+
+        readonly string name;
+
+        internal SingleExecutorService(string name = "SingleExecutorWorker")
         {
-            executor = new SingleThreadedExecutor();
+            this.name = name;
+            executor = new SingleThreadedExecutor(name);
         }
 
         public IDisposable Schedule(Action task)
@@ -68,7 +73,7 @@ namespace Reactive4.NET.schedulers
                 }
                 if (ys == null)
                 {
-                    ys = new SingleThreadedExecutor();
+                    ys = new SingleThreadedExecutor(name + "-" + (Interlocked.Increment(ref index)));
                 }
                 if (Interlocked.CompareExchange(ref executor, ys, xs) == xs)
                 {

@@ -16,17 +16,20 @@ namespace Reactive4.NET.schedulers
 
         readonly int parallelism;
 
+        readonly string name;
+
         SingleThreadedExecutor[] executors = ShutdownPool;
 
         int n;
 
-        internal ParallelExecutorService() : this(Environment.ProcessorCount)
+        internal ParallelExecutorService(string name = "ParallelExecutorWorker") : this(Environment.ProcessorCount, name)
         {
         }
 
-        internal ParallelExecutorService(int parallelism)
+        internal ParallelExecutorService(int parallelism, string name = "ParallelExecutorWorker")
         {
             this.parallelism = parallelism;
+            this.name = name;
             Start();
         }
 
@@ -95,7 +98,7 @@ namespace Reactive4.NET.schedulers
                     ys = new SingleThreadedExecutor[parallelism];
                     for (int i = 0; i < ys.Length; i++)
                     {
-                        ys[i] = new SingleThreadedExecutor();
+                        ys[i] = new SingleThreadedExecutor(name + "-" + (i + 1));
                     }
                 }
                 if (Interlocked.CompareExchange(ref executors, ys, ShutdownPool) == ShutdownPool)

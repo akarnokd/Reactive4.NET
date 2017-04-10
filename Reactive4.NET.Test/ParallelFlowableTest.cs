@@ -95,17 +95,20 @@ namespace Reactive4.NET.Test
             {
                 for (int i = 1; i < 33; i++)
                 {
-                    Flowable.Range(1, j)
-                        .Parallel(i)
-                        .RunOn(Executors.Computation)
-                        .Sequential()
-                        .Test()
-                        .WithTag("len=" + j + ", i=" + i)
-                        .AwaitDone(TimeSpan.FromSeconds(5))
-                        .AssertValueCount(j)
-                        .AssertValueSet(new HashSet<int>(Enumerable.Range(1, j)))
-                        .AssertNoError()
-                        .AssertComplete();
+                    for (int k = 0; k < 20; k++)
+                    {
+                        Flowable.Range(1, j)
+                            .Parallel(i)
+                            .RunOn(Executors.Computation)
+                            .Sequential()
+                            .Test()
+                            .WithTag("len=" + j + ", i=" + i)
+                            .AwaitDone(TimeSpan.FromSeconds(5))
+                            .AssertValueCount(j)
+                            .AssertValueSet(new HashSet<int>(Enumerable.Range(1, j)))
+                            .AssertNoError()
+                            .AssertComplete();
+                    }
                 }
             }
         }

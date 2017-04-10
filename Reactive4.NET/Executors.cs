@@ -104,10 +104,11 @@ namespace Reactive4.NET
         /// <summary>
         /// Creates a new single-threaded IExecutorService.
         /// </summary>
+        /// <param name="name">The optional worker name prefix.</param>
         /// <returns>The new IExecutorService instance.</returns>
-        public static IExecutorService NewSingle()
+        public static IExecutorService NewSingle(string name = "CustomSingleWorker")
         {
-            return new SingleExecutorService();
+            return new SingleExecutorService(name);
         }
 
         /// <summary>
@@ -115,10 +116,11 @@ namespace Reactive4.NET
         /// number of threads equal to the number of
         /// available processors.
         /// </summary>
+        /// <param name="name">The optional worker name prefix.</param>
         /// <returns>The new IExecutorService instance.</returns>
-        public static IExecutorService NewParallel()
+        public static IExecutorService NewParallel(string name = "CustomParallelWorker")
         {
-            return new ParallelExecutorService();
+            return new ParallelExecutorService(name);
         }
 
         /// <summary>
@@ -126,10 +128,11 @@ namespace Reactive4.NET
         /// fixed number of threads.
         /// </summary>
         /// <param name="parallelism">The parallelism level, positive.</param>
+        /// <param name="name">The optional worker name prefix.</param>
         /// <returns>The new IExecutorService instance.</returns>
-        public static IExecutorService NewParallel(int parallelism)
+        public static IExecutorService NewParallel(int parallelism, string name = "CustomParallelWorker")
         {
-            return new ParallelExecutorService(parallelism);
+            return new ParallelExecutorService(parallelism, name);
         }
 
         /// <summary>
@@ -151,7 +154,7 @@ namespace Reactive4.NET
         /// <returns>The new IExecutorService instance.</returns>
         public static IExecutorService NewShared(IExecutorWorker worker)
         {
-            return null; // TODO return proper
+            return new SharedExecutorService(worker);
         }
 
         /// <summary>

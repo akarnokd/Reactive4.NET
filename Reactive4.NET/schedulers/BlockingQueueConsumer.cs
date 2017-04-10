@@ -16,14 +16,17 @@ namespace Reactive4.NET.subscribers
 
         readonly bool daemon;
 
+        readonly string name;
+
         int shutdown;
 
         long wip;
 
-        internal BlockingQueueConsumer(int capacityHint, bool daemon = true)
+        internal BlockingQueueConsumer(int capacityHint, string name, bool daemon = true)
         {
             this.queue = new MpscLinkedArrayQueue<Action>(capacityHint);
             this.daemon = daemon;
+            this.name = name;
         }
 
         internal void Shutdown()
@@ -59,6 +62,11 @@ namespace Reactive4.NET.subscribers
         internal void Run()
         {
             Thread.CurrentThread.IsBackground = daemon;
+            var n = name;
+            if (n != null)
+            {
+                Thread.CurrentThread.Name = n;
+            }
             var sh = ShutdownAction;
             var q = queue;
             long missed = 0L;

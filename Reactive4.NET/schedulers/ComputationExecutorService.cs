@@ -10,6 +10,6 @@ namespace Reactive4.NET.schedulers
 {
     static class ComputationExecutorService
     {
-        internal static readonly IExecutorService Instance = new ParallelExecutorService();
+        internal static readonly IExecutorService Instance = new ParallelExecutorService(name: "ComputationExecutorWorker");
     }
 }

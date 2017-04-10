@@ -12,15 +12,18 @@ namespace Reactive4.NET.schedulers
     {
         readonly SortedSet<TimedTask> queue;
 
+        readonly string name;
+
         long index;
 
         bool shutdown;
 
         int once;
 
-        internal TimedBlockingExecutor()
+        internal TimedBlockingExecutor(string name)
         {
             this.queue = new SortedSet<TimedTask>();
+            this.name = name;
         }
 
         internal IDisposable Schedule(Action action, TimeSpan delay)
@@ -124,6 +127,7 @@ namespace Reactive4.NET.schedulers
         internal void Run()
         {
             Thread.CurrentThread.IsBackground = true;
+            Thread.CurrentThread.Name = name;
             var q = queue;
             for (;;)
             {

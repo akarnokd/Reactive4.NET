@@ -79,6 +79,21 @@ namespace Reactive4.NET.utils
             return true;
         }
 
+        public bool Peek(out T item)
+        {
+            var a = array;
+            var n = a.Length;
+            var ci = consumerIndex;
+            if (ci == producerIndex)
+            {
+                item = default(T);
+                return false;
+            }
+            var offset = (int)ci & (n - 1);
+            item = a[offset];
+            return true;
+        }
+
         /// <summary>
         /// Polls for the element last offered.
         /// </summary>

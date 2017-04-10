@@ -8,6 +8,11 @@ using System.Threading.Tasks;
 
 namespace Reactive4.NET.schedulers
 {
+    /// <summary>
+    /// Standard, tracking, single-threaded IExecutorWorker that runs with an
+    /// underlying SingleThreadedExecutor and optionally calls an onShutdown
+    /// action when it is disposed.
+    /// </summary>
     internal sealed class SingleExecutorWorker : IExecutorWorker, IWorkerServices
     {
         readonly SingleThreadedExecutor executor;

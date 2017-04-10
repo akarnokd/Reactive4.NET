@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Reactive4.NET.schedulers
@@ -12,6 +13,8 @@ namespace Reactive4.NET.schedulers
         internal static readonly IExecutorService Instance = new ThreadExecutorService();
 
         public long Now => SchedulerHelper.NowUTC();
+
+        static long index;
 
         public IDisposable Schedule(Action task)
         {
@@ -38,7 +41,9 @@ namespace Reactive4.NET.schedulers
             // this type of IExecutorService doesn't support the operation
         }
 
-        public IExecutorWorker Worker => new SingleExecutorWorker(new SingleThreadedExecutor(), e => e.Shutdown());
+        public IExecutorWorker Worker => new SingleExecutorWorker(
+            new SingleThreadedExecutor("ThreadExecutorWorker-" + Interlocked.Increment(ref index)), 
+            e => e.Shutdown());
 
     }
 }

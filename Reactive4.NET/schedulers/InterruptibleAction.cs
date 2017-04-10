@@ -47,9 +47,14 @@ namespace Reactive4.NET.schedulers
                         action = null;
                         parent?.DeleteAction(this);
                     }
+                    else
+                    {
+                        Interlocked.CompareExchange(ref state, Fresh, Completed);
+                    }
                     return;
                 }
             }
+            runner = null;
             int count = 64;
             while (Volatile.Read(ref state) == Interrupting && count != 0)
             {
@@ -70,7 +75,7 @@ namespace Reactive4.NET.schedulers
 #if !NETSTANDARD
                 try
                 {
-                    Thread.Sleep(int.MaxValue);
+                    Thread.Sleep(1); // consume the "interrupted" state
                 }
                 catch
                 {
@@ -78,35 +83,37 @@ namespace Reactive4.NET.schedulers
                 }
 #endif
             }
-            runner = null;
-            if (!periodic)
-            {
-                action = null;
-                parent?.DeleteAction(this);
-            }
+            action = null;
+            parent?.DeleteAction(this);
         }
 
         public void Dispose()
         {
             if (Interlocked.CompareExchange(ref state, Disposed, Fresh) != Fresh)
             {
-                Thread r = runner;
-                if (Interlocked.CompareExchange(ref state, Interrupting, Running) == Running)
-                {
 #if !NETSTANDARD
-                    r?.Interrupt();
-#endif
-                    Volatile.Write(ref state, Interrupted);
+                Thread r = runner;
+                if (r != null && r != Thread.CurrentThread)
+                {
+                    if (Interlocked.CompareExchange(ref state, Interrupting, Running) == Running)
+                    {
+                        r.Interrupt();
+                        Interlocked.Exchange(ref state, Interrupted);
+                    }
                 }
+                else
+                {
+                    Interlocked.CompareExchange(ref state, Disposed, Running);
+                }
+#else
+                Interlocked.CompareExchange(ref state, Disposed, Running);
+#endif
             }
             Interlocked.Exchange(ref action, null);
             Interlocked.Exchange(ref parent, null)?.DeleteAction(this);
             Interlocked.Exchange(ref resource, null)?.Dispose();
         }
 
-        internal bool Reset()
-        {
-            return Volatile.Read(ref state) == Fresh || Interlocked.CompareExchange(ref state, Fresh, Completed) == Completed;
-        }
+        public bool IsDisposed => Volatile.Read(ref action) == null;
     }
 }

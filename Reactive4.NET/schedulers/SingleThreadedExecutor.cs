@@ -23,17 +23,20 @@ namespace Reactive4.NET.schedulers
 
         readonly TimedBlockingExecutor timed;
 
-        internal SingleThreadedExecutor()
+        readonly string name;
+
+        internal SingleThreadedExecutor(string name)
         {
-            runner = new BlockingQueueConsumer(Flowable.BufferSize());
+            runner = new BlockingQueueConsumer(Flowable.BufferSize(), name);
             timed = TimedExecutorPool.TimedExecutor;
+            this.name = name;
         }
 
         internal void Start()
         {
             if (Interlocked.CompareExchange(ref state, STATE_STARTED, STATE_SHUTDOWN) == STATE_SHUTDOWN)
             {
-                Volatile.Write(ref runner, new BlockingQueueConsumer(Flowable.BufferSize()));
+                Volatile.Write(ref runner, new BlockingQueueConsumer(Flowable.BufferSize(), name));
             }
         }
 
@@ -124,7 +127,7 @@ namespace Reactive4.NET.schedulers
                 {
                     var d = timed.Schedule(() =>
                     {
-                        if (t.Reset())
+                        if (!t.IsDisposed)
                         {
                             run.Offer(t.Run);
                         }
