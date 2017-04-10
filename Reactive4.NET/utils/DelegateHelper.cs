@@ -8,7 +8,7 @@ namespace Reactive4.NET.utils
 {
     internal static class ListSupplier<T>
     {
-        internal static readonly Func<IList<T>> Instance = () => new List<T>();
+        internal static readonly Func<List<T>> Instance = () => new List<T>();
     }
 
     internal static class EmptyConsumer<T>
@@ -33,7 +33,7 @@ namespace Reactive4.NET.utils
 
     internal static class ListAdd<T>
     {
-        internal static readonly Action<List<T>, T> Instance = (a, b) => a.Add(b);
+        internal static readonly Action<IList<T>, T> Instance = (a, b) => a.Add(b);
     }
 
     internal static class IntAdd
@@ -94,5 +94,35 @@ namespace Reactive4.NET.utils
     internal static class ReplayProcessorSupplier<T>
     {
         internal static readonly Func<ReplayProcessor<T>> Instance = () => new ReplayProcessor<T>();
+    }
+
+    internal static class ListSort<T>
+    {
+        internal static readonly Action<List<T>> AsAction = list => list.Sort();
+
+        internal static readonly Func<List<T>, IList<T>> AsFunction = list => { list.Sort(); return list; };
+    }
+
+    internal static class MergeLists<T>
+    {
+        internal static readonly Func<IList<T>, IList<T>, IList<T>> Instance = (a, b) => Merge(a, b, Comparer<T>.Default);
+
+        internal static IList<T> Merge(IList<T> first, IList<T> second, IComparer<T> comparer)
+        {
+            if (first.Count == 0)
+            {
+                return second;
+            }
+            if (second.Count == 0)
+            {
+                return first;
+            }
+
+            IList<T> result = new List<T>(first.Count + second.Count);
+
+
+
+            return result;
+        }
     }
 }

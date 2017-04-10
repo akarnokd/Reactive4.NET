@@ -130,6 +130,12 @@
     <Compile Include="operators\FlowableZipArray.cs" />
     <Compile Include="operators\ParallelFlowableArray.cs" />
     <Compile Include="operators\ParallelFlowableDoFinally.cs" />
+    <Compile Include="operators\ParallelFlowableConcatMap.cs" />
+    <Compile Include="operators\ParallelFlowableCollect.cs" />
+    <Compile Include="operators\ParallelFlowableReduce.cs" />
+    <Compile Include="operators\ParallelFlowableReduceAll.cs" />
+    <Compile Include="operators\ParallelFlowableReducePlain.cs" />
+    <Compile Include="operators\ParallelFlowableFlatMap.cs" />
     <Compile Include="operators\ParallelFlowablePeek.cs" />
     <Compile Include="operators\ParallelFlowableFork.cs" />
     <Compile Include="operators\ParallelFlowableJoin.cs" />

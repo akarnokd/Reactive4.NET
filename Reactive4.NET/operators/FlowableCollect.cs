@@ -43,7 +43,7 @@ namespace Reactive4.NET.operators
             source.Subscribe(new CollectSubscriber(subscriber, initial, collector));
         }
 
-        sealed class CollectSubscriber : AbstractDeferredScalarSubscription<C>, IFlowableSubscriber<T>
+        internal sealed class CollectSubscriber : AbstractDeferredScalarSubscription<C>, IFlowableSubscriber<T>
         {
             readonly Action<C, T> collector;
 

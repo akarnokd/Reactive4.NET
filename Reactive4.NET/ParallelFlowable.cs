@@ -1,5 +1,6 @@
 ﻿using Reactive.Streams;
 using Reactive4.NET.operators;
+using Reactive4.NET.utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -228,28 +229,68 @@ namespace Reactive4.NET
             return new ParallelFlowableDoFinally<T>(source, onFinally);
         }
 
+        /// <summary>
+        /// Reduces the items on each rail into a single value per rail via the shared reducer function.
+        /// </summary>
+        /// <typeparam name="T">The input and output value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="reducer">The function that receives the current accumulated item
+        /// and the current upstream item (or the first two upstream items) and returns
+        /// the new accumulated item.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
         public static IParallelFlowable<T> Reduce<T>(this IParallelFlowable<T> source, Func<T, T, T> reducer)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new ParallelFlowableReducePlain<T>(source, reducer);
         }
 
+        /// <summary>
+        /// Reduces the items on each rail onto a single value per rail, starting with an
+        /// initial value each and by applying a shared reducer function.
+        /// </summary>
+        /// <typeparam name="T">The input value type.</typeparam>
+        /// <typeparam name="R">The accumulator and output type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="initialSupplier">The function returning the initial value for each rail to
+        /// start the accumulation from.</param>
+        /// <param name="reducer">The shared function that receives the current accumulator value
+        /// and current upstream rail item and should return the new accumulator value.</param>
+        /// <returns></returns>
         public static IParallelFlowable<R> Reduce<T, R>(this IParallelFlowable<T> source, Func<R> initialSupplier, Func<R, T, R> reducer)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new ParallelFlowableReduce<T, R>(source, initialSupplier, reducer);
         }
 
+        /// <summary>
+        /// Reduces the items on each rail onto a single sequential value via the shared
+        /// reducer function.
+        /// </summary>
+        /// <typeparam name="T">The input and output value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="reducer">The function that receives the current accumulated item
+        /// and the current upstream item (or the first two upstream items) and returns
+        /// the new accumulated item per rail and the single reduced values per rail
+        /// in a pairwise fashion to reduce them into the sequential result value.</param>
+        /// <returns></returns>
         public static IFlowable<T> ReduceAll<T>(this IParallelFlowable<T> source, Func<T, T, T> reducer)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new ParallelFlowableReduceAll<T>(source, reducer);
         }
 
+        /// <summary>
+        /// Collects items into a collection via a shared collector function on each individual rail
+        /// and emits the collection to the downstream.
+        /// </summary>
+        /// <typeparam name="T">The source value type.</typeparam>
+        /// <typeparam name="R">The collection and result value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="initialSupplier">The function called for each rail to provide the
+        /// collection.</param>
+        /// <param name="collector">The shared function called with
+        /// the per rail collection and per rail upstream item.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
         public static IParallelFlowable<R> Collect<T, R>(this IParallelFlowable<T> source, Func<R> initialSupplier, Action<R, T> collector)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new ParallelFlowableCollect<T, R>(source, initialSupplier, collector);
         }
 
         /// <summary>
@@ -282,42 +323,111 @@ namespace Reactive4.NET
             return converter(source);
         }
 
+        /// <summary>
+        /// Merges/flattens the IPublisher returned by the shared mapper function for each rail item into a
+        /// possibly interleaved sequence of values.
+        /// </summary>
+        /// <typeparam name="T">The upstream rail value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="mapper">The function that receives the upstream rail item and should
+        /// return an IPublisher whose items are merged.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
         public static IParallelFlowable<R> FlatMap<T, R>(this IParallelFlowable<T> source, Func<T, IPublisher<R>> mapper)
         {
             return FlatMap<T, R>(source, mapper, Flowable.BufferSize(), Flowable.BufferSize());
         }
 
+        /// <summary>
+        /// Merges/flattens a maximum number of the IPublisher at once returned by the shared mapper function for each rail item into a
+        /// possibly interleaved sequence of values.
+        /// </summary>
+        /// <typeparam name="T">The upstream rail value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="mapper">The function that receives the upstream rail item and should
+        /// return an IPublisher whose items are merged.</param>
+        /// <param name="maxConcurrency">The maximum number of active IPublishers per rail.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
         public static IParallelFlowable<R> FlatMap<T, R>(this IParallelFlowable<T> source, Func<T, IPublisher<R>> mapper, int maxConcurrency)
         {
             return FlatMap<T, R>(source, mapper, maxConcurrency, Flowable.BufferSize());
         }
 
+        /// <summary>
+        /// Merges/flattens a maximum number of the IPublishers at once returned by the shared mapper function for each rail item into a
+        /// possibly interleaved sequence of values and using the given buffer size/prefetch amount.
+        /// </summary>
+        /// <typeparam name="T">The upstream rail value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="mapper">The function that receives the upstream rail item and should
+        /// return an IPublisher whose items are merged.</param>
+        /// <param name="maxConcurrency">The maximum number of active IPublishers per rail.</param>
+        /// <param name="bufferSize">The number of items to prefetch and buffer from each IPublisher.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
         public static IParallelFlowable<R> FlatMap<T, R>(this IParallelFlowable<T> source, Func<T, IPublisher<R>> mapper, int maxConcurrency, int bufferSize)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new ParallelFlowableFlatMap<T, R>(source, mapper, maxConcurrency, bufferSize);
         }
 
+        /// <summary>
+        /// Concatenates the IPublishers, one after the other and one at a time, returned by the shared mapper
+        /// function for each rail.
+        /// </summary>
+        /// <typeparam name="T">The upstream rail value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="mapper">The function that receives the upstream rail item and should
+        /// return an IPublisher whose items are merged.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
         public static IParallelFlowable<R> ConcatMap<T, R>(this IParallelFlowable<T> source, Func<T, IPublisher<R>> mapper)
         {
             return ConcatMap<T, R>(source, mapper, 2);
         }
 
+        /// <summary>
+        /// Concatenates the IPublishers, one after the other and one at a time, returned by the shared mapper
+        /// function for each rail.
+        /// </summary>
+        /// <typeparam name="T">The upstream rail value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="mapper">The function that receives the upstream rail item and should
+        /// return an IPublisher whose items are merged.</param>
+        /// <param name="prefetch">The number of upstream items to prefetch on each rail from the upstream.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
         public static IParallelFlowable<R> ConcatMap<T, R>(this IParallelFlowable<T> source, Func<T, IPublisher<R>> mapper, int prefetch)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return new ParallelFlowableConcatMap<T, R>(source, mapper, prefetch);
         }
 
+        /// <summary>
+        /// Sorts the items on each rail and merges them into a single, sequential and ordered IList value.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<IList<T>> ToSortedList<T>(this IParallelFlowable<T> source)
         {
-            return ToSortedList(source, Comparer<T>.Default);
+            return source.Collect<T, List<T>>(ListSupplier<T>.Instance, ListAdd<T>.Instance)
+                .Map(ListSort<T>.AsFunction)
+                .ReduceAll(MergeLists<T>.Instance);
         }
 
+        /// <summary>
+        /// Sorts the items on each rail and merges them into a single, sequential and ordered IList value
+        /// where the ordering is determined by the given comparer.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="comparer">The shared comparer used for determining the element ordering.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<IList<T>> ToSortedList<T>(this IParallelFlowable<T> source, IComparer<T> comparer)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            return source.Collect<T, List<T>>(ListSupplier<T>.Instance, ListAdd<T>.Instance)
+                .Map(ListSort<T>.AsFunction)
+                .ReduceAll((a, b) => MergeLists<T>.Merge(a, b, comparer));
         }
 
         public static IFlowable<T> Sorted<T>(this IParallelFlowable<T> source)

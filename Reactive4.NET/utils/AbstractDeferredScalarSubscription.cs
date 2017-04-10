@@ -108,7 +108,10 @@ namespace Reactive4.NET.utils
             return Volatile.Read(ref state) == STATE_CANCELLED;
         }
 
-
+        /// <summary>
+        /// Enters into the consumed state and signals the given Exception to downstream.
+        /// </summary>
+        /// <param name="error">The Exception to signal, not null.</param>
         public void Error(Exception error)
         {
             if (Volatile.Read(ref state) != STATE_CANCELLED)

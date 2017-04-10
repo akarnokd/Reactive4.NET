@@ -23,7 +23,7 @@ namespace Reactive4.NET.operators
             source.Subscribe(new ReducePlainSubscriber(subscriber, reducer));
         }
 
-        sealed class ReducePlainSubscriber : AbstractDeferredScalarSubscription<T>, IFlowableSubscriber<T>
+        internal sealed class ReducePlainSubscriber : AbstractDeferredScalarSubscription<T>, IFlowableSubscriber<T>
         {
             readonly Func<T, T, T> reducer;
 

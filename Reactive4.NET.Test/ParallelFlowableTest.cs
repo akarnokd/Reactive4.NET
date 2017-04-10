@@ -218,5 +218,59 @@ namespace Reactive4.NET.Test
                 }
             }
         }
+
+        [Test]
+        public void SyncReduceAll()
+        {
+            for (int j = 0; j <= 100; j++)
+            {
+                for (int i = 1; i < 33; i++)
+                {
+                    long sum = (1 + j) * j / 2;
+                    var ts = Flowable.Range(1, j)
+                        .Parallel(i)
+                        .Map(v => (long)v)
+                        .ReduceAll((a, b) => a + b)
+                        .Test()
+                        .WithTag("len = " + j + ", parallel = " + i)
+                        ;
+                    if (j == 0)
+                    {
+                        ts.AssertResult();
+                    } else { 
+                        ts.AssertResult(sum);
+                    }
+                }
+            }
+        }
+
+        [Test]
+        public void AsyncReduceAll()
+        {
+            for (int j = 0; j <= 100; j++)
+            {
+                for (int i = 1; i < 33; i++)
+                {
+                    long sum = (1 + j) * j / 2;
+                    var ts = Flowable.Range(1, j)
+                        .Parallel(i)
+                        .RunOn(Executors.Computation)
+                        .Map(v => (long)v)
+                        .ReduceAll((a, b) => a + b)
+                        .Test()
+                        .AwaitDone(TimeSpan.FromSeconds(5))
+                        .WithTag("len = " + j + ", parallel = " + i)
+                        ;
+                    if (j == 0)
+                    {
+                        ts.AssertResult();
+                    }
+                    else
+                    {
+                        ts.AssertResult(sum);
+                    }
+                }
+            }
+        }
     }
 }
