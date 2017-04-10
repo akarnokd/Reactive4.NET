@@ -410,9 +410,9 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<IList<T>> ToSortedList<T>(this IParallelFlowable<T> source)
         {
-            return source.Collect<T, List<T>>(ListSupplier<T>.Instance, ListAdd<T>.Instance)
-                .Map(ListSort<T>.AsFunction)
-                .ReduceAll(MergeLists<T>.Instance);
+            var a = new ParallelFlowableCollect<T, List<T>>(source, ListSupplier<T>.Instance, ListAdd<T>.Instance);
+            var b = new ParallelFlowableMap<List<T>, IList<T>>(a, ListSort<T>.AsFunction);
+            return new ParallelFlowableReduceAll<IList<T>>(b, MergeLists<T>.Instance);
         }
 
         /// <summary>
@@ -425,20 +425,39 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<IList<T>> ToSortedList<T>(this IParallelFlowable<T> source, IComparer<T> comparer)
         {
-            return source.Collect<T, List<T>>(ListSupplier<T>.Instance, ListAdd<T>.Instance)
-                .Map(ListSort<T>.AsFunction)
-                .ReduceAll((a, b) => MergeLists<T>.Merge(a, b, comparer));
+            var a = new ParallelFlowableCollect<T, List<T>>(source, ListSupplier<T>.Instance, ListAdd<T>.Instance);
+            Func<List<T>, IList<T>> f = list => { list.Sort(comparer); return list; };
+            var b = new ParallelFlowableMap<List<T>, IList<T>>(a, f);
+            return new ParallelFlowableReduceAll<IList<T>>(b, (u, v) => MergeLists<T>.Merge(u, v, comparer));
         }
 
+        /// <summary>
+        /// Sorts the items on each rail and merges them into a sequential, ordered stream.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Sorted<T>(this IParallelFlowable<T> source)
         {
-            return Sorted(source, Comparer<T>.Default);
+            var a = new ParallelFlowableCollect<T, List<T>>(source, ListSupplier<T>.Instance, ListAdd<T>.Instance);
+            var b = new ParallelFlowableMap<List<T>, IList<T>>(a, ListSort<T>.AsFunction);
+            return new ParallelFlowableSorted<T>(b, Comparer<T>.Default);
         }
 
+        /// <summary>
+        /// Sorts the items on each rail and merges them into a sequential, ordered stream
+        /// where the item order is determined by the supplied comparer.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="comparer">The comparer used for sorting and merging.</param>
+        /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Sorted<T>(this IParallelFlowable<T> source, IComparer<T> comparer)
         {
-            // TODO implement
-            throw new NotImplementedException();
+            var a = new ParallelFlowableCollect<T, List<T>>(source, ListSupplier<T>.Instance, ListAdd<T>.Instance);
+            Func<List<T>, IList<T>> f = list => { list.Sort(comparer); return list; };
+            var b = new ParallelFlowableMap<List<T>, IList<T>>(a, f);
+            return new ParallelFlowableSorted<T>(b, Comparer<T>.Default);
         }
 
         /// <summary>

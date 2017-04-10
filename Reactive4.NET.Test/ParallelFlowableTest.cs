@@ -272,5 +272,43 @@ namespace Reactive4.NET.Test
                 }
             }
         }
+
+        [Test]
+        public void Sorted()
+        {
+            for (int j = 0; j <= 100; j++)
+            {
+                for (int i = 1; i < 33; i++)
+                {
+                    Flowable.Range(1, j)
+                        .Map(v => j - v + 1)
+                        .Parallel(i)
+                        .Sorted()
+                        .Test()
+                        .WithTag("len=" + j + ", i=" + i)
+                        .AssertValueCount(j)
+                        .AssertValues(Enumerable.Range(1, j))
+                        .AssertNoError()
+                        .AssertComplete();
+                }
+            }
+        }
+
+        [Test]
+        public void SortedP1S1()
+        {
+            int i = 1;
+            int j = 0;
+            Flowable.Range(1, j)
+                        .Map(v => j - v + 1)
+                        .Parallel(i)
+                        .Sorted()
+                        .Test()
+                        .WithTag("len=" + j + ", i=" + i)
+                        .AssertValueCount(j)
+                        .AssertValues(Enumerable.Range(1, j))
+                        .AssertNoError()
+                        .AssertComplete();
+        }
     }
 }

@@ -142,6 +142,7 @@
     <Compile Include="operators\ParallelFlowableFilter.cs" />
     <Compile Include="operators\ParallelFlowableMap.cs" />
     <Compile Include="operators\ParallelFlowableRunOn.cs" />
+    <Compile Include="operators\ParallelFlowableSorted.cs" />
     <Compile Include="ParallelFlowable.cs" />
     <Compile Include="ReplayProcessor.cs" />
     <Compile Include="schedulers\InterruptibleAction.cs" />
