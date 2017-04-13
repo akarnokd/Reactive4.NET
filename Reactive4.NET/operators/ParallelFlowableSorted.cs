@@ -150,6 +150,7 @@ namespace Reactive4.NET.operators
                                 {
                                     min = v;
                                     minIndex = i;
+                                    hasMin = true;
                                 }
                                 else
                                 {

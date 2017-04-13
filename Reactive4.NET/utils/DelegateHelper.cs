@@ -109,18 +109,49 @@ namespace Reactive4.NET.utils
 
         internal static IList<T> Merge(IList<T> first, IList<T> second, IComparer<T> comparer)
         {
-            if (first.Count == 0)
+            int c1 = first.Count;
+            if (c1 == 0)
             {
                 return second;
             }
-            if (second.Count == 0)
+            int c2 = second.Count;
+            if (c2 == 0)
             {
                 return first;
             }
 
-            IList<T> result = new List<T>(first.Count + second.Count);
+            IList<T> result = new List<T>(c1 + c2);
 
+            int i = 0;
+            int j = 0;
 
+            while (i < c1 && j < c2)
+            {
+                var v1 = first[i];
+                var v2 = second[j];
+
+                int k = comparer.Compare(v1, v2);
+                if (k <= 0)
+                {
+                    result.Add(v1);
+                    i++;
+                }
+                else
+                {
+                    result.Add(v2);
+                    j++;
+                }
+            }
+
+            while (i < c1)
+            {
+                result.Add(first[i++]);
+            }
+
+            while (j < c2)
+            {
+                result.Add(second[j++]);
+            }
 
             return result;
         }

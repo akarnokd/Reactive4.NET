@@ -369,14 +369,14 @@ namespace Reactive4.NET.operators
                             }
                         }
 
-                        if (notReady == n)
-                        {
-                            break;
-                        }
                         idx++;
                         if (idx == n)
                         {
                             idx = 0;
+                        }
+                        if (notReady == n)
+                        {
+                            break;
                         }
                     }
 
