@@ -25,10 +25,10 @@ namespace Reactive4.NET.subscribers
 
         ISubscription upstream;
 
-        internal TaskIgnoreElementsSubscriber(CancellationTokenSource cts)
+        internal TaskIgnoreElementsSubscriber(CancellationToken cancellationToken)
         {
             this.tcs = new TaskCompletionSource<object>();
-            reg = cts.Token.Register(Cancel);
+            reg = cancellationToken.Register(Cancel);
         }
 
         void Cancel()
