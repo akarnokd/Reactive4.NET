@@ -27,10 +27,10 @@ namespace Reactive4.NET.subscribers
 
         bool done;
 
-        internal TaskFirstSubscriber(CancellationTokenSource cts)
+        internal TaskFirstSubscriber(CancellationToken cancellationToken)
         {
             this.tcs = new TaskCompletionSource<T>();
-            reg = cts.Token.Register(Cancel);
+            reg = cancellationToken.Register(Cancel);
         }
 
         void Cancel()

@@ -3175,7 +3175,20 @@ namespace Reactive4.NET
         /// <returns>The new Task instance.</returns>
         public static Task<T> FirstTask<T>(this IFlowable<T> source, CancellationTokenSource cts)
         {
-            var s = new TaskFirstSubscriber<T>(cts);
+            return source.FirstTask(cts.Token);
+        }
+
+        /// <summary>
+        /// Returns a Task that returns the first element from the source
+        /// IFlowable.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="cancellationToken">The cancellation token to observe for cancellation.</param>
+        /// <returns>The new Task instance.</returns>
+        public static Task<T> FirstTask<T>(this IFlowable<T> source, CancellationToken cancellationToken)
+        {
+            var s = new TaskFirstSubscriber<T>(cancellationToken);
             source.Subscribe(s);
             return s.Task;
         }
