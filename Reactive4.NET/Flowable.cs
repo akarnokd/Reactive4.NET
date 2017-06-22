@@ -3203,7 +3203,20 @@ namespace Reactive4.NET
         /// <returns>The new Task instance.</returns>
         public static Task<T> LastTask<T>(this IFlowable<T> source, CancellationTokenSource cts)
         {
-            var s = new TaskLastSubscriber<T>(cts);
+            return source.LastTask(cts.Token);
+        }
+
+        /// <summary>
+        /// Returns a Task that returns the last element from the source
+        /// IFlowable.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="cancellationToken">The cancellation token to observe for cancellation.</param>
+        /// <returns>The new Task instance.</returns>
+        public static Task<T> LastTask<T>(this IFlowable<T> source, CancellationToken cancellationToken)
+        {
+            var s = new TaskLastSubscriber<T>(cancellationToken);
             source.Subscribe(s);
             return s.Task;
         }
