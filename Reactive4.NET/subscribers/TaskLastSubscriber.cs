@@ -30,10 +30,10 @@ namespace Reactive4.NET.subscribers
 
         bool done;
 
-        internal TaskLastSubscriber(CancellationTokenSource cts)
+        internal TaskLastSubscriber(CancellationToken cancellationToken)
         {
             this.tcs = new TaskCompletionSource<T>();
-            reg = cts.Token.Register(Cancel);
+            reg = cancellationToken.Register(Cancel);
         }
 
         void Cancel()
