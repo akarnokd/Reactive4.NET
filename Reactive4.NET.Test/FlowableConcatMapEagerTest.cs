@@ -71,5 +71,33 @@ namespace Reactive4.NET.Test
             .Test()
             .AssertResult(0, 1, 2);
         }
+
+        [Test]
+        public void LessConcurrencyAsync()
+        {
+            Flowable.Range(0, 3)
+            .ConcatMapEager(x =>
+            {
+                return Flowable.Just(x)
+                    .SubscribeOn(Executors.Computation);
+            }, 2)
+            .Test()
+            .AwaitDone(TimeSpan.FromSeconds(5))
+            .AssertResult(0, 1, 2);
+        }
+
+        [Test]
+        public void LessConcurrencyAsync3()
+        {
+            Flowable.Range(0, 10)
+            .ConcatMapEager(x =>
+            {
+                return Flowable.Just(x)
+                    .SubscribeOn(Executors.Computation);
+            }, 3)
+            .Test()
+            .AwaitDone(TimeSpan.FromSeconds(5))
+            .AssertResult(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+        }
     }
 }

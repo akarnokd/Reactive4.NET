@@ -96,7 +96,7 @@ namespace Reactive4.NET.operators
                 int ci = consumerIndex;
                 if (Interlocked.CompareExchange(ref s[ci], null, inner) == inner) {
                     ci++;
-                    producerIndex = ci == n ? 0 : ci;
+                    consumerIndex = ci == n ? 0 : ci;
                     return true;
                 }
                 return false;
@@ -438,8 +438,6 @@ namespace Reactive4.NET.operators
 
                         if (curr == null)
                         {
-                            int ci = consumerIndex + 1;
-                            consumerIndex = ci == n ? 0 : ci;
                             upstream.Request(1);
                             continue;
                         }
