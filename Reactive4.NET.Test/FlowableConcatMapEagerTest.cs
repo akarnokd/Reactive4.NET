@@ -47,5 +47,29 @@ namespace Reactive4.NET.Test
                     }
                 });
         }
+
+        [Test]
+        public void LessConcurrencyHidden()
+        {
+            var result = Flowable.Range(0, 3)
+            .ConcatMapEager(x =>
+            {
+                return Flowable.Just(x).Hide();
+            }, 2)
+            .Test()
+            .AssertResult(0, 1, 2);
+        }
+
+        [Test]
+        public void LessConcurrency()
+        {
+            var result = Flowable.Range(0, 3)
+            .ConcatMapEager(x =>
+            {
+                return Flowable.Just(x);
+            }, 2)
+            .Test()
+            .AssertResult(0, 1, 2);
+        }
     }
 }

@@ -614,6 +614,7 @@ namespace Reactive4.NET.operators
                                 fusionMode = m;
                                 Volatile.Write(ref queue, qs);
                                 Volatile.Write(ref done, true);
+                                parent.Drain();
                                 return;
                             }
                             if (m == FusionSupport.ASYNC)
