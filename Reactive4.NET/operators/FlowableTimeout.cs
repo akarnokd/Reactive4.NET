@@ -50,6 +50,8 @@ namespace Reactive4.NET.operators
 
             long index;
 
+            long produced;
+
             internal TimeoutSubscriber(IFlowableSubscriber<T> actual, TimeSpan firstTimeout,
                 TimeSpan itemTimeout, IExecutorWorker worker, IPublisher<T> fallback)
             {
@@ -87,6 +89,8 @@ namespace Reactive4.NET.operators
                 long idx = Volatile.Read(ref index);
                 if (Interlocked.CompareExchange(ref index, idx + 1, idx) == idx)
                 {
+                    produced++;
+
                     actual.OnNext(element);
 
                     DisposableHelper.Replace(ref timer, worker.Schedule(() => Timeout(idx + 1), itemTimeout));
@@ -132,6 +136,12 @@ namespace Reactive4.NET.operators
                     }
                     else
                     {
+                        long q = produced;
+                        if (q != 0L)
+                        {
+                            ArbiterProduced(q);
+                        }
+
                         p.Subscribe(new FallbackSubscriber(this));
                     }
                     worker.Dispose();

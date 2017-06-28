@@ -68,5 +68,22 @@ namespace Reactive4.NET.Test
 
             Console.WriteLine(c);
         }
+
+        [Test]
+        public void Backpressure()
+        {
+            var ts = Flowable.Just(1).ConcatWith(Flowable.Never<int>())
+                .Timeout(TimeSpan.FromMilliseconds(1), Flowable.Just(2))
+                .Test(1);
+
+            Thread.Sleep(100);
+
+            ts.AssertValues(1)
+                .AssertNoError()
+                .AssertNotComplete()
+                .RequestMore(1)
+                .AwaitDone(TimeSpan.FromSeconds(5))
+                .AssertResult(1, 2);
+        }
     }
 }
