@@ -570,7 +570,7 @@ namespace Reactive4.NET.operators
                         a.OnNext(default(T));
                     }
 
-                    if (d && empty)
+                    if (d)
                     {
                         var ex = error;
                         if (ex != null)

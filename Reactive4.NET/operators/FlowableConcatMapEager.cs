@@ -296,7 +296,7 @@ namespace Reactive4.NET.operators
                         a.OnNext(default(R));
                     }
 
-                    if (d && curr == null)
+                    if (d)
                     {
                         var ex = ExceptionHelper.Terminate(ref error);
                         if (ex == null)

@@ -276,7 +276,7 @@ namespace Reactive4.NET.operators
                         a.OnNext(default(T));
                     }
 
-                    if (d && empty)
+                    if (d)
                     {
                         var ex = error;
                         if (ex != null)
@@ -429,7 +429,7 @@ namespace Reactive4.NET.operators
                         a.TryOnNext(default(T));
                     }
 
-                    if (d && empty)
+                    if (d)
                     {
                         var ex = error;
                         if (ex != null)

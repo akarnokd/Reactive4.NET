@@ -253,7 +253,7 @@ namespace Reactive4.NET.operators
                         a.OnNext(default(R));
                     }
 
-                    if (d && empty)
+                    if (d)
                     {
                         ClearLatest();
                         var ex = ExceptionHelper.Terminate(ref error);

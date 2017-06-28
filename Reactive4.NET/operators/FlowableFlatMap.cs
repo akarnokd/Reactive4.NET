@@ -354,8 +354,12 @@ namespace Reactive4.NET.operators
                         }
                     }
 
+                    if (again)
+                    {
+                        continue;
+                    }
                     int w = Volatile.Read(ref wip);
-                    if (w == missed && !again)
+                    if (w == missed)
                     {
                         emitted = e;
                         missed = Interlocked.Add(ref wip, -missed);

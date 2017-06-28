@@ -234,7 +234,12 @@ namespace Reactive4.NET.operators
                     bool d = Volatile.Read(ref done);
                     bool empty = q.IsEmpty();
 
-                    if (d && empty)
+                    if (!empty)
+                    {
+                        a.OnNext(default(T));
+                    }
+
+                    if (d)
                     {
                         Exception ex = error;
                         if (ex != null)
@@ -246,10 +251,6 @@ namespace Reactive4.NET.operators
                             a.OnComplete();
                         }
                         return;
-                    } else
-                    if (!empty)
-                    {
-                        a.OnNext(default(T));
                     }
 
                     int w = Volatile.Read(ref wip);

@@ -753,9 +753,12 @@ namespace Reactive4.NET
                     bool d = Volatile.Read(ref done);
                     bool empty = Volatile.Read(ref size) == ps.emitted;
 
-                    ps.OnNext(default(T));
+                    if (!empty)
+                    {
+                        ps.OnNext(default(T));
+                    }
 
-                    if (d && empty)
+                    if (d)
                     {
                         Exception ex = error;
                         if (ex != null)
@@ -974,9 +977,12 @@ namespace Reactive4.NET
                     bool d = Volatile.Read(ref done);
                     bool empty = Volatile.Read(ref size) == ps.emitted;
 
-                    ps.OnNext(default(T));
+                    if (!empty)
+                    {
+                        ps.OnNext(default(T));
+                    }
 
-                    if (d && empty)
+                    if (d)
                     {
                         Exception ex = error;
                         if (ex != null)
@@ -1081,7 +1087,7 @@ namespace Reactive4.NET
                 }
             }
 
-    public override void Finish()
+            public override void Finish()
             {
                 long now = executor.Now - maxAgeMillis;
                 var h = head;
@@ -1258,9 +1264,12 @@ namespace Reactive4.NET
                     bool d = Volatile.Read(ref done);
                     bool empty = Volatile.Read(ref size) == ps.emitted;
 
-                    ps.OnNext(default(T));
+                    if (!empty)
+                    {
+                        ps.OnNext(default(T));
+                    }
 
-                    if (d && empty)
+                    if (d)
                     {
                         Exception ex = error;
                         if (ex != null)
