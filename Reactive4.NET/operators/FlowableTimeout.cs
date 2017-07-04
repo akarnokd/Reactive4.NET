@@ -87,7 +87,7 @@ namespace Reactive4.NET.operators
                 Volatile.Read(ref timer)?.Dispose();
 
                 long idx = Volatile.Read(ref index);
-                if (Interlocked.CompareExchange(ref index, idx + 1, idx) == idx)
+                if (idx != long.MaxValue && Interlocked.CompareExchange(ref index, idx + 1, idx) == idx)
                 {
                     produced++;
 
