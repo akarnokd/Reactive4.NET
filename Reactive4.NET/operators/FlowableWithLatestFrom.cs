@@ -29,7 +29,7 @@ namespace Reactive4.NET.operators
             source.Subscribe(parent);
         }
 
-        sealed class WithLatestFromSubscriber : IFlowableSubscriber<T>, ISubscription
+        sealed class WithLatestFromSubscriber : IConditionalSubscriber<T>, ISubscription
         {
             readonly IFlowableSubscriber<R> actual;
 
@@ -86,9 +86,17 @@ namespace Reactive4.NET.operators
 
             public void OnNext(T element)
             {
+                if (!TryOnNext(element) && !done)
+                {
+                    upstream.Request(1);
+                }
+            }
+
+            public bool TryOnNext(T element)
+            {
                 if (done)
                 {
-                    return;
+                    return false;
                 }
                 var n = Volatile.Read(ref latest);
                 if (n != null)
@@ -103,11 +111,13 @@ namespace Reactive4.NET.operators
                     {
                         Cancel();
                         OnError(ex);
-                        return;
+                        return false;
                     }
 
                     SerializationHelper.OnNext(actual, ref wip, ref error, v);
+                    return true;
                 }
+                return false;
             }
 
             public void OnSubscribe(ISubscription subscription)
