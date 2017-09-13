@@ -53,5 +53,20 @@ namespace Reactive4.NET.Test
 
             Assert.IsFalse(pp.HasSubscribers);
         }
+
+        [Test]
+        public void GroupByPublish()
+        {
+            var published = Flowable.FromArray("A", "AB", "BC")
+            .GroupBy(x => x.Length)
+            .Publish();
+
+            published.Subscribe(g =>
+            {
+                Console.WriteLine(g.Key);
+            });
+
+            published.Connect();
+        }
     }
 }

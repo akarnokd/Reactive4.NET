@@ -132,7 +132,7 @@ namespace Reactive4.NET
         /// <param name="element">The element signaled</param>
         public void OnNext(T element)
         {
-            if (element == null)
+            if (element == null && fusionMode == FusionSupport.NONE)
             {
                 throw new ArgumentNullException(nameof(element));
             }
