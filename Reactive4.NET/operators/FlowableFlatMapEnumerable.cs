@@ -228,6 +228,7 @@ namespace Reactive4.NET.operators
                 var e = emitted;
                 var f = consumed;
                 var en = current;
+                var limit = this.limit;
 
                 for (;;)
                 {
@@ -262,6 +263,12 @@ namespace Reactive4.NET.operators
                             if (empty)
                             {
                                 break;
+                            }
+
+                            if (++f == limit)
+                            {
+                                f = 0;
+                                upstream.Request(limit);
                             }
 
                             bool hasValue;
