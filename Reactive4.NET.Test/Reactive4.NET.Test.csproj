@@ -59,6 +59,7 @@
     <Compile Include="Benchmark.cs" />
     <Compile Include="ConnectableFlowableReplay1Tck.cs" />
     <Compile Include="FlowableFlatMapEnumerable3Tck.cs" />
+    <Compile Include="FlowableParallelTest.cs" />
     <Compile Include="MulticastPublisher1Tck.cs" />
     <Compile Include="FlowableAmb2Tck.cs" />
     <Compile Include="FlowableParallel4Tck.cs" />

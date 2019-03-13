@@ -138,6 +138,7 @@ namespace Reactive4.NET.operators
                                     empty = false;
                                     a.OnNext(t);
 
+                                    inner.Produced(limit);
                                     if (++e == r)
                                     {
                                         noRequest = true;

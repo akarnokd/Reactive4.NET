@@ -167,9 +167,7 @@ namespace Reactive4.NET.operators
                 var subs = subscribers;
                 var n = subs.Length;
                 var q = queue;
-                var c = consumed;
                 var idx = index;
-                var lim = limit;
 
                 for (;;)
                 {
@@ -208,16 +206,11 @@ namespace Reactive4.NET.operators
                                     notReady++;
                                     subs[idx].cancelled = 1;
                                     quit = true;
-                                } else
+                                }
+                                else
                                 {
                                     a.OnNext(t);
                                     subs[idx].emitted = e + 1;
-
-                                    if (++c == lim)
-                                    {
-                                        c = 0;
-                                        upstream.Request(lim);
-                                    }
                                 }
                             }
                             else
@@ -263,7 +256,6 @@ namespace Reactive4.NET.operators
                     int w = Volatile.Read(ref wip);
                     if (w == missed)
                     {
-                        consumed = c;
                         index = idx;
                         missed = Interlocked.Add(ref wip, -missed);
                         if (missed == 0)
