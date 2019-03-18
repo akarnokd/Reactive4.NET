@@ -175,5 +175,30 @@ namespace Reactive4.NET.Test
                 .Test()
                 .AssertResult(n + 1);
         }
+
+        [Test]
+        public void FlattenArray()
+        {
+            var n = 1000;
+            Flowable.Range(0, n)
+                .FlatMapEnumerable(x => new[] { x })
+                .Test()
+                .AssertValueCount(n)
+                .AssertNoError()
+                .AssertComplete();
+        }
+
+        [Test]
+        public void FlattenArray_NotFused()
+        {
+            var n = 1000;
+            Flowable.Range(0, n)
+                .Hide()
+                .FlatMapEnumerable(x => new[] { x })
+                .Test()
+                .AssertValueCount(n)
+                .AssertNoError()
+                .AssertComplete();
+        }
     }
 }

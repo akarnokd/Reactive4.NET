@@ -229,6 +229,7 @@ namespace Reactive4.NET.operators
                 var f = consumed;
                 var en = current;
                 var limit = this.limit;
+                var syncFused = fusionMode == FusionSupport.SYNC;
 
                 for (;;)
                 {
@@ -265,7 +266,7 @@ namespace Reactive4.NET.operators
                                 break;
                             }
 
-                            if (++f == limit)
+                            if (!syncFused && ++f == limit)
                             {
                                 f = 0;
                                 upstream.Request(limit);
