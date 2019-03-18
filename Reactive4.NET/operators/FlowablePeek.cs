@@ -174,6 +174,7 @@ namespace Reactive4.NET.operators
                 done = true;
                 try
                 {
+                    parent.onError?.Invoke(cause);
                     parent.onTerminated?.Invoke();
                 }
                 catch (Exception ex)
@@ -342,6 +343,7 @@ namespace Reactive4.NET.operators
                 done = true;
                 try
                 {
+                    parent.onError?.Invoke(cause);
                     parent.onTerminated?.Invoke();
                 }
                 catch (Exception ex)
