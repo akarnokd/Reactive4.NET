@@ -58,6 +58,7 @@
     <Compile Include="AsyncProcessor1Tck.cs" />
     <Compile Include="Benchmark.cs" />
     <Compile Include="ConnectableFlowableReplay1Tck.cs" />
+    <Compile Include="FlowableDoOnErrorTest.cs" />
     <Compile Include="FlowableFlatMapEnumerable3Tck.cs" />
     <Compile Include="FlowableParallelTest.cs" />
     <Compile Include="MulticastPublisher1Tck.cs" />
