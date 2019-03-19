@@ -1,4 +1,4 @@
-﻿using Reactive.Streams;
+using Reactive.Streams;
 using Reactive4.NET.utils;
 using System;
 using System.Collections.Generic;
@@ -17,19 +17,23 @@ namespace Reactive4.NET.operators
 
         readonly int bufferSize;
 
+        readonly bool delayError;
+
         public FlowableFlatMap(IFlowable<T> source, 
             Func<T, IPublisher<R>> mapper,
             int maxConcurrency,
-            int bufferSize) : base(source)
+            int bufferSize, 
+            bool delayError) : base(source)
         {
             this.mapper = mapper;
             this.maxConcurrency = maxConcurrency;
             this.bufferSize = bufferSize;
+            this.delayError = delayError;
         }
 
         public override void Subscribe(IFlowableSubscriber<R> subscriber)
         {
-            source.Subscribe(new FlatMapMainSubscriber(subscriber, mapper, maxConcurrency, bufferSize));
+            source.Subscribe(new FlatMapMainSubscriber(subscriber, mapper, maxConcurrency, bufferSize, delayError));
         }
 
         internal sealed class FlatMapMainSubscriber : IFlowableSubscriber<T>, ISubscription
@@ -41,6 +45,8 @@ namespace Reactive4.NET.operators
             readonly int maxConcurrency;
 
             readonly int bufferSize;
+
+            readonly bool delayError;
 
             ISubscription upstream;
 
@@ -60,12 +66,13 @@ namespace Reactive4.NET.operators
             static readonly FlatMapInnerSubscriber[] TERMINATED = new FlatMapInnerSubscriber[0];
 
             internal FlatMapMainSubscriber(IFlowableSubscriber<R> actual, Func<T, IPublisher<R>> mapper,
-                int maxConcurrency, int bufferSize)
+                int maxConcurrency, int bufferSize, bool delayError)
             {
                 this.actual = actual;
                 this.mapper = mapper;
                 this.maxConcurrency = maxConcurrency;
                 this.bufferSize = bufferSize;
+                this.delayError = delayError;
                 Interlocked.Exchange(ref subscribers, EMPTY);
             }
 
@@ -101,6 +108,12 @@ namespace Reactive4.NET.operators
                 {
                     ExceptionHelper.AddException(ref error, cause);
                     Volatile.Write(ref done, true);
+
+                    if (!delayError)
+                    {
+                        CancelAll();
+                    }
+
                     Drain();
                 }
             }
@@ -411,9 +424,20 @@ namespace Reactive4.NET.operators
 
             internal void InnerError(FlatMapInnerSubscriber inner, Exception ex)
             {
-                ExceptionHelper.AddException(ref error, ex);
-                Volatile.Write(ref inner.done, true);
-                Drain();
+                if (!Volatile.Read(ref done))
+                {
+                    ExceptionHelper.AddException(ref error, ex);
+                    if (!delayError)
+                    {
+                        Volatile.Write(ref done, true);
+
+                        upstream.Cancel();
+                        CancelAll();
+                    }
+                    
+                    Volatile.Write(ref inner.done, true);
+                    Drain();
+                }
             }
 
             internal void InnerComplete(FlatMapInnerSubscriber inner)
@@ -543,20 +567,24 @@ namespace Reactive4.NET.operators
 
         readonly int bufferSize;
 
+        readonly bool delayError;
+
         public FlowableFlatMapPublisher(IPublisher<T> source,
             Func<T, IPublisher<R>> mapper,
             int maxConcurrency,
-            int bufferSize)
+            int bufferSize, 
+            bool delayError)
         {
             this.source = source;
             this.mapper = mapper;
             this.maxConcurrency = maxConcurrency;
             this.bufferSize = bufferSize;
+            this.delayError = delayError;
         }
 
         public override void Subscribe(IFlowableSubscriber<R> subscriber)
         {
-            source.Subscribe(new FlowableFlatMap<T, R>.FlatMapMainSubscriber(subscriber, mapper, maxConcurrency, bufferSize));
+            source.Subscribe(new FlowableFlatMap<T, R>.FlatMapMainSubscriber(subscriber, mapper, maxConcurrency, bufferSize, delayError));
         }
     }
 }
