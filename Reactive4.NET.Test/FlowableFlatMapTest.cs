@@ -12,59 +12,47 @@ namespace Reactive4.NET.Test
         [Test]
         public void SourceErrorDelayed()
         {
-            var seen = new List<int>();
             Flowable.Just(0)
                 .ConcatWith(Flowable.Error<int>(new Exception()))
                 .FlatMap(x => Flowable.Range(0, 5).Delay(TimeSpan.FromMilliseconds(10)))
-                .DoOnNext(seen.Add)
                 .Test()
                 .AwaitDone(TimeSpan.FromSeconds(5))
+                .AssertValues(Enumerable.Range(0, 5))
                 .AssertError(typeof(Exception));
-
-            CollectionAssert.AreEqual(Enumerable.Range(0, 5), seen);
         }
         
         [Test]
         public void SourceErrorEager()
         {
-            var seen = new List<int>();
             Flowable.Just(0)
                 .ConcatWith(Flowable.Error<int>(new Exception()))
                 .FlatMap(x => Flowable.Range(0, 5).Delay(TimeSpan.FromMilliseconds(10)), Flowable.BufferSize(), Flowable.BufferSize(), false)
-                .DoOnNext(seen.Add)
                 .Test()
                 .AwaitDone(TimeSpan.FromSeconds(5))
+                .AssertValueCount(0)
                 .AssertError(typeof(Exception));
-
-            CollectionAssert.IsEmpty(seen);
         }
         
         [Test]
         public void InnerErrorDelayed()
         {
-            var seen = new List<int>();
             Flowable.Range(0, 5)
                 .FlatMap(x => x == 0 ? Flowable.Error<int>(new Exception()) : Flowable.Just(x).Delay(TimeSpan.FromMilliseconds(10)))
-                .DoOnNext(seen.Add)
                 .Test()
                 .AwaitDone(TimeSpan.FromSeconds(5))
+                .AssertValueCount(4)
                 .AssertError(typeof(Exception));
-            
-            CollectionAssert.AreEquivalent(Enumerable.Range(1, 4), seen);
         }
         
         [Test]
         public void InnerErrorEager()
         {
-            var seen = new List<int>();
             Flowable.Range(0, 5)
                 .FlatMap(x => x == 0 ? Flowable.Error<int>(new Exception()) : Flowable.Just(x).Delay(TimeSpan.FromMilliseconds(10)), Flowable.BufferSize(), Flowable.BufferSize(), false)
-                .DoOnNext(seen.Add)
                 .Test()
                 .AwaitDone(TimeSpan.FromSeconds(5))
+                .AssertValueCount(0)
                 .AssertError(typeof(Exception));
-            
-            CollectionAssert.IsEmpty(seen);
         }
 
         [Test]
