@@ -424,20 +424,20 @@ namespace Reactive4.NET.operators
 
             internal void InnerError(FlatMapInnerSubscriber inner, Exception ex)
             {
-                if (!Volatile.Read(ref done))
+                ExceptionHelper.AddException(ref error, ex);
+                if (!delayError)
                 {
-                    ExceptionHelper.AddException(ref error, ex);
-                    if (!delayError)
+                    if (!Volatile.Read(ref done))
                     {
                         Volatile.Write(ref done, true);
 
                         upstream.Cancel();
                         CancelAll();
                     }
-                    
-                    Volatile.Write(ref inner.done, true);
-                    Drain();
                 }
+                
+                Volatile.Write(ref inner.done, true);
+                Drain();
             }
 
             internal void InnerComplete(FlatMapInnerSubscriber inner)
