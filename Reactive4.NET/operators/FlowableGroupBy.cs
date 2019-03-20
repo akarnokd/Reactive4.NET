@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -575,6 +575,7 @@ namespace Reactive4.NET.operators
                     var a = Volatile.Read(ref actual);
                     var q = queue;
                     var e = emitted;
+                    var p = parent;
 
                     for (;;)
                     {
@@ -587,6 +588,11 @@ namespace Reactive4.NET.operators
                             {
                                 if (Volatile.Read(ref cancelled))
                                 {
+                                    if (f != 0)
+                                    {
+                                        p.RequestInner(f);
+                                    }
+
                                     q.Clear();
                                     actual = null;
                                     return;
@@ -620,6 +626,11 @@ namespace Reactive4.NET.operators
                                 e++;
                                 f++;
                             }
+                            
+                            if (f != 0)
+                            {
+                                p.RequestInner(f);
+                            }
 
                             if (e == r)
                             {
@@ -647,11 +658,6 @@ namespace Reactive4.NET.operators
                                     }
                                     return;
                                 }
-                            }
-
-                            if (f != 0)
-                            {
-                                parent.RequestInner(f);
                             }
                         }
                         int w = Volatile.Read(ref wip);
