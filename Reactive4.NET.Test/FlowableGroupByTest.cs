@@ -97,5 +97,29 @@ namespace Reactive4.NET.Test
                 .Test()
                 .AssertResult(1);
         }
+
+        [Test]
+        public void GroupUnsubscriptionOnError()
+        {
+            Flowable.Range(0, 1000)
+                .GroupBy(x => x % 2)
+                .FlatMap(g => g.Map<int, int>(x => throw new Exception()))
+                .Test()
+                .AwaitDone(TimeSpan.FromSeconds(5))
+                .AssertValueCount(0)
+                .AssertError(typeof(Exception));
+        }
+
+        [Test]
+        public void GroupUnsubscriptionOnErrorHidden()
+        {
+            Flowable.Range(0, 1000)
+                .GroupBy(x => x % 2)
+                .FlatMap(g => g.Hide().Map<int, int>(x => throw new Exception()).Hide())
+                .Test()
+                .AwaitDone(TimeSpan.FromSeconds(5))
+                .AssertValueCount(0)
+                .AssertError(typeof(Exception));
+        }
     }
 }
