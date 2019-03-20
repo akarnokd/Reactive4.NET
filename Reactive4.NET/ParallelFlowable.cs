@@ -1,4 +1,4 @@
-﻿using Reactive.Streams;
+using Reactive.Streams;
 using Reactive4.NET.operators;
 using Reactive4.NET.utils;
 using System;
@@ -368,7 +368,25 @@ namespace Reactive4.NET
         /// <returns>The new IParallelFlowable instance.</returns>
         public static IParallelFlowable<R> FlatMap<T, R>(this IParallelFlowable<T> source, Func<T, IPublisher<R>> mapper, int maxConcurrency, int bufferSize)
         {
-            return new ParallelFlowableFlatMap<T, R>(source, mapper, maxConcurrency, bufferSize);
+            return FlatMap<T, R>(source, mapper, maxConcurrency, bufferSize, true);
+        }
+
+        /// <summary>
+        /// Merges/flattens a maximum number of the IPublishers at once returned by the shared mapper function for each rail item into a
+        /// possibly interleaved sequence of values and using the given buffer size/prefetch amount.
+        /// </summary>
+        /// <typeparam name="T">The upstream rail value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IParallelFlowable instance.</param>
+        /// <param name="mapper">The function that receives the upstream rail item and should
+        /// return an IPublisher whose items are merged.</param>
+        /// <param name="maxConcurrency">The maximum number of active IPublishers per rail.</param>
+        /// <param name="bufferSize">The number of items to prefetch and buffer from each IPublisher.</param>
+        /// <param name="delayError">Whether error publication should be delayed until all sources have terminated.</param>
+        /// <returns>The new IParallelFlowable instance.</returns>
+        public static IParallelFlowable<R> FlatMap<T, R>(this IParallelFlowable<T> source, Func<T, IPublisher<R>> mapper, int maxConcurrency, int bufferSize, bool delayError)
+        {
+            return new ParallelFlowableFlatMap<T, R>(source, mapper, maxConcurrency, bufferSize, delayError);
         }
 
         /// <summary>

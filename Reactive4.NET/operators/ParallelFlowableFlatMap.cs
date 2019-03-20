@@ -15,11 +15,14 @@ namespace Reactive4.NET.operators
 
         readonly int bufferSize;
 
-        public ParallelFlowableFlatMap(IParallelFlowable<T> source, Func<T, IPublisher<R>> mapper, int maxConcurrency, int bufferSize) : base(source)
+        readonly bool delayError;
+
+        public ParallelFlowableFlatMap(IParallelFlowable<T> source, Func<T, IPublisher<R>> mapper, int maxConcurrency, int bufferSize, bool delayError) : base(source)
         {
             this.mapper = mapper;
             this.maxConcurrency = maxConcurrency;
             this.bufferSize = bufferSize;
+            this.delayError = delayError;
         }
 
         public override void Subscribe(IFlowableSubscriber<R>[] subscribers)
@@ -32,7 +35,7 @@ namespace Reactive4.NET.operators
                 for (int i = 0; i < n; i++)
                 {
                     var s = subscribers[i];
-                    parents[i] = new FlowableFlatMap<T, R>.FlatMapMainSubscriber(s, mapper, maxConcurrency, bufferSize);
+                    parents[i] = new FlowableFlatMap<T, R>.FlatMapMainSubscriber(s, mapper, maxConcurrency, bufferSize, delayError);
                 }
 
                 source.Subscribe(parents);

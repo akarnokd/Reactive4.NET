@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +9,52 @@ namespace Reactive4.NET.Test
     [TestFixture]
     public class FlowableFlatMapTest
     {
+        [Test]
+        public void SourceErrorDelayed()
+        {
+            Flowable.Just(0)
+                .ConcatWith(Flowable.Error<int>(new Exception()))
+                .FlatMap(x => Flowable.Range(0, 5).Delay(TimeSpan.FromMilliseconds(10)))
+                .Test()
+                .AwaitDone(TimeSpan.FromSeconds(5))
+                .AssertValues(Enumerable.Range(0, 5))
+                .AssertError(typeof(Exception));
+        }
+        
+        [Test]
+        public void SourceErrorEager()
+        {
+            Flowable.Just(0)
+                .ConcatWith(Flowable.Error<int>(new Exception()))
+                .FlatMap(x => Flowable.Range(0, 5).Delay(TimeSpan.FromMilliseconds(10)), Flowable.BufferSize(), Flowable.BufferSize(), false)
+                .Test()
+                .AwaitDone(TimeSpan.FromSeconds(5))
+                .AssertValueCount(0)
+                .AssertError(typeof(Exception));
+        }
+        
+        [Test]
+        public void InnerErrorDelayed()
+        {
+            Flowable.Range(0, 5)
+                .FlatMap(x => x == 0 ? Flowable.Error<int>(new Exception()) : Flowable.Just(x).Delay(TimeSpan.FromMilliseconds(10)))
+                .Test()
+                .AwaitDone(TimeSpan.FromSeconds(5))
+                .AssertValueCount(4)
+                .AssertError(typeof(Exception));
+        }
+        
+        [Test]
+        public void InnerErrorEager()
+        {
+            Flowable.Range(0, 5)
+                .FlatMap(x => x == 0 ? Flowable.Error<int>(new Exception()) : Flowable.Just(x).Delay(TimeSpan.FromMilliseconds(10)), Flowable.BufferSize(), Flowable.BufferSize(), false)
+                .Test()
+                .AwaitDone(TimeSpan.FromSeconds(5))
+                .AssertValueCount(0)
+                .AssertError(typeof(Exception));
+        }
+
         [Test]
         public void Simple()
         {

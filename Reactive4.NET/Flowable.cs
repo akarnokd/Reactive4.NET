@@ -685,7 +685,22 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Merge<T>(this IPublisher<IPublisher<T>> sources, int maxConcurrency, int bufferSize)
         {
-            return new FlowableFlatMapPublisher<IPublisher<T>, T>(sources, Identity<IPublisher<T>>.Instance, maxConcurrency, bufferSize);
+            return Merge(sources, maxConcurrency, bufferSize, true);
+        }
+        
+        /// <summary>
+        /// Merges an IPublisher sequence of IPublishers up to a maximum at a time
+        /// and using the specified bufferSize to prefetch items from the inner IPublishers.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="sources">The IPublisher of inner IPublisher instances.</param>
+        /// <param name="maxConcurrency">The maximum number of inner IPublishers to merge at once.</param>
+        /// <param name="bufferSize">The number of items to prefetch from the inner IPublishers.</param>
+        /// <param name="delayError">Whether error publication should be delayed until all sources have terminated.</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<T> Merge<T>(this IPublisher<IPublisher<T>> sources, int maxConcurrency, int bufferSize, bool delayError)
+        {
+            return new FlowableFlatMapPublisher<IPublisher<T>, T>(sources, Identity<IPublisher<T>>.Instance, maxConcurrency, bufferSize, delayError);
         }
 
         /// <summary>
@@ -1386,7 +1401,27 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> FlatMap<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper, int maxConcurrency, int bufferSize)
         {
-            return new FlowableFlatMap<T, R>(source, mapper, maxConcurrency, bufferSize);
+            return FlatMap<T, R>(source, mapper, maxConcurrency, bufferSize, true);
+        }
+
+        /// <summary>
+        /// Maps each upstream value into an IPublisher and merges them
+        /// together in a potentially interleaved fashion, running
+        /// up to the specified number of IPublisher's at a time
+        /// and prefetches the given number of items from each IPublishers.
+        /// </summary>
+        /// <typeparam name="T">The upstream value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="mapper">The function that takes each upstream item
+        /// and turns them into an IPublisher source to be merged.</param>
+        /// <param name="maxConcurrency">The maximum number of IPublishers to run at a time.</param>
+        /// <param name="bufferSize">The number of items to prefetch and buffer from each inner IPublisher.</param>
+        /// <param name="delayError">Whether error publication should be delayed until all sources have terminated.</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<R> FlatMap<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper, int maxConcurrency, int bufferSize, bool delayError)
+        {
+            return new FlowableFlatMap<T, R>(source, mapper, maxConcurrency, bufferSize, delayError);
         }
 
         /// <summary>
