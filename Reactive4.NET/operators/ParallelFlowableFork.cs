@@ -172,7 +172,6 @@ namespace Reactive4.NET.operators
                 for (;;)
                 {
 
-                    bool quit = false;
                     int notReady = 0;
                     for (;;)
                     {
@@ -197,15 +196,19 @@ namespace Reactive4.NET.operators
                                     var ex = error;
                                     if (ex == null)
                                     {
-                                        a.OnComplete();
+                                        foreach (var sub in subs)
+                                        {
+                                            sub.actual.OnComplete();
+                                        }
                                     }
                                     else
                                     {
-                                        a.OnError(ex);
+                                        foreach (var sub in subs)
+                                        {
+                                            sub.actual.OnError(ex);
+                                        }
                                     }
-                                    notReady++;
-                                    subs[idx].cancelled = 1;
-                                    quit = true;
+                                    return;
                                 }
                                 else
                                 {
@@ -220,15 +223,19 @@ namespace Reactive4.NET.operators
                                     var ex = error;
                                     if (ex == null)
                                     {
-                                        a.OnComplete();
+                                        foreach (var sub in subs)
+                                        {
+                                            sub.actual.OnComplete();
+                                        }
                                     }
                                     else
                                     {
-                                        a.OnError(ex);
+                                        foreach (var sub in subs)
+                                        {
+                                            sub.actual.OnError(ex);
+                                        }
                                     }
-                                    notReady++;
-                                    subs[idx].cancelled = 1;
-                                    quit = true;
+                                    return;
                                 }
                                 else
                                 {
@@ -246,11 +253,6 @@ namespace Reactive4.NET.operators
                         {
                             idx = 0;
                         }
-                    }
-
-                    if (quit)
-                    {
-                        return;
                     }
 
                     int w = Volatile.Read(ref wip);
@@ -283,7 +285,6 @@ namespace Reactive4.NET.operators
                 for (;;)
                 {
 
-                    bool quit = false;
                     int notReady = 0;
                     for (;;)
                     {
@@ -308,15 +309,20 @@ namespace Reactive4.NET.operators
                                     var ex = error;
                                     if (ex == null)
                                     {
-                                        a.OnComplete();
+
+                                        foreach (var sub in subs)
+                                        {
+                                            sub.actual.OnComplete();
+                                        }
                                     }
                                     else
                                     {
-                                        a.OnError(ex);
+                                        foreach (var sub in subs)
+                                        {
+                                            sub.actual.OnError(ex);
+                                        }
                                     }
-                                    notReady++;
-                                    subs[idx].cancelled = 1;
-                                    quit = true;
+                                    return;
                                 } else
                                 if (empty)
                                 {
@@ -344,15 +350,19 @@ namespace Reactive4.NET.operators
                                     var ex = error;
                                     if (ex == null)
                                     {
-                                        a.OnComplete();
+                                        foreach (var sub in subs)
+                                        {
+                                            sub.actual.OnComplete();
+                                        }
                                     }
                                     else
                                     {
-                                        a.OnError(ex);
+                                        foreach (var sub in subs)
+                                        {
+                                            sub.actual.OnError(ex);
+                                        }
                                     }
-                                    notReady++;
-                                    subs[idx].cancelled = 1;
-                                    quit = true;
+                                    return;
                                 }
                                 else
                                 {
@@ -370,11 +380,6 @@ namespace Reactive4.NET.operators
                         {
                             break;
                         }
-                    }
-
-                    if (quit)
-                    {
-                        return;
                     }
 
                     int w = Volatile.Read(ref wip);

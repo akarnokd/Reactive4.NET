@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Reactive4.NET.Test
 {
@@ -133,6 +134,36 @@ namespace Reactive4.NET.Test
                         .AssertNoError()
                         .AssertComplete();
                 }
+            }
+        }
+
+        [Test]
+        [Repeat(1000)]
+        public void AsyncHidden2()
+        {
+            var j = 2294;
+            var i = Environment.ProcessorCount;
+            var completions = 0;
+
+            try
+            {
+                Flowable.Range(1, j)
+                    .Hide()
+                    .Parallel(i)
+                    .DoOnComplete(() => Interlocked.Increment(ref completions))
+                    .RunOn(Executors.Computation)
+                    .Sequential()
+                    .Test()
+                    .WithTag("len=" + j + ", i=" + i)
+                    .AwaitDone(TimeSpan.FromSeconds(5))
+                    .AssertValueCount(j)
+                    .AssertValueSet(new HashSet<int>(Enumerable.Range(1, j)))
+                    .AssertNoError()
+                    .AssertComplete();
+            }
+            finally
+            {
+                Assert.AreEqual(i, Volatile.Read(ref completions));
             }
         }
 
