@@ -1,7 +1,6 @@
 language: csharp
 dotnet: 2.1.400
 mono: latest
-# running in container causes test failures and 2x-3x longer build, use standalone instances
 sudo: required
 solution: Reactive4.NET.sln
 install:
