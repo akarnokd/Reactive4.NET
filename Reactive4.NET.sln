@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26403.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29509.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reactive4.NET", "Reactive4.NET\Reactive4.NET.csproj", "{0979DB2E-0955-44B9-8B2B-8128A65D00A3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reactive4.NET.Test", "Reactive4.NET.Test\Reactive4.NET.Test.csproj", "{95B0864D-8BA5-478C-B03B-437612884A43}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reactive4.NET.Standard", "Reactive4.NET.Standard\Reactive4.NET.Standard.csproj", "{90D6F5D6-EC6A-4EC5-83FA-34A4C1AAB9AC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reactive4.NET.Standard", "Reactive4.NET.Standard\Reactive4.NET.Standard.csproj", "{90D6F5D6-EC6A-4EC5-83FA-34A4C1AAB9AC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,5 +30,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F9B65939-23D1-41FF-AE83-1351CB4F603D}
 	EndGlobalSection
 EndGlobal

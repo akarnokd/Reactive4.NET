@@ -93,7 +93,7 @@ namespace Reactive4.NET.operators
             {
                 Volatile.Write(ref cancelled, true);
                 CancelAll();
-                if (Interlocked.Increment(ref wip) == 1)
+                if (!outputFused && Interlocked.Increment(ref wip) == 1)
                 {
                     Clear();
                 }

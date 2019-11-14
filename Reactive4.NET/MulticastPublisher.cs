@@ -306,7 +306,7 @@ namespace Reactive4.NET
                 {
                     parent.Remove(this);
                     worker.Dispose();
-                    if (Interlocked.Increment(ref wip) == 1)
+                    if (!outputFused && Interlocked.Increment(ref wip) == 1)
                     {
                         queue.Clear();
                     }

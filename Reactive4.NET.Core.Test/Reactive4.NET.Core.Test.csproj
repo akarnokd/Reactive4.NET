@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="nunit" Version="3.12.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.13.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
+    <PackageReference Include="Reactive.Streams.TCK" Version="1.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Reactive4.NET.Test\*Test.cs" />
+    <Compile Include="..\Reactive4.NET.Test\*Tck.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Reactive4.NET.Standard\Reactive4.NET.Standard.csproj" />
+  </ItemGroup>
+  </Project>

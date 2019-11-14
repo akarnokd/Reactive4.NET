@@ -93,7 +93,7 @@ namespace Reactive4.NET.operators
                 if (Interlocked.Decrement(ref active) == 0)
                 {
                     upstream.Cancel();
-                    if (Interlocked.Increment(ref wip) == 1)
+                    if (!outputFused && Interlocked.Increment(ref wip) == 1)
                     {
                         queue.Clear();
                     }

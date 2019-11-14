@@ -71,7 +71,7 @@ namespace Reactive4.NET.operators
                     Volatile.Write(ref cancelled, true);
                     upstream.Cancel();
                     worker.Dispose();
-                    if (Interlocked.Increment(ref wip) == 1)
+                    if (!outputMode && Interlocked.Increment(ref wip) == 1)
                     {
                         queue.Clear();
                     }

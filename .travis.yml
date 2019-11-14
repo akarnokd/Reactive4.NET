@@ -1,0 +1,12 @@
+language: csharp
+dotnet: 2.1.400
+mono: latest
+# running in container causes test failures and 2x-3x longer build, use standalone instances
+sudo: required
+solution: Reactive4.NET.sln
+install:
+  - nuget restore Reactive4.NET.sln
+  - nuget install NUnit.Console -Version 3.9.0 -OutputDirectory testrunner
+script:
+  - msbuild /p:Configuration=Release Reactive4.NET.sln
+  - mono ./testrunner/NUnit.ConsoleRunner.3.0.9/tools/nunit3-console.exe ./Reactive4.NET.Test/bin/Release/Reactive4.NET.Test.dll 

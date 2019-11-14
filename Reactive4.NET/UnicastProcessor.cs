@@ -232,7 +232,7 @@ namespace Reactive4.NET
             Volatile.Write(ref actual, null);
             Terminate();
             SubscriptionHelper.Cancel(ref upstream);
-            if (Interlocked.Increment(ref wip) == 1)
+            if (!outputFused && Interlocked.Increment(ref wip) == 1)
             {
                 queue.Clear();
             }
