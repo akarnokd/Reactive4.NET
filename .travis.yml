@@ -7,5 +7,6 @@ install:
   - nuget restore Reactive4.NET.sln
   - nuget install NUnit.Console -Version 3.9.0 -OutputDirectory testrunner
 script:
-  - msbuild /p:Configuration=Release Reactive4.NET.sln
+  - msbuild /p:Configuration=Release ./Reactive4.NET/Reactive4.NET.csproj
+  - msbuild /p:Configuration=Release ./Reactive4.NET.Test/Reactive4.NET.Test.csproj
   - mono ./testrunner/NUnit.ConsoleRunner.3.0.9/tools/nunit3-console.exe ./Reactive4.NET.Test/bin/Release/Reactive4.NET.Test.dll 
