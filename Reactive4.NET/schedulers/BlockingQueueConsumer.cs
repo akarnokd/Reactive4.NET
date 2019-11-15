@@ -65,7 +65,14 @@ namespace Reactive4.NET.schedulers
             var n = name;
             if (n != null)
             {
-                Thread.CurrentThread.Name = n;
+                try 
+                { 
+                    Thread.CurrentThread.Name = n;
+                }
+                catch (InvalidOperationException)
+                {
+                    // ignored
+                }
             }
             var sh = ShutdownAction;
             var q = queue;
