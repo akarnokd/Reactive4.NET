@@ -121,5 +121,21 @@ namespace Reactive4.NET.Test
                 .AssertValueCount(0)
                 .AssertError(typeof(Exception));
         }
+
+        [Test]
+        public void GroupByParallelFused()
+        {
+            Flowable.Range(0, 10000)
+                .GroupBy(v => v % 2)
+                .FlatMap(g => g.Key == 0 ?
+                    g.Parallel().RunOn(Executors.Computation).Map(v => v).Sequential()
+                    : g.Map(v => v)
+                ).
+                Test()
+                .AwaitDone(TimeSpan.FromSeconds(10))
+                .AssertValueCount(10000)
+                .AssertComplete()
+                .AssertNoError();
+        }
     }
 }
