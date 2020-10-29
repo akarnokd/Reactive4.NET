@@ -1,5 +1,5 @@
 # Reactive4.NET
-Travis-CI: <a href='https://travis-ci.org/akarnokd/Reactive4.NET/builds'><img src='https://travis-ci.org/akarnokd/Reactive4.NET.svg?branch=master' alt="Reactive4.NET"></a>
+Travis-CI: <a href='https://travis-ci.com/akarnokd/Reactive4.NET/builds'><img src='https://travis-ci.com/akarnokd/Reactive4.NET.svg?branch=master' alt="Reactive4.NET"></a>
 NuGet: <a href='https://www.nuget.org/packages/Reactive4.NET'><img src='https://img.shields.io/nuget/v/Reactive4.NET.svg' alt="Reactive4.NET NuGet version"/></a>
 
 Modern, [Reactive-Streams](https://github.com/reactive-streams/reactive-streams-dotnet) compliant library for composing (a)synchronous sequences of data and events.
