@@ -23,7 +23,14 @@ namespace Reactive4.NET.utils
                 Exception b;
                 if (ex != null)
                 {
-                    b = new AggregateException(ex, next);
+                    if (ex is AggregateException aggregateException)
+                    {
+                        b = new AggregateException(aggregateException.InnerExceptions.Concat(new[] { next }));
+                    }
+                    else
+                    {
+                        b = new AggregateException(ex, next);
+                    }
                 }
                 else
                 {
