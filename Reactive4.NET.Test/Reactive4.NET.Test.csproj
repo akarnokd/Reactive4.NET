@@ -51,6 +51,7 @@
     <Compile Include="AsyncProcessor1Tck.cs" />
     <Compile Include="Benchmark.cs" />
     <Compile Include="ConnectableFlowableReplay1Tck.cs" />
+    <Compile Include="FlowableDistinctTest.cs" />
     <Compile Include="FlowableDoOnErrorTest.cs" />
     <Compile Include="FlowableFlatMapEnumerable3Tck.cs" />
     <Compile Include="FlowableParallelTest.cs" />
@@ -82,7 +83,7 @@
     <Compile Include="FlowableDistinctUntilChanged2Tck.cs" />
     <Compile Include="FlowableDistinctUntilChanged1Tck.cs" />
     <Compile Include="FlowableDistinct2Tck.cs" />
-    <Compile Include="FlowableDistinctTest.cs" />
+    <Compile Include="FlowableDoFinallyTest.cs" />
     <Compile Include="FlowableDoFinally2Tck.cs" />
     <Compile Include="FlowableDoFinally1Tck.cs" />
     <Compile Include="FlowableConcatMap1Tck.cs" />
@@ -276,11 +277,14 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk">
+      <Version>16.10.0</Version>
+    </PackageReference>
     <PackageReference Include="NUnit">
-      <Version>3.12.0</Version>
+      <Version>3.13.2</Version>
     </PackageReference>
     <PackageReference Include="NUnit3TestAdapter">
-      <Version>3.15.1</Version>
+      <Version>4.0.0</Version>
     </PackageReference>
     <PackageReference Include="Reactive.Streams.TCK">
       <Version>1.0.2</Version>

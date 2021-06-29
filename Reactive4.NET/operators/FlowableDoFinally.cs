@@ -90,6 +90,12 @@ namespace Reactive4.NET.operators
             {
                 actual.OnSubscribe(this);
             }
+
+            public override void Cancel()
+            {
+                base.Cancel();
+                Finally();
+            }
         }
 
         sealed class DoFinallyConditionalSubscriber : AbstractFuseableConditionalSubscriber<T, T>
@@ -156,6 +162,11 @@ namespace Reactive4.NET.operators
             protected override void OnStart(ISubscription subscription)
             {
                 actual.OnSubscribe(this);
+            }
+            public override void Cancel()
+            {
+                base.Cancel();
+                Finally();
             }
         }
     }

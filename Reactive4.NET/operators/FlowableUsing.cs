@@ -187,6 +187,29 @@ namespace Reactive4.NET.operators
                 actual.OnSubscribe(this);
             }
 
+            public override void Cancel()
+            {
+                if (eager)
+                {
+                    if (Interlocked.CompareExchange(ref once, 1, 0) == 0)
+                    {
+                        try
+                        {
+                            resourceCleanup?.Invoke(resource);
+                        }
+                        catch
+                        {
+                            // what to do?
+                        }
+                    }
+                }
+                base.Cancel();
+                if (!eager)
+                {
+                    DisposeAfter();
+                }
+            }
+
             void DisposeAfter()
             {
                 if (Interlocked.CompareExchange(ref once, 1, 0) == 0)
@@ -302,6 +325,28 @@ namespace Reactive4.NET.operators
             protected override void OnStart(ISubscription subscription)
             {
                 actual.OnSubscribe(this);
+            }
+            public override void Cancel()
+            {
+                if (eager)
+                {
+                    if (Interlocked.CompareExchange(ref once, 1, 0) == 0)
+                    {
+                        try
+                        {
+                            resourceCleanup?.Invoke(resource);
+                        }
+                        catch
+                        {
+                            // what to do?
+                        }
+                    }
+                }
+                base.Cancel();
+                if (!eager)
+                {
+                    DisposeAfter();
+                }
             }
 
             void DisposeAfter()
