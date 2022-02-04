@@ -7,7 +7,7 @@ using Reactive.Streams;
 using NUnit.Framework;
 using System.Threading;
 
-namespace Reactive4.NET.Test
+namespace Reactive4.NET.Test.Direct
 {
     [TestFixture]
     class DirectProcessorTest
@@ -32,6 +32,28 @@ namespace Reactive4.NET.Test
             dp.OnComplete();
 
             ts.AssertResult(1, 2, 3, 4);
+        }
+
+        [Test]
+        public void Error()
+        {
+            var dp = new DirectProcessor<int>();
+            Assert.IsFalse(dp.HasSubscribers);
+
+            var ts = dp.Test();
+
+            Assert.IsTrue(dp.HasSubscribers);
+
+            dp.OnNext(1);
+            dp.OnNext(2);
+            dp.OnNext(3);
+            dp.OnNext(4);
+
+            ts.AssertValues(1, 2, 3, 4);
+
+            dp.OnError(new ArgumentException("error"));
+
+            ts.AssertFailureAndMessage(typeof(ArgumentException), "error", 1, 2, 3, 4);
         }
     }
 }

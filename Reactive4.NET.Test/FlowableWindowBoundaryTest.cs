@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Reactive4.NET.Test
+namespace Reactive4.NET.Test.Direct
 {
     [TestFixture]
     public class FlowableWindowBoundaryTest

@@ -499,7 +499,8 @@ namespace Reactive4.NET
         }
 
         /// <summary>
-        /// Concatenates elements of IPublishers one after the other.
+        /// Concatenates elements of IPublishers one after the other,
+        /// delaying errors until all sources terminate.
         /// </summary>
         /// <typeparam name="T">The value type.</typeparam>
         /// <param name="sources">The IPublisher of IPublisher sources.</param>
@@ -510,7 +511,22 @@ namespace Reactive4.NET
         }
 
         /// <summary>
-        /// Concatenates elements of IPublishers one after the other.
+        /// Concatenates elements of IPublishers one after the other,
+        /// optionally delaying errors.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="sources">The IPublisher of IPublisher sources.</param>
+        /// <param name="errorMode">Specifies the error handling mode: immediate completion, 
+        /// delay until the current inner terminates or delay until all sources terminate</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<T> Concat<T>(this IPublisher<IPublisher<T>> sources, ErrorMode errorMode)
+        {
+            return Concat(sources, BufferSize(), errorMode);
+        }
+
+        /// <summary>
+        /// Concatenates elements of IPublishers one after the other,
+        /// delaying errors until all sources terminate.
         /// </summary>
         /// <typeparam name="T">The value type.</typeparam>
         /// <param name="sources">The IPublisher of IPublisher sources.</param>
@@ -518,7 +534,21 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<T> Concat<T>(this IPublisher<IPublisher<T>> sources, int prefetch)
         {
-            return new FlowableConcatMapPublisher<IPublisher<T>, T>(sources, Identity<IPublisher<T>>.Instance, prefetch);
+            return new FlowableConcatMapPublisher<IPublisher<T>, T>(sources, Identity<IPublisher<T>>.Instance, prefetch, ErrorMode.End);
+        }
+        /// <summary>
+        /// Concatenates elements of IPublishers one after the other,
+        /// optionally delaying errors.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="sources">The IPublisher of IPublisher sources.</param>
+        /// <param name="prefetch">Number of inner IPublishers to prefetch from the outer IPublisher.</param>
+        /// <param name="errorMode">Specifies the error handling mode: immediate completion, 
+        /// delay until the current inner terminates or delay until all sources terminate</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<T> Concat<T>(this IPublisher<IPublisher<T>> sources, int prefetch, ErrorMode errorMode)
+        {
+            return new FlowableConcatMapPublisher<IPublisher<T>, T>(sources, Identity<IPublisher<T>>.Instance, prefetch, ErrorMode.End);
         }
 
         /// <summary>
@@ -1556,7 +1586,8 @@ namespace Reactive4.NET
 
         /// <summary>
         /// Transforms items of the source into IPublishers and concatenates their items,
-        /// in order and non-overlapping manner into a single sequence.
+        /// in order and non-overlapping manner into a single sequence,
+        /// delaying and aggregating all errors until all sources terminate.
         /// </summary>
         /// <typeparam name="T">The upstream value type.</typeparam>
         /// <typeparam name="R">The result value type.</typeparam>
@@ -1568,10 +1599,28 @@ namespace Reactive4.NET
         {
             return ConcatMap(source, mapper, 2);
         }
+        /// <summary>
+        /// Transforms items of the source into IPublishers and concatenates their items,
+        /// in order and non-overlapping manner into a single sequence,
+        /// optionally delaying errors.
+        /// </summary>
+        /// <typeparam name="T">The upstream value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="mapper">The function that receives the upstream value and
+        /// returns an IPublisher instance for it.</param>
+        /// <param name="errorMode">Specifies the error handling mode: immediate completion, 
+        /// delay until the current inner terminates or delay until all sources terminate</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<R> ConcatMap<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper, ErrorMode errorMode)
+        {
+            return ConcatMap(source, mapper, 2, errorMode);
+        }
 
         /// <summary>
         /// Transforms items of the source into IPublishers and concatenates their items,
-        /// in order and non-overlapping manner into a single sequence.
+        /// in order and non-overlapping manner into a single sequence,
+        /// delaying and aggregating all errors until all sources terminate.
         /// </summary>
         /// <typeparam name="T">The upstream value type.</typeparam>
         /// <typeparam name="R">The result value type.</typeparam>
@@ -1582,7 +1631,26 @@ namespace Reactive4.NET
         /// <returns>The new IFlowable instance.</returns>
         public static IFlowable<R> ConcatMap<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper, int prefetch)
         {
-            return new FlowableConcatMap<T, R>(source, mapper, prefetch);
+            return new FlowableConcatMap<T, R>(source, mapper, prefetch, ErrorMode.End);
+        }
+
+        /// <summary>
+        /// Transforms items of the source into IPublishers and concatenates their items,
+        /// in order and non-overlapping manner into a single sequence,
+        /// optionally delaying errors.
+        /// </summary>
+        /// <typeparam name="T">The upstream value type.</typeparam>
+        /// <typeparam name="R">The result value type.</typeparam>
+        /// <param name="source">The source IFlowable instance.</param>
+        /// <param name="mapper">The function that receives the upstream value and
+        /// returns an IPublisher instance for it.</param>
+        /// <param name="prefetch">The number of items to prefetch from the upstream.</param>
+        /// <param name="errorMode">Specifies the error handling mode: immediate completion, 
+        /// delay until the current inner terminates or delay until all sources terminate</param>
+        /// <returns>The new IFlowable instance.</returns>
+        public static IFlowable<R> ConcatMap<T, R>(this IFlowable<T> source, Func<T, IPublisher<R>> mapper, int prefetch, ErrorMode errorMode)
+        {
+            return new FlowableConcatMap<T, R>(source, mapper, prefetch, errorMode);
         }
 
         /// <summary>

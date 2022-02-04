@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Reactive.Streams;
 
-namespace Reactive4.NET.Test
+namespace Reactive4.NET.Test.Direct
 {
     public sealed class Benchmark
     {

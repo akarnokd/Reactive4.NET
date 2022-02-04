@@ -3,7 +3,7 @@ using System;
 using System.Linq;
 using System.Threading;
 
-namespace Reactive4.NET.Test
+namespace Reactive4.NET.Test.Direct
 {
     [TestFixture]
     public class FlowableTimeoutTest

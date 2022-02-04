@@ -29,7 +29,7 @@ namespace Reactive4.NET.operators
                 for (int i = 0; i < n; i++)
                 {
                     var s = subscribers[i];
-                    parents[i] = new FlowableConcatMap<T, R>.ConcatMapSubscriber(s, mapper, bufferSize);
+                    parents[i] = new FlowableConcatMap<T, R>.ConcatMapSubscriber(s, mapper, bufferSize, true);
                 }
 
                 source.Subscribe(parents);

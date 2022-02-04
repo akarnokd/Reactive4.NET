@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace Reactive4.NET.Test
+namespace Reactive4.NET.Test.Direct
 {
     [TestFixture]
     public class FlowableDoOnErrorTest

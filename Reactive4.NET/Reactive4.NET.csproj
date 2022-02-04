@@ -45,6 +45,7 @@
     <Compile Include="BackpressureStrategy.cs" />
     <Compile Include="BufferStrategy.cs" />
     <Compile Include="AsyncProcessor.cs" />
+    <Compile Include="ErrorMode.cs" />
     <Compile Include="operators\AbstractParallelFlowable.cs" />
     <Compile Include="operators\ConnectableFlowableMulticast.cs" />
     <Compile Include="operators\FlowableBufferBoundary.cs" />

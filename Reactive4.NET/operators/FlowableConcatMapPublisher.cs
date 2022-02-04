@@ -17,16 +17,26 @@ namespace Reactive4.NET.operators
 
         readonly int prefetch;
 
-        public FlowableConcatMapPublisher(IPublisher<T> source, Func<T, IPublisher<R>> mapper, int prefetch)
+        readonly ErrorMode errorMode;
+
+        public FlowableConcatMapPublisher(IPublisher<T> source, Func<T, IPublisher<R>> mapper, int prefetch, ErrorMode errorMode)
         {
             this.source = source;
             this.mapper = mapper;
             this.prefetch = prefetch;
+            this.errorMode = errorMode;
         }
 
         public override void Subscribe(IFlowableSubscriber<R> subscriber)
         {
-            source.Subscribe(new FlowableConcatMap<T, R>.ConcatMapSubscriber(subscriber, mapper, prefetch));
+            if (errorMode == ErrorMode.Immediate)
+            {
+                source.Subscribe(new FlowableConcatMap<T, R>.ConcatMapSubscriberEagerError(subscriber, mapper, prefetch));
+            }
+            else
+            {
+                source.Subscribe(new FlowableConcatMap<T, R>.ConcatMapSubscriber(subscriber, mapper, prefetch, errorMode == ErrorMode.End));
+            }
         }
     }
 }

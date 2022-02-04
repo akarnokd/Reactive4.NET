@@ -115,7 +115,7 @@ namespace Reactive4.NET
                 error = cause;
                 foreach (var inner in Interlocked.Exchange(ref subscribers, Terminated))
                 {
-                    inner.OnComplete();
+                    inner.OnError(cause);
                 }
             }
         }

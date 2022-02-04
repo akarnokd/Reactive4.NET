@@ -7,7 +7,7 @@ using Reactive.Streams;
 using NUnit.Framework;
 using System.Threading;
 
-namespace Reactive4.NET.Test
+namespace Reactive4.NET.Test.Direct
 {
     [TestFixture]
     class UnicastProcessorTest
