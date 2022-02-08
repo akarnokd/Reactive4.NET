@@ -108,5 +108,18 @@ namespace Reactive4.NET.Test.Direct
 
             Assert.AreEqual(50, v.Count);
         }
+
+        [Test]
+        public void MergeNoDelayError()
+        {
+            var delayError = false;
+            var ok = Flowable.Timer(TimeSpan.FromMilliseconds(1000));
+            var errRx = Flowable.Interval(TimeSpan.FromMilliseconds(100)).Take(2)
+                .ConcatWith(Flowable.Error<long>(new Exception("wtf")));
+            Flowable.FromArray(ok, errRx).Merge(42, 42, delayError)
+                .Test()
+                .AwaitDone(TimeSpan.FromSeconds(5))
+                .AssertFailureAndMessage(typeof(Exception), "wtf", 0L, 1L);
+        }
     }
 }

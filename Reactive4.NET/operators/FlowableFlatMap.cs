@@ -242,6 +242,7 @@ namespace Reactive4.NET.operators
                 IFlowableSubscriber<R> a = actual;
                 int missed = 1;
                 long e = emitted;
+                bool delayError = this.delayError;
 
                 for (;;)
                 {
@@ -251,6 +252,12 @@ namespace Reactive4.NET.operators
                     }
                     bool again = false;
                     bool d = Volatile.Read(ref done);
+                    if (d && !delayError && Volatile.Read(ref error) != null)
+                    {
+                        Volatile.Write(ref cancelled, 1);
+                        a.OnError(ExceptionHelper.Terminate(ref error));
+                        return;
+                    }
                     FlatMapInnerSubscriber[] s = Volatile.Read(ref subscribers);
                     int n = s.Length;
 
@@ -279,6 +286,12 @@ namespace Reactive4.NET.operators
                             {
                                 return;
                             }
+                            if (Volatile.Read(ref done) && !delayError && Volatile.Read(ref error) != null)
+                            {
+                                Volatile.Write(ref cancelled, 1);
+                                a.OnError(ExceptionHelper.Terminate(ref error));
+                                return;
+                            }
                             if (r == e)
                             {
                                 break;
@@ -303,6 +316,12 @@ namespace Reactive4.NET.operators
                                 {
                                     if (Volatile.Read(ref cancelled) != 0)
                                     {
+                                        return;
+                                    }
+                                    if (Volatile.Read(ref done) && !delayError && Volatile.Read(ref error) != null)
+                                    {
+                                        Volatile.Write(ref cancelled, 1);
+                                        a.OnError(ExceptionHelper.Terminate(ref error));
                                         return;
                                     }
                                     innerDone = Volatile.Read(ref inner.done);
@@ -333,6 +352,12 @@ namespace Reactive4.NET.operators
                                     {
                                         return;
                                     }
+                                    if (Volatile.Read(ref done) && !delayError && Volatile.Read(ref error) != null)
+                                    {
+                                        Volatile.Write(ref cancelled, 1);
+                                        a.OnError(ExceptionHelper.Terminate(ref error));
+                                        return;
+                                    }
                                     innerDone = Volatile.Read(ref inner.done);
                                     innerEmpty = q.IsEmpty();
                                     if (innerDone && innerEmpty)
@@ -352,6 +377,12 @@ namespace Reactive4.NET.operators
                         s = Volatile.Read(ref subscribers);
                         n = s.Length;
 
+                        if (d && !delayError && Volatile.Read(ref error) != null)
+                        {
+                            Volatile.Write(ref cancelled, 1);
+                            a.OnError(ExceptionHelper.Terminate(ref error));
+                            return;
+                        }
                         if (d && n == 0)
                         {
                             Exception ex = ExceptionHelper.Terminate(ref error);
