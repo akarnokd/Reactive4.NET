@@ -497,7 +497,7 @@ namespace Reactive4.NET.operators
                         }
 
                         bool d = Volatile.Read(ref done);
-                        bool empty = q.Poll(out T v);
+                        bool empty = !q.Poll(out T v);
 
                         if (d && empty)
                         {

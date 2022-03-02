@@ -264,6 +264,7 @@
     <Compile Include="SharedExecutorServiceTest.cs" />
     <Compile Include="BlockingExecutorServiceTest.cs" />
     <Compile Include="ParallelFlowableToSortedListTest.cs" />
+    <Compile Include="FlowableFromObservableTest.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Benchmarks.cs" />
   </ItemGroup>
