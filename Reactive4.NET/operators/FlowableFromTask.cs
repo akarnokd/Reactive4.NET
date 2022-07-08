@@ -41,6 +41,11 @@ namespace Reactive4.NET.operators
                     Error(task.Exception);
                 }
                 else
+                if (task.IsCanceled)
+                {
+                    Error(new OperationCanceledException());
+                }
+                else
                 if (task.IsCompleted)
                 {
                     Complete(task.Result);

@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FlowableFromTaskTest.cs" />
     <Compile Include="tck\AsyncProcessor4Tck_Ignored.cs" />
     <Compile Include="tck\AsyncProcessor3Tck_Ignored.cs" />
     <Compile Include="tck\AsyncProcessor2Tck.cs" />
