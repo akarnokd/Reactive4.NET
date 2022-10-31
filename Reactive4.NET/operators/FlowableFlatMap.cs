@@ -458,15 +458,11 @@ namespace Reactive4.NET.operators
                 ExceptionHelper.AddException(ref error, ex);
                 if (!delayError)
                 {
-                    if (!Volatile.Read(ref done))
-                    {
-                        Volatile.Write(ref done, true);
-
-                        upstream.Cancel();
-                        CancelAll();
-                    }
+                    upstream.Cancel();
+                    CancelAll();
+                    Volatile.Write(ref done, true);
                 }
-                
+
                 Volatile.Write(ref inner.done, true);
                 Drain();
             }

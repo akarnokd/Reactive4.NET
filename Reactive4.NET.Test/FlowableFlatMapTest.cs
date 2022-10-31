@@ -121,5 +121,91 @@ namespace Reactive4.NET.Test.Direct
                 .AwaitDone(TimeSpan.FromSeconds(5))
                 .AssertFailureAndMessage(typeof(Exception), "wtf", 0L, 1L);
         }
+
+        [Test]
+        public void NoDelayError1()
+        {
+            DirectProcessor<int> pp1 = new DirectProcessor<int>();
+            DirectProcessor<int> pp2 = new DirectProcessor<int>();
+            DirectProcessor<int> pp3 = new DirectProcessor<int>();
+
+            var ts = pp1.FlatMap(v =>
+            {
+                if (v == 1)
+                {
+                    return pp2;
+                }
+                return pp3;
+            }, int.MaxValue, 1024, false)
+            .Test();
+
+            pp1.OnNext(1);
+
+            pp2.OnError(new InvalidOperationException());
+
+            Assert.IsFalse(pp1.HasSubscribers);
+
+            ts.AssertFailure(typeof(InvalidOperationException));
+        }
+
+        [Test]
+        public void NoDelayError2()
+        {
+            DirectProcessor<int> pp1 = new DirectProcessor<int>();
+            DirectProcessor<int> pp2 = new DirectProcessor<int>();
+            DirectProcessor<int> pp3 = new DirectProcessor<int>();
+
+            var ts = pp1.FlatMap(v =>
+            {
+                if (v == 1)
+                {
+                    return pp2;
+                }
+                return pp3;
+            }, int.MaxValue, 1024, false)
+            .Test();
+
+            pp1.OnNext(1);
+            pp1.OnNext(2);
+
+            Assert.IsTrue(pp2.HasSubscribers);
+
+            pp2.OnError(new InvalidOperationException());
+
+            Assert.IsFalse(pp1.HasSubscribers);
+            Assert.IsFalse(pp3.HasSubscribers);
+
+            ts.AssertFailure(typeof(InvalidOperationException));
+        }
+
+        [Test]
+        public void NoDelayError3()
+        {
+            DirectProcessor<int> pp1 = new DirectProcessor<int>();
+            DirectProcessor<int> pp2 = new DirectProcessor<int>();
+            DirectProcessor<int> pp3 = new DirectProcessor<int>();
+
+            var ts = pp1.FlatMap(v =>
+            {
+                if (v == 1)
+                {
+                    return pp2;
+                }
+                return pp3;
+            }, int.MaxValue, 1024, false)
+            .Test();
+
+            pp1.OnNext(1);
+            pp1.OnNext(2);
+            pp1.OnComplete();
+
+            Assert.IsTrue(pp2.HasSubscribers);
+
+            pp2.OnError(new InvalidOperationException());
+
+            Assert.IsFalse(pp3.HasSubscribers);
+
+            ts.AssertFailure(typeof(InvalidOperationException));
+        }
     }
 }
